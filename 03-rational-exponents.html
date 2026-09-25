@@ -1,0 +1,2002 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roots as Exponents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
+<style>
+/* Math 1200 · exponent crash course · shared theme
+   Neutral professional palette: graphite accent, warm-neutral paper.
+   Correctness colour is SEMANTIC (--ok / --wrong) and deliberately separate
+   from the accent, so "right" never reads as "emphasised". */
+
+:root{
+  --paper:#F6F6F4; --surface:#FFFFFF; --surface-2:#EDEDEA;
+  --ink:#1B1C1B; --ink-2:#4F524F; --ink-3:#858885;
+  --rule:#E0E0DB; --rule-strong:#C6C7C1;
+  --accent:#33403F; --accent-2:#1F2827; --accent-wash:#E9EBEA;
+  --on-accent:#FFFFFF;
+  --ok:#3D6B55; --ok-wash:#E8EEEB;
+  --wrong:#96453A; --wrong-wash:#F4E9E7;
+  --chip:#EEEEEB;
+  --shadow:0 1px 2px rgba(27,28,27,.05), 0 8px 24px -14px rgba(27,28,27,.20);
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"Karla", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+    --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+    --rule:#2D302E; --rule-strong:#3F423F;
+    --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+    --on-accent:#141514;
+    --ok:#7CBB9C; --ok-wash:#1B2721;
+    --wrong:#DA9184; --wrong-wash:#2B1D1A;
+    --chip:#212422;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+  --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+  --rule:#2D302E; --rule-strong:#3F423F;
+  --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+  --on-accent:#141514;
+  --ok:#7CBB9C; --ok-wash:#1B2721;
+  --wrong:#DA9184; --wrong-wash:#2B1D1A;
+  --chip:#212422;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--paper);
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.topbar-in{
+  max-width:820px; margin:0 auto; padding:10px 24px;
+  display:flex; align-items:center; gap:16px; justify-content:space-between;
+}
+.brandmark{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.brandmark b{color:var(--ink-2); font-weight:500}
+.brandmark a{color:var(--ink-2); text-decoration:none}
+.brandmark a:hover{color:var(--ink); text-decoration:underline}
+.brandmark a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.meter{display:flex; align-items:center; gap:10px}
+.meter-track{width:120px; height:5px; border-radius:99px; background:var(--rule); overflow:hidden}
+.meter-fill{height:100%; width:0%; background:var(--accent); transition:width .35s ease}
+.meter-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+/* phones: the bar keeps one line; the title truncates and the track goes */
+@media (max-width:560px){
+  .topbar-in{padding:9px 16px; gap:10px}
+  .brandmark{overflow:hidden; text-overflow:ellipsis; min-width:0}
+  .meter-track{display:none}
+  main{padding:0 16px 80px}
+}
+
+/* ---------- page frame ---------- */
+main{max-width:820px; margin:0 auto; padding:0 24px 96px}
+section{padding:44px 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(34px,6vw,52px);
+  line-height:1.08; margin:0 0 16px; letter-spacing:-.015em; text-wrap:balance;
+}
+h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(25px,3.6vw,32px);
+  line-height:1.2; margin:0 0 14px; letter-spacing:-.01em; text-wrap:balance;
+}
+h3{font-family:var(--sans); font-weight:700; font-size:15px; margin:0 0 8px}
+p{margin:0 0 16px; max-width:62ch; color:var(--ink-2)}
+p.lead{font-size:19px; color:var(--ink)}
+strong{color:var(--ink); font-weight:700}
+ul.plain{margin:0 0 16px; padding-left:20px; max-width:62ch; color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+
+/* ---------- math ---------- */
+.m{font-family:var(--serif); font-size:1.18em; line-height:1.35; white-space:nowrap}
+.m i{font-style:italic}
+.m sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.m .op{padding:0 .18em; color:var(--ink-2)}
+/* An inline-grid takes its baseline from the numerator, so anything written
+   after a fraction lands level with the top half. Centring the box on the
+   parent's x-height puts the bar where a reader expects it. */
+.fr{display:inline-grid; vertical-align:middle; text-align:center; margin:0 .14em}
+.fr > span{padding:0 .4em}
+.fr > span + span{border-top:1.6px solid currentColor; padding-top:.1em; margin-top:.1em}
+.rad{border-top:1.5px solid currentColor; padding:.06em .18em 0 .1em; margin-left:-.06em}
+.idx{font-size:.58em; vertical-align:.75em; margin-right:-.32em; line-height:0}
+.big{font-size:1.5em}
+
+/* ---------- factor chips ---------- */
+.expand{
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  padding:20px; margin:0 0 20px; box-shadow:var(--shadow);
+}
+.expand-row{display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px}
+.chiprow{display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:34px}
+.chip{
+  font-family:var(--mono); font-size:14px;
+  min-width:30px; height:32px; padding:0 8px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--chip); border:1px solid var(--rule-strong); border-radius:6px;
+  color:var(--ink);
+}
+.chip.a{background:var(--accent-wash); border-color:var(--accent); color:var(--accent-2)}
+.chip.b{background:var(--ok-wash); border-color:var(--ok); color:var(--ok)}
+.chip.gone{opacity:.3; text-decoration:line-through; text-decoration-color:var(--wrong)}
+.dot{font-family:var(--mono); color:var(--ink-3); font-size:13px}
+.count{
+  font-family:var(--mono); font-size:12px; color:var(--ink-2);
+  background:var(--surface-2); border-radius:6px; padding:3px 9px;
+}
+.stack{display:flex; flex-direction:column; gap:10px}
+.overline{border-top:1.6px solid var(--rule-strong); padding-top:10px}
+
+/* ---------- controls ---------- */
+button{font-family:inherit; font-size:inherit; cursor:pointer}
+.btn{
+  font-family:var(--sans); font-weight:500; font-size:14px;
+  padding:8px 15px; border-radius:8px; border:1px solid var(--rule-strong);
+  background:var(--surface); color:var(--ink); transition:background .15s, border-color .15s;
+}
+.btn:hover{background:var(--surface-2); border-color:var(--accent)}
+.btn.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn:focus-visible, .opt:focus-visible, .rulebtn:focus-visible, .tab:focus-visible{
+  outline:2.5px solid var(--accent); outline-offset:2px;
+}
+.ctrls{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px}
+.ctrl-label{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-right:4px}
+
+/* ---------- rule statement ---------- */
+.rulebox{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px;
+  background:var(--accent-wash); border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0; padding:18px 22px; margin:0 0 20px;
+}
+.rulebox .tag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-2);
+}
+.rulebox .m{font-size:1.5em; color:var(--ink)}
+/* a condition on a rule, e.g. (a ≠ 0): lower case matters, so never a .tag */
+.rulebox .cond{font-family:var(--serif); font-size:16px; color:var(--ink-2)}
+.rulebox .cond i{font-style:italic}
+@media (max-width:560px){ .rulebox .m{white-space:normal} }
+
+/* ---------- side-by-side compare ---------- */
+.compare{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; background:var(--surface)}
+.compare > div{padding:18px 20px}
+.compare > div + div{border-left:1px solid var(--rule)}
+.compare .hd{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* only the stacked statements are blocks — an inline .m inside a caption stays inline */
+.compare > div > .m{display:block; margin-bottom:8px}
+.compare small{color:var(--ink-2); font-size:13.5px; line-height:1.45; display:block}
+@media (max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .compare > div + div{border-left:0; border-top:1px solid var(--rule)}
+}
+
+/* ---------- traps ---------- */
+.trap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; margin:0 0 14px}
+.trap-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:6px}
+.never{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--wrong); background:var(--wrong-wash); border-radius:5px; padding:3px 8px; white-space:nowrap;
+}
+.trap p{margin:8px 0 12px; font-size:15px}
+.subst{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:12px; padding-top:14px; border-top:1px dashed var(--rule-strong)}
+.subst .side{display:flex; flex-direction:column; gap:4px}
+.subst .side .lbl{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.verdict{font-family:var(--mono); font-size:13px; color:var(--wrong); align-self:center}
+
+/* ---------- multiple choice ---------- */
+.check{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; margin:22px 0 0; box-shadow:var(--shadow)}
+.check-q{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin-bottom:14px}
+.check-q .ask{font-weight:700; color:var(--ink); font-size:15px}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px}
+.opt{
+  font-family:var(--sans); text-align:left; padding:11px 14px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  transition:border-color .15s, background .15s;
+}
+/* Options are mostly math (nowrap is right) but some are prose — "no solution",
+   "it cannot be simplified" — which must wrap rather than clip. */
+.opt .m{white-space:normal; display:inline-block}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok); background:var(--ok-wash)}
+.opt.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.fb{margin-top:12px; font-size:14.5px; line-height:1.5; display:none}
+.fb.show{display:block}
+.fb.ok{color:var(--ok)}
+.fb.no{color:var(--wrong)}
+
+/* ---------- two-button drill (factor-or-term, splits-or-not) ---------- */
+.drill{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:22px 20px; box-shadow:var(--shadow)}
+.drill-top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+.drill-q{font-family:var(--serif); font-size:clamp(22px,3.4vw,30px); line-height:1.35; padding:6px 0 14px}
+.drill-q i{font-style:italic}
+.drill-q.m{white-space:normal}
+.drill-q sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.drill-btns{display:flex; flex-wrap:wrap; gap:8px}
+.drill-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:3em}
+.drill-fb.ok{color:var(--ok)}
+.drill-fb.no{color:var(--wrong)}
+.pips{display:flex; flex-wrap:wrap; gap:5px}
+.pip{width:9px; height:9px; border-radius:99px; background:var(--rule); border:1px solid var(--rule-strong)}
+.pip.ok{background:var(--ok); border-color:var(--ok)}
+.pip.no{background:var(--wrong); border-color:var(--wrong)}
+.pip.now{box-shadow:0 0 0 3px var(--accent-wash); border-color:var(--accent)}
+
+/* ---------- rule chooser ---------- */
+.solver{background:var(--surface); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+.solver-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--rule); background:var(--surface-2)}
+.solver-head .which{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.tabs{display:flex; flex-wrap:wrap; gap:6px}
+.tab{font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:6px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink-2)}
+.tab.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.work{padding:22px 20px; display:flex; flex-direction:column; gap:2px; overflow-x:auto}
+.line{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:7px 0}
+.line .eq{font-family:var(--serif); font-size:1.18em; color:var(--ink-3); width:14px; flex:none}
+.line.now .m{color:var(--ink)}
+.line.past .m{color:var(--ink-2)}
+.line .note{color:var(--ink-3); font-size:13px; line-height:1.45}
+.usedtag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); background:var(--accent-wash); border-radius:5px; padding:2px 8px}
+.line.done .m{color:var(--ok); font-weight:600}
+.picker{padding:16px 20px 20px; border-top:1px solid var(--rule)}
+.picker .prompt{font-size:14px; font-weight:700; color:var(--ink); margin-bottom:12px}
+.rulegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px}
+.rulebtn{
+  font-family:var(--sans); text-align:left; padding:10px 13px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; gap:3px; transition:border-color .15s, background .15s;
+}
+.rulebtn:hover:not(:disabled){border-color:var(--accent); background:var(--surface-2)}
+.rulebtn:disabled{opacity:.5; cursor:default}
+.rulebtn .nm{font-weight:700; font-size:14px}
+.rulebtn .frm{font-family:var(--serif); font-size:14.5px; color:var(--ink-3)}
+.rulebtn .frm i{font-style:italic}
+.rulebtn .frm sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.solver-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:1.5em}
+.solver-fb.no{color:var(--wrong)}
+.solver-fb.ok{color:var(--ok)}
+.finish{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:16px}
+
+/* ---------- scoreboard ---------- */
+.score{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  border:1px solid var(--rule); border-radius:10px; padding:18px 22px; background:var(--surface); margin-top:26px;
+}
+.score .n{font-family:var(--serif); font-size:36px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1}
+.score .say{font-size:14.5px; color:var(--ink-2); max-width:44ch}
+
+/* ---------- factor tree (lesson 3) ---------- */
+.treewrap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
+.treewrap svg{display:block; max-width:100%; height:auto}
+.tree-line{stroke:var(--rule-strong); stroke-width:1.5}
+.tree-node{font-family:var(--mono); font-size:14px; fill:var(--ink)}
+.tree-leaf-ring{fill:none; stroke:var(--rule-strong); stroke-width:1.5}
+.tree-leaf-ring.p1{stroke:var(--accent); stroke-width:2.2}
+.tree-leaf-ring.p2{stroke:var(--ok); stroke-width:2.2}
+.tree-legend{display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--rule)}
+.swatch{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--ink-2)}
+.swatch i{width:13px; height:13px; border-radius:99px; border:2.2px solid var(--rule-strong); display:inline-block}
+.swatch.p1 i{border-color:var(--accent)}
+.swatch.p2 i{border-color:var(--ok)}
+
+/* ---------- closing ---------- */
+.next{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-top:20px}
+.nextcard{border:1px solid var(--rule); border-radius:10px; padding:16px 18px; background:var(--surface)}
+.nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
+.nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
+.nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
+.colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
+
+/* ---------- number lines (inequalities crash course) ---------- */
+.nlbox{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.nlrow{display:grid; grid-template-columns:minmax(96px,auto) 1fr; gap:6px 14px; align-items:center}
+.nlrow + .nlrow{margin-top:8px}
+.nlrow .lbl{font-family:var(--serif); font-size:17px; text-align:right; color:var(--ink); white-space:nowrap}
+.nlrow .lbl i{font-style:italic}
+.nlrow.res{border-top:1px solid var(--rule-strong); padding-top:12px; margin-top:12px}
+.nlrow.res .lbl{font-weight:600}
+.nlrow.res .lbl.none{color:var(--wrong)}
+svg.nl{display:block; width:100%; height:auto; overflow:visible}
+svg.nl .ax{stroke:var(--ink-3); stroke-width:1.6; fill:none}
+svg.nl .head{fill:var(--ink-3); stroke:none}
+svg.nl .tk{stroke:var(--ink-2); stroke-width:1.8}
+svg.nl .tk.minor{stroke:var(--ink-3); stroke-width:1.2}
+svg.nl text{font-family:var(--mono); text-anchor:middle}
+svg.nl text.key{font-size:17px; font-weight:500; fill:var(--ink)}
+svg.nl text.minor{font-size:13px; fill:var(--ink-3)}
+svg.nl .seg{stroke:var(--accent); stroke-width:7; stroke-linecap:butt; fill:none}
+svg.nl .pt{stroke:var(--accent); stroke-width:2.6}
+svg.nl .pt.open{fill:var(--surface)}
+svg.nl .pt.closed{fill:var(--accent)}
+svg.nl .pt.ghost{fill:none; stroke:var(--ink-3); stroke-dasharray:3 3}
+svg.nl.dim .seg{stroke:var(--ink-3)}
+svg.nl.dim .pt{stroke:var(--ink-3)}
+svg.nl.dim .pt.closed{fill:var(--ink-3)}
+svg.nl.ok .seg{stroke:var(--ok)}
+svg.nl.ok .pt{stroke:var(--ok)}
+svg.nl.ok .pt.closed{fill:var(--ok)}
+svg.nl .arc{fill:none; stroke:var(--accent); stroke-width:1.8}
+svg.nl .arclbl{font-size:15px; fill:var(--accent-2); font-weight:500}
+svg.nl .pin line{stroke-width:2}
+svg.nl .pin text{font-size:14px; font-weight:500}
+svg.nl .pin.yes line{stroke:var(--ok)}   svg.nl .pin.yes polygon, svg.nl .pin.yes circle{fill:var(--ok)}   svg.nl .pin.yes text{fill:var(--ok)}
+svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no circle{fill:var(--wrong)} svg.nl .pin.no text{fill:var(--wrong)}
+.nlnote{font-size:14.5px; color:var(--ink-2); margin-top:14px; padding-top:12px; border-top:1px solid var(--rule); line-height:1.5}
+.nlgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:26px}
+.nlgrid > div + div{padding-top:20px; border-top:1px solid var(--rule)}
+@media (min-width:1000px){ .nlgrid > div + div{padding-top:0; border-top:none} }
+@media (max-width:520px){ .nlgrid{grid-template-columns:1fr} .nlrow{grid-template-columns:minmax(72px,auto) 1fr} }
+.nlgrid .hd{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* a math statement heading a box: never uppercased, since x and X differ */
+.boxhd{font-family:var(--serif); font-size:21px; color:var(--ink); padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid var(--rule)}
+.boxhd i{font-style:italic}
+.hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
+
+/* ---------- page map ---------- */
+.pagemap{list-style:none; counter-reset:pm; margin:22px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px}
+.pagemap li{counter-increment:pm}
+.pagemap a{display:block; position:relative; padding:10px 14px 10px 38px; border:1px solid var(--rule); border-radius:8px; background:var(--surface); color:var(--ink); text-decoration:none; font-size:15px; line-height:1.35}
+.pagemap a::before{content:counter(pm); position:absolute; left:14px; top:12px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{border-color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+
+/* ---------- key idea / watch out ---------- */
+.keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
+.keybox .tag, .warn .tag{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin-bottom:6px}
+.keybox p, .warn p{margin:0; color:var(--ink); max-width:none}
+.keybox p + p, .warn p + p{margin-top:8px}
+.keybox ul{margin:4px 0 0; padding-left:20px; color:var(--ink)}
+.keybox li{margin-bottom:4px}
+.warn{background:var(--wrong-wash); border-left:3px solid var(--wrong); border-radius:0 10px 10px 0; padding:14px 20px; margin:0 0 20px}
+.warn .tag{color:var(--wrong)}
+
+/* ---------- symbol table ---------- */
+.symtab{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; font-size:15.5px}
+.symtab th{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:500; text-align:left; padding:10px 14px; background:var(--surface-2); border-bottom:1px solid var(--rule)}
+.symtab td{padding:10px 14px; border-bottom:1px solid var(--rule); color:var(--ink); vertical-align:middle}
+.symtab tr:last-child td{border-bottom:0}
+.symtab td.m, .symtab td .m{font-size:1.15em}
+.dotic{display:inline-block; width:14px; height:14px; border-radius:99px; border:2.4px solid var(--ok); vertical-align:-2px; margin-right:6px}
+.dotic.closed{background:var(--ok)}
+@media (max-width:560px){ .symtab{font-size:14px} .symtab th, .symtab td{padding:8px 9px} }
+
+/* ---------- worked example, one step at a time ---------- */
+.walk{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; box-shadow:var(--shadow); margin:0 0 20px}
+.walk-q{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; padding-bottom:12px; border-bottom:1px solid var(--rule)}
+.walk-q .ask{font-weight:700; font-size:15px}
+.walk-q .m{font-size:1.4em}
+.walk-steps{list-style:none; margin:0; padding:6px 0 0}
+.walk-steps li{display:grid; grid-template-columns:minmax(150px,auto) 1fr; gap:4px 20px; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--rule)}
+.walk-steps li:last-child{border-bottom:0}
+.walk-steps li .m{font-size:1.3em}
+.walk-steps li.ans .m{color:var(--ok); font-weight:600}
+.walk-steps .why{font-size:14.5px; color:var(--ink-2); line-height:1.45}
+.walk-steps .why b{color:var(--wrong)}
+@media (max-width:560px){ .walk-steps li{grid-template-columns:1fr} }
+.walk-ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:12px}
+.walk-hint{font-size:13.5px; color:var(--ink-3)}
+.walk + .walk{margin-top:-4px}
+
+/* ---------- test-a-number ---------- */
+.tester{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.tester .tp-probs{margin-bottom:10px}
+.tester .tp-line{cursor:crosshair}
+.tp-slide{display:flex; align-items:center; gap:12px; margin:10px 0 4px}
+.tp-slide input{flex:1; accent-color:var(--accent); min-width:0; height:28px}
+.tp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; margin:8px 0 12px; font-size:15px}
+.tp-out.yes{background:var(--ok-wash)}
+.tp-out.no{background:var(--wrong-wash)}
+.tp-verdict{font-weight:700}
+.tp-out.yes .tp-verdict{color:var(--ok)}
+.tp-out.no .tp-verdict{color:var(--wrong)}
+
+/* ---------- explorers (and/or, flip, distance) ---------- */
+.xp{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.xp-row{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px}
+.xp-row .ctrl-label{min-width:74px}
+.stepper{display:inline-flex; align-items:center; border:1px solid var(--rule-strong); border-radius:8px; overflow:hidden}
+.stepper button{border:0; background:var(--surface-2); color:var(--ink); width:34px; height:34px; font-size:17px}
+.stepper button:hover{background:var(--accent-wash)}
+.stepper button:focus-visible{outline:2.5px solid var(--accent); outline-offset:-2px}
+.stepper span{min-width:44px; text-align:center; font-family:var(--serif); font-size:18px}
+.xp-stmt{font-family:var(--serif); font-size:clamp(20px,3vw,26px); padding:10px 0 4px; border-top:1px solid var(--rule); margin-top:6px}
+.xp-stmt i{font-style:italic}
+.xp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; background:var(--ok-wash); margin-top:12px; font-size:15px}
+.xp-out .m{font-size:1.3em}
+.xp-out .shape{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); font-weight:500}
+.xp-out.empty{background:var(--wrong-wash)} .xp-out.empty .shape{color:var(--wrong)}
+.xp-say{font-size:14.5px; color:var(--ink-2); margin-top:10px}
+
+/* ---------- build-the-graph drill ---------- */
+.gb .drill-q{padding-bottom:6px}
+.gb .xp-row{margin:6px 0}
+.btn.right{border-color:var(--ok); background:var(--ok-wash)}
+.btn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.btn:disabled{cursor:default}
+.drill-end{margin-top:10px; padding-top:10px; border-top:1px solid var(--rule); color:var(--ink-2)}
+
+/* ---------- numbered method (steps-list) ---------- */
+.steps-list{list-style:none; counter-reset:rc; margin:0 0 20px; padding:0}
+.steps-list > li{counter-increment:rc; position:relative; padding:12px 16px 12px 52px; border:1px solid var(--rule); border-radius:10px; background:var(--surface); margin-bottom:8px; color:var(--ink)}
+.steps-list > li::before{content:counter(rc); position:absolute; left:14px; top:11px; width:26px; height:26px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-family:var(--mono); font-size:13px; display:flex; align-items:center; justify-content:center}
+.steps-list > li small{display:block; color:var(--ink-2); font-size:14px; margin-top:2px}
+
+/* ---------- cheat sheet ---------- */
+.cheat{border:1.5px solid var(--accent); border-radius:12px; padding:20px 22px; background:var(--surface)}
+.cheat h3{font-family:var(--serif); font-size:21px; font-weight:600; margin:0 0 12px}
+.cheat ul{margin:0; padding-left:20px; color:var(--ink)}
+.cheat li{margin-bottom:6px}
+.cheat .symtab{margin:10px 0 14px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important; scroll-behavior:auto !important}
+}
+</style>
+<style>
+/* lesson 3 only */
+.routes{display:grid; grid-template-columns:1fr 1fr; gap:0; border:1px solid var(--rule); border-radius:10px; overflow:hidden; background:var(--surface); margin:0 0 20px}
+.routes > div{padding:20px}
+.routes > div + div{border-left:1px solid var(--rule)}
+.routes .hd{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:12px}
+.routes .step{display:block; margin-bottom:7px}
+@media (max-width:640px){
+  .routes{grid-template-columns:1fr}
+  .routes > div + div{border-left:0; border-top:1px solid var(--rule)}
+}
+/* pair picker */
+.pthead{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px}
+.ptask{display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; margin-bottom:4px}
+.ptsvg{display:flex; justify-content:center; padding:8px 0 2px; overflow-x:auto}
+.ptlive{display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; margin-top:12px; padding-top:14px; border-top:1.6px solid var(--rule-strong)}
+.ptfoot{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-top:14px}
+.ptfb{font-size:14px; line-height:1.5; flex:1 1 260px; min-height:2.2em}
+.ptfb.ok{color:var(--ok)}
+.ptfb.no{color:var(--wrong)}
+.leafgroup{cursor:pointer; outline:none}
+.leafgroup .ring{fill:none; stroke:var(--rule-strong); stroke-width:1.5; transition:stroke .15s, stroke-width .15s}
+.leafgroup:hover .ring, .leafgroup:focus-visible .ring{stroke:var(--accent); stroke-width:2.6}
+.leafgroup .ring.sel{stroke:var(--ink-2); stroke-width:2.6; stroke-dasharray:4 3}
+.leafgroup .ring.g0{stroke:var(--accent); stroke-width:2.8}
+.leafgroup .ring.g1{stroke:var(--ok); stroke-width:2.8}
+.leafgroup .ring.g2{stroke:var(--ink-2); stroke-width:2.8}
+.leafgroup.locked{cursor:default}
+.ptdone{font-family:var(--mono); font-size:12px; color:var(--ok); letter-spacing:.06em}
+.rulepair{display:inline-flex; align-items:center; gap:10px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Exponents, Lesson 3 of 3</b></div>
+    <div class="meter">
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-num" id="meterNum">0 / 13 correct</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<section id="top">
+  <div class="eyebrow">Exponents · Lesson 3 of 3</div>
+  <h1>A root is an exponent that is a fraction</h1>
+  <p class="lead"><span class="m"><i>a</i><sup>1/2</sup> = √<span class="rad"><i>a</i></span></span>. Every root can be written as a power with a fraction in the exponent. Then <strong>the rules from Lessons 1 and 2 do all the work</strong>.</p>
+  <p>This lesson also covers simplifying, adding and multiplying square roots. No calculator needed.</p>
+  <p style="font-size:14.5px">ALEKS topics: <em>Finding nth roots of perfect nth powers with signs</em> · <em>Converting between radical form and exponent form</em> · the five <em>Rational exponents</em> topics · <em>Simplifying the square root of a whole number less than 100</em> · <em>Square root addition or subtraction</em> · <em>Square root multiplication: Basic</em> (§R.3).</p>
+  <ol class="pagemap">
+    <li><a href="#s1">Where roots come from</a></li>
+    <li><a href="#s2">Roots of negative numbers</a></li>
+    <li><a href="#s3">The top and bottom of the fraction</a></li>
+    <li><a href="#s4">Simplifying square roots</a></li>
+    <li><a href="#s5">Multiplying and adding roots</a></li>
+    <li><a href="#s6">Negative and fractional together</a></li>
+    <li><a href="#s7">Common mistakes</a></li>
+    <li><a href="#s8">Practice one step at a time</a></li>
+    <li><a href="#s9">Check yourself</a></li>
+    <li><a href="#s10">Cheat sheet</a></li>
+  </ol>
+</section>
+
+<section id="s1">
+  <div class="eyebrow">1 · Where they come from</div>
+  <h2>What <span class="m"><i>a</i><sup>1/2</sup></span> has to mean</h2>
+  <p>If the product rule still works, then <span class="m"><i>a</i><sup>1/2</sup> <span class="op">·</span> <i>a</i><sup>1/2</sup> = <i>a</i><sup>1/2 + 1/2</sup> = <i>a</i><sup>1</sup> = <i>a</i></span>. So <span class="m"><i>a</i><sup>1/2</sup></span> is the number that multiplies by itself to give <span class="m"><i>a</i></span>: the square root.</p>
+
+  <div class="expand">
+    <div class="ctrls" style="margin-bottom:16px">
+      <span class="ctrl-label">Root</span>
+      <button class="btn on" data-n="2">1/2</button>
+      <button class="btn" data-n="3">1/3</button>
+      <button class="btn" data-n="4">1/4</button>
+      <button class="btn" data-n="5">1/5</button>
+    </div>
+    <div class="expand-row">
+      <div class="chiprow" id="rtChips"></div>
+      <span class="m op">=</span>
+      <span class="m big" id="rtSum"></span>
+      <span class="m op">=</span>
+      <span class="m big"><i>a</i></span>
+    </div>
+    <div class="expand-row overline" style="margin-top:14px">
+      <span class="count" id="rtSay"></span>
+      <span class="m op">so</span>
+      <span class="m big" id="rtEq"></span>
+    </div>
+  </div>
+
+  <div class="rulebox">
+    <span class="tag">Unit fraction</span>
+    <span class="m"><i>a</i><sup>1/n</sup> = <span class="idx">n</span>√<span class="rad"><i>a</i></span></span>
+    <span class="cond">(<i>a</i> &ge; 0 when <i>n</i> is even)</span>
+  </div>
+
+  <p>The bottom of the fraction tells you which root.</p>
+
+  <div class="check" data-q="c1">
+    <div class="check-q"><span class="ask">Evaluate</span><span class="m">25<sup>1/2</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+
+  <div class="check" data-q="c2">
+    <div class="check-q"><span class="ask">Evaluate</span><span class="m">27<sup>1/3</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="eyebrow">2 · Signs</div>
+  <h2>Roots of negative numbers</h2>
+
+  <div class="keybox">
+    <span class="tag">Key idea</span>
+    <ul>
+      <li><strong>Odd root</strong> of a negative number: negative. <span class="m"><span class="idx">3</span>√<span class="rad">&minus;8</span> = &minus;2</span>, because <span class="m">(&minus;2)<sup>3</sup> = &minus;8</span>.</li>
+      <li><strong>Even root</strong> of a negative number: not a real number. No real number squared gives <span class="m">&minus;16</span>.</li>
+      <li>A minus sign <strong>outside</strong> the root just waits: <span class="m">&minus;√<span class="rad">16</span> = &minus;4</span>.</li>
+    </ul>
+  </div>
+
+  <h3>Positive, negative, or not real?</h3>
+  <div id="rDrill"></div>
+</section>
+
+<section id="s3">
+  <div class="eyebrow">3 · Both numbers</div>
+  <h2>The bottom is the root, the top is the power</h2>
+  <p>With any fraction in the exponent, use the power-of-a-power rule from Lesson 1: <span class="m"><i>a</i><sup>m/n</sup> = (<i>a</i><sup>1/n</sup>)<sup>m</sup></span>.</p>
+
+  <div class="rulebox">
+    <span class="tag">Rational exponent</span>
+    <span class="m"><i>a</i><sup>m/n</sup> = (<span class="idx">n</span>√<span class="rad"><i>a</i></span>)<sup>m</sup> = <span class="idx">n</span>√<span class="rad"><i>a</i><sup>m</sup></span></span>
+    <span class="cond">(<i>a</i> &ge; 0)</span>
+  </div>
+
+  <p>Both orders give the same answer. <strong>Take the root first.</strong> The numbers stay small.</p>
+
+  <div class="routes">
+    <div>
+      <div class="hd">Root first: do this one</div>
+      <span class="m step">8<sup>2/3</sup> = (<span class="idx">3</span>√<span class="rad">8</span>)<sup>2</sup></span>
+      <span class="m step">= 2<sup>2</sup></span>
+      <span class="m step big">= 4</span>
+      <small style="color:var(--ink-2); font-size:13.5px; display:block; margin-top:8px">Small numbers, easy in your head.</small>
+    </div>
+    <div>
+      <div class="hd">Power first: more work</div>
+      <span class="m step">8<sup>2/3</sup> = <span class="idx">3</span>√<span class="rad">8<sup>2</sup></span></span>
+      <span class="m step">= <span class="idx">3</span>√<span class="rad">64</span></span>
+      <span class="m step big">= 4</span>
+      <small style="color:var(--ink-2); font-size:13.5px; display:block; margin-top:8px">Now you need the cube root of 64 instead of 8.</small>
+    </div>
+  </div>
+
+  <div class="check" data-q="c3">
+    <div class="check-q"><span class="ask">Evaluate</span><span class="m">8<sup>2/3</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="eyebrow">4 · Simplifying</div>
+  <h2>Pairs come out, everything else stays in</h2>
+  <p>When a square root isn't a whole number, pull out any perfect squares hiding inside. There are two ways.</p>
+
+  <div class="routes">
+    <div>
+      <div class="hd">The algebra way</div>
+      <span class="m step">√<span class="rad">48</span> = √<span class="rad">16 <span class="op">·</span> 3</span></span>
+      <span class="m step">= √<span class="rad">16</span> <span class="op">·</span> √<span class="rad">3</span></span>
+      <span class="m step big">= 4√<span class="rad">3</span></span>
+      <small style="color:var(--ink-2); font-size:13.5px; display:block; margin-top:8px">Fast, if you spot that 16 goes into 48.</small>
+    </div>
+    <div>
+      <div class="hd">The factor tree</div>
+      <p style="font-size:14px; margin:0">Break the number into primes. Circle the pairs. <strong>Each pair sends one copy out of the root.</strong> Everything else stays in. It always works, and you don't have to spot anything.</p>
+    </div>
+  </div>
+
+  <p>Try it. <strong>Click two identical factors to pair them.</strong> The last three are <strong>cube roots</strong>, where you need three of a kind.</p>
+
+  <div class="treewrap">
+    <div class="pthead">
+      <span class="count" id="ptWhich"></span>
+      <div class="tabs" id="ptTabs"></div>
+    </div>
+
+    <div class="ptask">
+      <span class="m big" id="ptAsk"></span>
+      <span class="count" id="ptRule"></span>
+    </div>
+
+    <div class="ptsvg" id="ptSvg"></div>
+
+    <div class="ptlive">
+      <span class="count">so far</span>
+      <span class="m big" id="ptLive"></span>
+      <span class="ptdone" id="ptDone"></span>
+    </div>
+
+    <div class="ptfoot">
+      <button class="btn" id="ptReset">Start over</button>
+      <button class="btn" id="ptShow">Show me</button>
+      <button class="btn on" id="ptNext" style="display:none">Next problem</button>
+      <span class="ptfb" id="ptFb"></span>
+    </div>
+  </div>
+
+  <div class="rulebox">
+    <span class="rulepair"><span class="tag">Square root</span><span class="m">a <strong>pair</strong> sends one copy out</span></span>
+    <span class="rulepair"><span class="tag">Cube root</span><span class="m">a <strong>triple</strong> sends one copy out</span></span>
+  </div>
+
+  <div class="check" data-q="c4">
+    <div class="check-q"><span class="ask">Simplify</span><span class="m">√<span class="rad">45</span></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="eyebrow">5 · Combining roots</div>
+  <h2>Multiplying and adding roots</h2>
+
+  <div class="keybox">
+    <span class="tag">Two rules</span>
+    <p><strong>Multiply:</strong> <span class="m">√<span class="rad"><i>a</i></span> <span class="op">·</span> √<span class="rad"><i>b</i></span> = √<span class="rad"><i>ab</i></span></span> (for <span class="m"><i>a</i>, <i>b</i> &ge; 0</span>). Then simplify.</p>
+    <p><strong>Add:</strong> only when the number inside the root matches, like <span class="m">3√<span class="rad">5</span> + 2√<span class="rad">5</span> = 5√<span class="rad">5</span></span>. But <span class="m">√<span class="rad">2</span> + √<span class="rad">3</span></span> doesn't simplify.</p>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Multiply</span><span class="m">√<span class="rad">6</span> <span class="op">·</span> √<span class="rad">3</span></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">√<span class="rad">18</span></span><span class="why">Multiply the numbers inside: <span class="m">6 &middot; 3 = 18</span>.</span></li>
+      <li><span class="m">√<span class="rad">9 <span class="op">·</span> 2</span></span><span class="why"><span class="m">18 = 9 &middot; 2</span>, and 9 is a perfect square (a pair of 3s).</span></li>
+      <li class="ans"><span class="m">3√<span class="rad">2</span></span><span class="why">The pair of 3s sends one 3 out.</span></li>
+    </ol>
+  </div>
+
+  <p>Adding usually needs simplifying first, so the roots match. Start with one root on its own:</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">First, simplify</span><span class="m">√<span class="rad">20</span></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">√<span class="rad">4 <span class="op">·</span> 5</span></span><span class="why"><span class="m">20 = 2 &middot; 2 &middot; 5</span>. There's a pair of 2s.</span></li>
+      <li class="ans"><span class="m">2√<span class="rad">5</span></span><span class="why">The pair of 2s sends one 2 out. The 5 stays in.</span></li>
+    </ol>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Now add</span><span class="m">√<span class="rad">45</span> + √<span class="rad">20</span></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">3√<span class="rad">5</span> + √<span class="rad">20</span></span><span class="why"><span class="m">45 = 3 &middot; 3 &middot; 5</span>. The pair of 3s sends one 3 out.</span></li>
+      <li><span class="m">3√<span class="rad">5</span> + 2√<span class="rad">5</span></span><span class="why">Just done above: <span class="m">√<span class="rad">20</span> = 2√<span class="rad">5</span></span>.</span></li>
+      <li class="ans"><span class="m">5√<span class="rad">5</span></span><span class="why">Both are <span class="m">√<span class="rad">5</span></span> now, so add the numbers in front: <span class="m">3 + 2 = 5</span>.</span></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c6">
+    <div class="check-q"><span class="ask">Simplify</span><span class="m">√<span class="rad">12</span> + √<span class="rad">27</span></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="eyebrow">6 · All of it at once</div>
+  <h2>Negative and fractional together</h2>
+  <p>Read the exponent one piece at a time. <strong>The minus says which side of the bar. The fraction says which root.</strong></p>
+
+  <div class="rulebox">
+    <span class="tag">Both at once</span>
+    <span class="m"><i>a</i><sup>−m/n</sup> = <span class="fr"><span>1</span><span><i>a</i><sup>m/n</sup></span></span></span>
+    <span class="cond">(<i>a</i> &gt; 0)</span>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Evaluate</span><span class="m">16<sup>−1/2</sup></span></div>
+    <ol class="walk-steps">
+      <li><span class="m"><span class="fr"><span>1</span><span>16<sup>1/2</sup></span></span></span><span class="why">The minus: move it across the bar.</span></li>
+      <li><span class="m"><span class="fr"><span>1</span><span>√<span class="rad">16</span></span></span></span><span class="why">The 1/2: square root.</span></li>
+      <li class="ans"><span class="m"><span class="fr"><span>1</span><span>4</span></span></span><span class="why"><span class="m">√<span class="rad">16</span> = 4</span>.</span></li>
+    </ol>
+  </div>
+
+  <p>When the base is a fraction, the negative exponent turns the fraction upside down:</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Evaluate</span><span class="m">(<span class="fr"><span>4</span><span>9</span></span>)<sup>−1/2</sup></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">(<span class="fr"><span>9</span><span>4</span></span>)<sup>1/2</sup></span><span class="why">The minus: flip the fraction, and the exponent turns positive.</span></li>
+      <li><span class="m"><span class="fr"><span>√<span class="rad">9</span></span><span>√<span class="rad">4</span></span></span></span><span class="why">The 1/2: take the square root of the top and of the bottom.</span></li>
+      <li class="ans"><span class="m"><span class="fr"><span>3</span><span>2</span></span></span><span class="why"><span class="m">√<span class="rad">9</span> = 3</span> and <span class="m">√<span class="rad">4</span> = 2</span>.</span></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c5">
+    <div class="check-q"><span class="ask">Evaluate</span><span class="m">16<sup>−1/2</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+  <div class="check" data-q="c7">
+    <div class="check-q"><span class="ask">Evaluate</span><span class="m">(<span class="fr"><span>9</span><span>16</span></span>)<sup>−1/2</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="eyebrow">7 · Common mistakes</div>
+  <h2>Four mistakes with roots</h2>
+  <p>Test each one with a number.</p>
+  <div id="trapHost"></div>
+</section>
+
+<section id="s8">
+  <div class="eyebrow">8 · Putting it together</div>
+  <h2>Practice one step at a time</h2>
+  <p>Same six tools as Lesson 2, now with fractions in the exponents. The rules haven't changed. A good order: <strong>clear brackets, combine, move negatives, then work out the numbers.</strong></p>
+
+  <div class="solver">
+    <div class="solver-head">
+      <span class="which" id="solverWhich">Problem 1</span>
+      <div class="tabs" id="solverTabs"></div>
+    </div>
+    <div class="work" id="solverWork"></div>
+    <div class="picker">
+      <div class="prompt" id="solverPrompt">Which rule can you use on this line?</div>
+      <div class="rulegrid" id="solverRules"></div>
+      <div class="solver-fb" id="solverFb"></div>
+      <div class="finish" id="solverFinish" style="display:none">
+        <button class="btn on" id="solverNext">Next problem</button>
+        <span class="count" id="solverDone"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s9">
+  <div class="eyebrow">9 · Check yourself</div>
+  <h2>Six on your own</h2>
+  <p>These mix all three lessons. The feedback says where to go back to.</p>
+  <div id="quizHost"></div>
+  <div class="score">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span class="n" id="scoreN">0</span><span class="count">of 6</span>
+    </div>
+    <div class="say" id="scoreSay">Answer all six to see where you stand.</div>
+  </div>
+</section>
+
+<section id="s10">
+  <div class="eyebrow">10 · Keep this</div>
+  <h2>Cheat sheet</h2>
+  <div class="cheat">
+    <h3>Roots and fractional exponents</h3>
+    <table class="symtab">
+      <thead><tr><th>Rule</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td class="m"><i>a</i><sup>1/n</sup> = <span class="idx">n</span>√<span class="rad"><i>a</i></span></td><td class="m">27<sup>1/3</sup> = 3</td></tr>
+        <tr><td class="m"><i>a</i><sup>m/n</sup> = (<span class="idx">n</span>√<span class="rad"><i>a</i></span>)<sup>m</sup></td><td class="m">8<sup>2/3</sup> = 2<sup>2</sup> = 4</td></tr>
+        <tr><td class="m"><i>a</i><sup>−m/n</sup> = <span class="fr"><span>1</span><span><i>a</i><sup>m/n</sup></span></span></td><td class="m">16<sup>−1/2</sup> = <span class="fr"><span>1</span><span>4</span></span></td></tr>
+        <tr><td class="m">√<span class="rad"><i>a</i></span> <span class="op">·</span> √<span class="rad"><i>b</i></span> = √<span class="rad"><i>ab</i></span></td><td class="m">√<span class="rad">6</span> <span class="op">·</span> √<span class="rad">3</span> = 3√<span class="rad">2</span></td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>Bottom of the fraction = which root. Top = which power. Root first.</li>
+      <li>Simplifying: pairs come out of a square root, triples out of a cube root.</li>
+      <li>Add roots only when the number inside matches.</li>
+      <li>Even root of a negative: not real. Odd root of a negative: negative.</li>
+    </ul>
+  </div>
+
+  <div class="next">
+    <div class="nextcard soon">
+      <div class="n">Done</div><div class="t">Lesson 1</div>
+      <p>Positive exponents: the four rules.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Done</div><div class="t">Lesson 2</div>
+      <p>Zero and negative exponents.</p>
+    </div>
+    <div class="nextcard">
+      <div class="n">Done</div><div class="t">Lesson 3</div>
+      <p>Fractional exponents and roots.</p>
+    </div>
+  </div>
+  <div class="colophon">
+    Math 1200 · College Algebra · supplement to ALEKS §R.2–R.3<br>
+    Practice only. Nothing here is graded or submitted.<br>
+    Your progress is saved on this device only.
+  </div>
+</section>
+
+</main>
+<script>
+/* Math 1200 · exponent crash course · shared engine
+   A lesson supplies a LESSON config object; this builds the interactive parts.
+
+   LESSON = {
+     storeKey : localStorage key, unique per lesson
+     checks   : { key: {ask?, m?, opts:[{t, ok?, fb}]} }   all MC items
+     inline   : [keys]   rendered into existing .check[data-q="key"] hosts
+     quiz     : [keys]   rendered into #quizHost, scored together
+     traps    : [{bad, why, sub, left:{lbl,val}, right:{lbl,val}}]
+     rules    : [{id, nm, frm}]
+     generic  : { RULEID: "why that rule does not apply, generically" }
+     problems : [{start, steps:[{rule, result, note, wrong:{RULEID:msg}}]}]
+     verdicts : {all, most, few}   score copy
+     solver   : {connector, ask, ok, last, done}   optional solver wording;
+                connector "" suits inequalities, where "=" between lines is false
+   }                                                                        */
+
+var EXP = (function(){
+"use strict";
+
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+function el(tag, cls, html){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+
+function rep(sym, n, cls){
+  var a = [];
+  for(var i = 0; i < n; i++) a.push({t: sym, cls: cls});
+  return a;
+}
+
+function chipRow(host, items){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.innerHTML = "";
+  items.forEach(function(it, i){
+    if(i) host.appendChild(el("span", "dot", "·"));
+    host.appendChild(el("span", "chip" + (it.cls ? " " + it.cls : ""), it.t));
+  });
+}
+
+/* a fraction, as math HTML */
+function frac(n, d){
+  return "<span class='fr'><span>" + n + "</span><span>" + d + "</span></span>";
+}
+
+/* a radical: sqrt(inner), or nth root when idx is given */
+function root(inner, idx){
+  return (idx ? "<span class='idx'>" + idx + "</span>" : "") +
+         "√<span class='rad'>" + inner + "</span>";
+}
+
+function init(L){
+  var correct = {};
+  try{
+    var saved = window.localStorage.getItem(L.storeKey);
+    if(saved) correct = JSON.parse(saved) || {};
+  }catch(e){ correct = {}; }
+
+  function persist(){
+    try{ window.localStorage.setItem(L.storeKey, JSON.stringify(correct)); }catch(e){}
+  }
+
+  var TOTAL = L.inline.length + L.quiz.length;
+
+  function paintMeter(){
+    var n = 0, k;
+    for(k in correct){ if(correct[k]) n++; }
+    var fill = $("#meterFill"), num = $("#meterNum");
+    if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
+    if(num) num.textContent = n + " / " + TOTAL + " correct";
+  }
+
+  /* ---------------- multiple choice ---------------- */
+  /* Options are authored correct-first for reviewability, then shuffled here,
+     so the right answer is never in a predictable slot. */
+  function shuffled(arr){
+    var a = arr.slice(), i, j, t;
+    for(i = a.length - 1; i > 0; i--){
+      j = Math.floor(Math.random() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildCheck(host, key, cfg){
+    var optsHost = $(".opts", host), fb = $(".fb", host);
+    var order = shuffled(cfg.opts);
+    order.forEach(function(o){
+      var b = el("button", "opt", "<span class='m'>" + o.t + "</span>");
+      b.type = "button";
+      b._ok = !!o.ok;
+      b.addEventListener("click", function(){
+        $$(".opt", optsHost).forEach(function(c){ c.disabled = true; });
+        if(o.ok){
+          b.classList.add("right");
+          fb.className = "fb show ok";
+          correct[key] = true; persist(); paintMeter();
+        }else{
+          b.classList.add("wrongpick");
+          $$(".opt", optsHost).forEach(function(c){
+            if(c._ok) c.classList.add("right");
+          });
+          fb.className = "fb show no";
+        }
+        fb.innerHTML = o.fb;
+        if(L.quiz.indexOf(key) !== -1) paintScore();
+      });
+      optsHost.appendChild(b);
+    });
+  }
+
+  L.inline.forEach(function(key){
+    var host = $(".check[data-q='" + key + "']");
+    if(host) buildCheck(host, key, L.checks[key]);
+  });
+
+  var quizHost = $("#quizHost");
+  if(quizHost){
+    L.quiz.forEach(function(key, i){
+      var cfg = L.checks[key];
+      var card = el("div", "check");
+      card.innerHTML =
+        "<div class='check-q'><span class='ask'>" + (i + 1) + ". " + cfg.ask + "</span>" +
+        "<span class='m'>" + cfg.m + "</span></div>" +
+        "<div class='opts'></div><div class='fb'></div>";
+      quizHost.appendChild(card);
+      buildCheck(card, key, cfg);
+    });
+  }
+
+  function paintScore(){
+    var n = 0;
+    L.quiz.forEach(function(k){ if(correct[k]) n++; });
+    var nEl = $("#scoreN"), sEl = $("#scoreSay");
+    if(!nEl || !sEl) return;
+    nEl.textContent = n;
+    var answered = $$("#quizHost .fb.show").length;
+    var total = L.quiz.length;
+    if(answered < total){
+      sEl.textContent = answered + " of " + total + " answered. Keep going.";
+    }else if(n === total){
+      sEl.textContent = L.verdicts.all;
+    }else if(n >= total - 2){
+      sEl.textContent = L.verdicts.most;
+    }else{
+      sEl.textContent = L.verdicts.few;
+    }
+  }
+
+  /* ---------------- traps ---------------- */
+  var trapHost = $("#trapHost");
+  if(trapHost && L.traps){
+    L.traps.forEach(function(t){
+      var card = el("div", "trap");
+      card.innerHTML =
+        "<div class='trap-head'><span class='never'>" + (t.badge || "Never") + "</span>" +
+        "<span class='m'>" + t.bad + "</span></div><p>" + t.why + "</p>";
+      var btn = el("button", "btn", "Test it with " + t.sub);
+      btn.type = "button";
+      var out = el("div", "subst");
+      out.style.display = "none";
+      out.innerHTML =
+        "<div class='side'><span class='lbl'>" + t.left.lbl + "</span><span class='m'>" + t.left.val + "</span></div>" +
+        "<div class='side'><span class='lbl'>" + t.right.lbl + "</span><span class='m'>" + t.right.val + "</span></div>" +
+        "<span class='verdict'>" + (t.verdict || "not equal") + "</span>";
+      btn.addEventListener("click", function(){
+        var shown = out.style.display !== "none";
+        out.style.display = shown ? "none" : "flex";
+        btn.textContent = shown ? ("Test it with " + t.sub) : "Hide";
+      });
+      card.appendChild(btn);
+      card.appendChild(out);
+      trapHost.appendChild(card);
+    });
+  }
+
+  /* ---------------- rule chooser ---------------- */
+  var workEl = $("#solverWork");
+  if(workEl && L.problems){
+    var pi = 0, history = [];
+    var SV = L.solver || {};
+    var CONN = (SV.connector == null) ? "=" : SV.connector;
+    var ASK  = SV.ask  || "Which rule can you legally use on this line?";
+    var DONE = SV.done || "Fully simplified — every base appears once, nothing sits in a bracket, and no exponent is negative.";
+    var OKM  = SV.ok   || "Yes — that one is legal here.";
+    var LAST = SV.last || "That is the answer.";
+    var fbEl = $("#solverFb"), rulesEl = $("#solverRules");
+    var whichEl = $("#solverWhich"), tabsEl = $("#solverTabs");
+    var finishEl = $("#solverFinish"), doneEl = $("#solverDone"), nextEl = $("#solverNext");
+    var promptEl = $("#solverPrompt");
+
+    L.rules.forEach(function(r){
+      var b = el("button", "rulebtn",
+        "<span class='nm'>" + r.nm + "</span><span class='frm'>" + r.frm + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){ pick(r.id); });
+      rulesEl.appendChild(b);
+    });
+
+    L.problems.forEach(function(p, i){
+      var t = el("button", "tab", String(i + 1));
+      t.type = "button";
+      t.addEventListener("click", function(){ load(i); });
+      tabsEl.appendChild(t);
+    });
+
+    function render(){
+      var p = L.problems[pi];
+      workEl.innerHTML = "";
+      var first = el("div", history.length ? "line past" : "line now");
+      first.innerHTML = "<span class='eq'></span><span class='m'>" + p.start + "</span>";
+      workEl.appendChild(first);
+
+      history.forEach(function(h, i){
+        var isLast = (i === history.length - 1) && (history.length === p.steps.length);
+        var ln = el("div", "line " + (isLast ? "done" : "past"));
+        ln.innerHTML = "<span class='eq'>" + CONN + "</span><span class='m'>" + h.result + "</span>" +
+                       "<span class='usedtag'>" + h.nm + "</span>";
+        workEl.appendChild(ln);
+        if(h.note){
+          var nt = el("div", "line");
+          nt.innerHTML = "<span class='eq'></span><span class='note'>" + h.note + "</span>";
+          workEl.appendChild(nt);
+        }
+      });
+
+      $$(".tab", tabsEl).forEach(function(t, i){
+        t.className = "tab" + (i === pi ? " on" : "");
+      });
+      whichEl.textContent = "Problem " + (pi + 1) + " of " + L.problems.length;
+
+      var finished = history.length === p.steps.length;
+      $$(".rulebtn", rulesEl).forEach(function(b){ b.disabled = finished; });
+      finishEl.style.display = finished ? "flex" : "none";
+      promptEl.innerHTML = finished ? DONE : ASK;
+      if(finished){
+        doneEl.textContent = p.steps.length + " steps, " + p.steps.length + " decisions";
+        nextEl.textContent = (pi === L.problems.length - 1) ? "Back to problem 1" : "Next problem";
+      }
+    }
+
+    function pick(id){
+      var p = L.problems[pi];
+      if(history.length >= p.steps.length) return;
+      var step = p.steps[history.length];
+      if(id === step.rule){
+        var r = L.rules.filter(function(x){ return x.id === id; })[0];
+        history.push({result: step.result, note: step.note, nm: r.nm});
+        fbEl.className = "solver-fb ok";
+        fbEl.innerHTML = (history.length === p.steps.length) ? LAST : OKM;
+        render();
+      }else{
+        fbEl.className = "solver-fb no";
+        fbEl.innerHTML = (step.wrong && step.wrong[id]) ? step.wrong[id] : L.generic[id];
+      }
+    }
+
+    function load(i){
+      pi = i; history = [];
+      fbEl.className = "solver-fb"; fbEl.innerHTML = "";
+      render();
+    }
+
+    nextEl.addEventListener("click", function(){
+      load((pi + 1) % L.problems.length);
+      $(".solver").scrollIntoView({behavior: "smooth", block: "start"});
+    });
+
+    load(0);
+  }
+
+  paintMeter();
+  paintScore();
+}
+
+/* ---------------- numbers ----------------
+   A value as it should read on the page: true minus sign, halves written as
+   fractions, no floating-point dust. plain=true keeps decimals (slider read-outs). */
+var HALF = {"0.5":"&frac12;", "1.5":"3/2", "2.5":"5/2", "3.5":"7/2", "4.5":"9/2",
+            "5.5":"11/2", "6.5":"13/2", "7.5":"15/2"};
+function num(v, plain){
+  var r = Math.round(v * 100) / 100;
+  var s = String(Math.abs(r));
+  if(!plain && HALF[s]) s = HALF[s];
+  return (r < 0 ? "−" : "") + s;
+}
+
+/* ---------------- sets of numbers ----------------
+   A SET is a list of pieces [left, right, openLeft, openRight] — the same
+   shape nline draws. null on a side = runs off to infinity. [] = empty.
+
+   SET.fromTest(test, crit) builds the exact set where test(x) is true, given
+   every point where the truth could change (the critical values). Between
+   two neighbouring critical values the truth cannot change, so testing one
+   number per gap and each critical value itself decides everything.       */
+var SET = (function(){
+  function fromTest(test, crit){
+    var c = crit.slice().sort(function(a, b){ return a - b; })
+                .filter(function(v, i, a){ return i === 0 || v !== a[i - 1]; });
+    if(!c.length) return test(0) ? [[null, null, false, false]] : [];
+    var regions = [{lo:null, hi:c[0], x:c[0] - 1}];
+    c.forEach(function(v, i){
+      var nx = c[i + 1];
+      regions.push({pt:true, lo:v, hi:v, x:v});
+      regions.push({lo:v, hi:(nx == null ? null : nx), x:(nx == null ? v + 1 : (v + nx) / 2)});
+    });
+    var out = [], cur = null;
+    regions.forEach(function(r){
+      if(test(r.x)){
+        if(!cur) cur = [r.lo, r.hi, !r.pt, !r.pt];
+        else { cur[1] = r.hi; cur[3] = !r.pt; }
+      }else if(cur){ out.push(cur); cur = null; }
+    });
+    if(cur) out.push(cur);
+    return out;
+  }
+
+  var SYM = {lt:"&lt;", le:"&le;", gt:"&gt;", ge:"&ge;"};
+  function rel(r, v){
+    return {lt:function(x){ return x < v; }, le:function(x){ return x <= v; },
+            gt:function(x){ return x > v; }, ge:function(x){ return x >= v; }}[r];
+  }
+
+  function fmt(P){
+    if(!P.length) return "no solution";
+    return P.map(function(p){
+      if(p[0] == null && p[1] == null) return "(&minus;&infin;, &infin;)";
+      if(p[0] != null && p[0] === p[1]) return "{" + num(p[0]) + "}";
+      var L = (p[0] == null) ? "(&minus;&infin;" : (p[2] ? "(" : "[") + num(p[0]);
+      var R = (p[1] == null) ? "&infin;)" : num(p[1]) + (p[3] ? ")" : "]");
+      return L + ", " + R;
+    }).join(" &cup; ");
+  }
+
+  /* "one piece" / "two pieces" / "no solution" / "all real numbers" */
+  function shape(P){
+    if(!P.length) return "no solution";
+    if(P.length === 1 && P[0][0] == null && P[0][1] == null) return "all real numbers";
+    if(P.length === 1 && P[0][0] != null && P[0][0] === P[0][1]) return "a single number";
+    return P.length === 1 ? "one piece" : "two pieces";
+  }
+
+  function has(P, x){
+    return P.some(function(p){
+      var okL = (p[0] == null) || (p[2] ? x > p[0] : x >= p[0]);
+      var okR = (p[1] == null) || (p[3] ? x < p[1] : x <= p[1]);
+      return okL && okR;
+    });
+  }
+
+  return {fromTest:fromTest, rel:rel, SYM:SYM, fmt:fmt, shape:shape, has:has};
+})();
+
+/* ---------------- number lines ----------------
+   One axis, with zero or more shaded pieces on it.
+
+     nline({ticks:[-1,4], pieces:[[-1,null,true,false]]})
+
+   A PIECE is [left, right, openLeft, openRight] in axis coordinates; null on a
+   side means the shading runs off that end. No pieces at all = the empty set.
+   A fifth entry of true draws the shading without its endpoint dots.
+   Returns an SVG string, so it drops straight into innerHTML.
+
+     ticks : key values, labelled bold. An entry may be [value, "label"].
+     grid  : small tick + light label at every integer (default on when the
+             axis spans 24 or fewer units), so a student can count along it
+     ghost : a value to mark with a dashed ring (an endpoint not yet decided)
+     pin   : {v, ok, label}  a marker above the axis for a tested number
+     arc   : {a, b, label}   a bracket above the axis, for a distance
+     cls   : "dim" for an input row, "ok" for a result worth colouring      */
+var NL = {W:560, PAD:26};
+function nlGeom(cfg){
+  var lo = (cfg.lo == null) ? -6 : cfg.lo;
+  var hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var span = NL.W - 2 * NL.PAD;
+  return {lo:lo, hi:hi, x:function(v){ return NL.PAD + (v - lo) / (hi - lo) * span; }};
+}
+/* the axis value under a click, from its horizontal fraction across the svg */
+function nlValueAt(cfg, frac){
+  var g = nlGeom(cfg);
+  return g.lo + (frac * NL.W - NL.PAD) / (NL.W - 2 * NL.PAD) * (g.hi - g.lo);
+}
+function nline(cfg){
+  var g = nlGeom(cfg), lo = g.lo, hi = g.hi, x = g.x, W = NL.W, PAD = NL.PAD;
+  var top = (cfg.pin || cfg.arc) ? 40 : 6;
+  var Y = top + 12, H = Y + 34, R = 7;
+  var s = '<svg class="nl' + (cfg.cls ? " " + cfg.cls : "") +
+          '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">';
+  s += '<line class="ax" x1="' + PAD + '" y1="' + Y + '" x2="' + (W - PAD) + '" y2="' + Y + '"/>';
+  s += '<polygon class="head" points="' + (PAD - 15) + ',' + Y + ' ' +
+       (PAD - 3) + ',' + (Y - 5.5) + ' ' + (PAD - 3) + ',' + (Y + 5.5) + '"/>';
+  s += '<polygon class="head" points="' + (W - PAD + 15) + ',' + Y + ' ' +
+       (W - PAD + 3) + ',' + (Y - 5.5) + ' ' + (W - PAD + 3) + ',' + (Y + 5.5) + '"/>';
+
+  var keys = (cfg.ticks || []).map(function(t){
+    return (t instanceof Array) ? {v:t[0], t:t[1]} : {v:t, t:num(t)};
+  });
+  var grid = (cfg.grid == null) ? (hi - lo <= 24) : cfg.grid;
+  if(grid){
+    for(var k = Math.ceil(lo); k <= Math.floor(hi); k++){
+      var near = keys.some(function(kk){ return Math.abs(kk.v - k) < 0.6; });
+      s += '<line class="tk minor" x1="' + x(k) + '" y1="' + (Y - 4) + '" x2="' + x(k) + '" y2="' + (Y + 4) + '"/>';
+      if(!near) s += '<text class="minor" x="' + x(k) + '" y="' + (Y + 24) + '">' + num(k) + '</text>';
+    }
+  }
+
+  /* ticks go under the shading, so an open circle stays visibly open */
+  keys.forEach(function(t){
+    s += '<line class="tk" x1="' + x(t.v) + '" y1="' + (Y - 6) + '" x2="' + x(t.v) +
+         '" y2="' + (Y + 6) + '"/>';
+  });
+
+  (cfg.pieces || []).forEach(function(p){
+    var a = (p[0] == null) ? PAD - 13 : x(p[0]);
+    var b = (p[1] == null) ? W - PAD + 13 : x(p[1]);
+    s += '<line class="seg" x1="' + a + '" y1="' + Y + '" x2="' + b + '" y2="' + Y + '"/>';
+  });
+  (cfg.pieces || []).forEach(function(p){
+    if(p[4]) return;                       /* [.., true] = shading only, no dots */
+    if(p[0] != null){
+      s += '<circle class="pt ' + (p[2] ? "open" : "closed") + '" cx="' + x(p[0]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+    if(p[1] != null && p[1] !== p[0]){
+      s += '<circle class="pt ' + (p[3] ? "open" : "closed") + '" cx="' + x(p[1]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+  });
+  if(cfg.ghost != null){
+    s += '<circle class="pt ghost" cx="' + x(cfg.ghost) + '" cy="' + Y + '" r="' + R + '"/>';
+  }
+
+  keys.forEach(function(t){
+    s += '<text class="key" x="' + x(t.v) + '" y="' + (Y + 25) + '">' + t.t + '</text>';
+  });
+
+  if(cfg.arc){
+    var xa = x(cfg.arc.a), xb = x(cfg.arc.b), ay = Y - 20;
+    s += '<path class="arc" d="M' + xa + ',' + (Y - 9) + ' V' + ay + ' H' + xb + ' V' + (Y - 9) + '"/>';
+    if(cfg.arc.label){
+      s += '<text class="arclbl" x="' + ((xa + xb) / 2) + '" y="' + (ay - 7) + '">' + cfg.arc.label + '</text>';
+    }
+  }
+  if(cfg.pin){
+    var px = x(Math.max(lo, Math.min(hi, cfg.pin.v)));
+    s += '<g class="pin ' + (cfg.pin.ok ? "yes" : "no") + '">' +
+         '<line x1="' + px + '" y1="' + (Y - 26) + '" x2="' + px + '" y2="' + (Y - 10) + '"/>' +
+         '<polygon points="' + (px - 6) + ',' + (Y - 12) + ' ' + (px + 6) + ',' + (Y - 12) + ' ' + px + ',' + (Y - 3) + '"/>' +
+         '<circle cx="' + px + '" cy="' + Y + '" r="4.5"/>';
+    if(cfg.pin.label) s += '<text x="' + px + '" y="' + (Y - 31) + '">' + cfg.pin.label + '</text>';
+    s += '</g>';
+  }
+  return s + '</svg>';
+}
+
+/* A labelled stack: input rows, a rule, then the result row.
+   rows = [[label, nlineCfg], ...]; the LAST row is the result.          */
+function nstack(host, rows){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var last = rows.length - 1;
+  host.innerHTML = rows.map(function(r, i){
+    var cfg = r[1] || {};
+    if(i < last && cfg.cls == null) cfg.cls = "dim";
+    var none = (i === last) && !(cfg.pieces && cfg.pieces.length);
+    return '<div class="nlrow' + (i === last ? " res" : "") + '">' +
+           '<span class="lbl' + (none ? " none" : "") + '">' + r[0] + '</span>' +
+           nline(cfg) + '</div>';
+  }).join("");
+}
+
+/* ---------------- worked examples, one line at a time ----------------
+   <div class="walk">
+     <div class="walk-q"><span class="m">2x + 3 &gt; 7</span></div>
+     <ol class="walk-steps">
+       <li><span class="m">2x &gt; 4</span><span class="why">Subtract 3.</span></li>
+     </ol>
+   </div>
+   Lines stay hidden until asked for, so a student can try each one on paper
+   first.                                                                 */
+function walks(){
+  $$(".walk").forEach(function(w){
+    var steps = $$(".walk-steps > li", w);
+    if(!steps.length) return;
+    var shown = 0;
+    var bar = el("div", "walk-ctrls");
+    var nextB = el("button", "btn on", ""); nextB.type = "button";
+    var allB = el("button", "btn", "Show all"); allB.type = "button";
+    var hint = el("span", "walk-hint", "");
+    bar.appendChild(nextB); bar.appendChild(allB); bar.appendChild(hint);
+    w.appendChild(bar);
+    function paint(){
+      steps.forEach(function(li, i){ li.style.display = (i < shown) ? "" : "none"; });
+      var done = shown >= steps.length;
+      nextB.textContent = done ? "Start over" : (shown ? "Next step" : "Show first step");
+      allB.style.display = done ? "none" : "";
+      hint.textContent = done ? "Could you do it again without looking?"
+                              : shown + " of " + steps.length + " steps shown. Try the next one on paper first.";
+    }
+    nextB.addEventListener("click", function(){
+      shown = (shown >= steps.length) ? 0 : shown + 1; paint();
+    });
+    allB.addEventListener("click", function(){ shown = steps.length; paint(); });
+    paint();
+  });
+}
+
+/* ---------------- quick-fire drill ----------------
+   drill("#host", {
+     items   : [{m, a, why}]          a = the key of the right choice
+     choices : [{k, t}]               the buttons
+     end     : "closing line"
+   })                                                                   */
+function drill(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.classList.add("drill");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='drill-q m'></div><div class='drill-btns'></div><div class='drill-fb'></div>";
+  var q = $(".drill-q", host), fb = $(".drill-fb", host), cnt = $(".count", host);
+  var pips = $(".pips", host), btns = $(".drill-btns", host);
+  var i = 0, marks = [], label = {};
+  var choiceBtns = cfg.choices.map(function(c){
+    label[c.k] = c.t;
+    var b = el("button", "btn", c.t); b.type = "button";
+    b.addEventListener("click", function(){ answer(c.k); });
+    btns.appendChild(b);
+    return b;
+  });
+  var nextB = el("button", "btn on", "Next"); nextB.type = "button";
+  btns.appendChild(nextB);
+  nextB.addEventListener("click", function(){
+    if(i === cfg.items.length - 1){ i = 0; marks = []; } else { i++; }
+    draw();
+  });
+
+  function drawPips(){
+    pips.innerHTML = "";
+    cfg.items.forEach(function(_, k){
+      pips.appendChild(el("span", "pip" +
+        (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") + (k === i ? " now" : "")));
+    });
+  }
+  function draw(){
+    q.innerHTML = cfg.items[i].m;
+    cnt.textContent = (i + 1) + " of " + cfg.items.length;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    choiceBtns.forEach(function(b){ b.disabled = false; b.classList.remove("right", "wrongpick"); });
+    nextB.style.display = "none";
+    drawPips();
+  }
+  function answer(k){
+    var it = cfg.items[i], right = (k === it.a);
+    if(marks[i] === undefined) marks[i] = right;
+    choiceBtns.forEach(function(b, j){
+      b.disabled = true;
+      var ck = cfg.choices[j].k;
+      if(ck === it.a) b.classList.add("right");
+      else if(ck === k) b.classList.add("wrongpick");
+    });
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not this one &mdash; it's <strong>" + label[it.a] + "</strong>. ") + it.why;
+    var lastOne = (i === cfg.items.length - 1);
+    nextB.textContent = lastOne ? "Start again" : "Next";
+    nextB.style.display = "";
+    if(lastOne){
+      var n = marks.filter(function(v){ return v; }).length;
+      fb.innerHTML += "<div class='drill-end'>" + n + " of " + cfg.items.length +
+        " right first time. " + (cfg.end || "") + "</div>";
+    }
+    drawPips();
+  }
+  draw();
+}
+
+/* ---------------- test-a-number ----------------
+   tester("#host", {
+     problems : [{label, set, ticks, test(x) -> {html, ok}}]
+     lo, hi, step, start
+     hidden   : true = the shading starts hidden, so the student predicts it
+   })
+   A slider (or a click on the line) moves a pin; the page substitutes that
+   number and says whether it lands in the set.                          */
+function tester(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var pi = 0, xv = (cfg.start == null) ? 0 : cfg.start, show = !cfg.hidden;
+  var lo = (cfg.lo == null) ? -6 : cfg.lo, hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var step = cfg.step || 0.5;
+  host.classList.add("tester");
+  host.innerHTML =
+    (cfg.problems.length > 1 ? "<div class='ctrls tp-probs'></div>" : "") +
+    "<div class='tp-line'></div>" +
+    "<div class='tp-slide'><span class='ctrl-label'>Move the point</span>" +
+      "<input type='range' min='" + lo + "' max='" + hi + "' step='" + step + "' value='" + xv +
+      "' aria-label='the number to test'></div>" +
+    "<div class='tp-out'></div>" +
+    "<div class='ctrls'><button type='button' class='btn tp-show'></button></div>";
+  var probs = $(".tp-probs", host), lineEl = $(".tp-line", host);
+  var range = $("input", host), out = $(".tp-out", host), showB = $(".tp-show", host);
+
+  if(probs){
+    probs.appendChild(el("span", "ctrl-label", "Inequality"));
+    cfg.problems.forEach(function(p, i){
+      var b = el("button", "btn" + (i === 0 ? " on" : ""), "<span class='m'>" + p.label + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){
+        $$(".btn", probs).forEach(function(o){ o.classList.remove("on"); });
+        b.classList.add("on"); pi = i; show = !cfg.hidden; draw();
+      });
+      probs.appendChild(b);
+    });
+  }
+  function lineCfg(){
+    var p = cfg.problems[pi];
+    return {lo:lo, hi:hi, ticks:p.ticks || [], pieces:show ? p.set : [], cls:"ok",
+            pin:{v:xv, ok:p.test(xv).ok, label:"x = " + num(xv, true)}};
+  }
+  function draw(){
+    var p = cfg.problems[pi], r = p.test(xv), n = num(xv, true);
+    lineEl.innerHTML = nline(lineCfg());
+    out.className = "tp-out " + (r.ok ? "yes" : "no");
+    out.innerHTML = "<span class='m'>" + r.html + "</span>" +
+      "<span class='tp-verdict'>" + (r.ok ? "true, so " + n + " is in the set"
+                                          : "false, so " + n + " is not in the set") + "</span>";
+    showB.textContent = show ? "Hide the shading" : "Show every number that works";
+  }
+  range.addEventListener("input", function(){ xv = parseFloat(range.value); draw(); });
+  lineEl.addEventListener("click", function(e){
+    var svg = $("svg", lineEl); if(!svg) return;
+    var r = svg.getBoundingClientRect();
+    var v = Math.round(nlValueAt(lineCfg(), (e.clientX - r.left) / r.width) / step) * step;
+    xv = Math.max(lo, Math.min(hi, v)); range.value = xv; draw();
+  });
+  showB.addEventListener("click", function(){ show = !show; draw(); });
+  draw();
+}
+
+return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
+        root: root, num: num, SET: SET, nline: nline, nlValueAt: nlValueAt,
+        nstack: nstack, walks: walks, drill: drill, tester: tester, init: init};
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var F = EXP.frac;
+
+EXP.init({
+  storeKey: "m1200-exp-l3",
+  inline: ["c1","c2","c3","c4","c6","c5","c7"],
+  quiz:   ["q1","q2","q3","q4","q5","q6"],
+
+  checks: {
+    c1: { opts:[
+      {t:"5", ok:true, fb:"Right. 1/2 means square root, and 5 &middot; 5 = 25."},
+      {t:"12.5", fb:"That's 25 &divide; 2. A fraction in the exponent is a root, not division."},
+      {t:"50", fb:"That's 25 &times; 2. The exponent doesn't multiply the base."},
+      {t:"625", fb:"That's 25<sup>2</sup>. The 2 is on the bottom of the fraction, so it's a root."}
+    ]},
+    c2: { opts:[
+      {t:"3", ok:true, fb:"Right. 3 &middot; 3 &middot; 3 = 27."},
+      {t:"9", fb:"9 &middot; 9 &middot; 9 is 729. You want the number that multiplies by itself three times to give 27."},
+      {t:"81", fb:"That's 27 &times; 3. The exponent is a root, not a multiplier."},
+      {t:"13.5", fb:"That's 27 &divide; 2. A fraction in the exponent is a root."}
+    ]},
+    c3: { opts:[
+      {t:"4", ok:true, fb:"Right. Cube root of 8 is 2, and 2 squared is 4."},
+      {t:"64", fb:"That's 8<sup>2</sup>. You still need the cube root: the 3 on the bottom."},
+      {t:"2", fb:"That's just the cube root. The 2 on top still has to be used as a power."},
+      {t:"12", fb:"That's 8 &times; 3/2. A fraction in the exponent is a root and a power, not a multiplication."}
+    ]},
+    c4: { opts:[
+      {t:"3√<span class='rad'>5</span>", ok:true, fb:"Right. 45 = 3 &middot; 3 &middot; 5. The pair of 3s sends one 3 out."},
+      {t:"5√<span class='rad'>3</span>", fb:"Swapped. The pair is 3 &middot; 3, so a 3 comes out and the 5 stays in."},
+      {t:"9√<span class='rad'>5</span>", fb:"A pair of 3s sends <em>one</em> 3 out, not 9."},
+      {t:"it cannot be simplified", fb:"45 = 9 &middot; 5, and 9 is a perfect square. Try the factor tree."}
+    ]},
+    c5: { opts:[
+      {t:F("1","4"), ok:true, fb:"Right. The minus moves it under the bar, and the 1/2 takes the square root: 1/&radic;16 = 1/4."},
+      {t:"−4", fb:"The minus is on the exponent. It says which side of the bar, nothing else."},
+      {t:"4", fb:"That's 16<sup>1/2</sup>. You dropped the minus instead of acting on it."},
+      {t:"−" + F("1","4"), fb:"The 1/4 is right, but there's no minus sign in the answer."}
+    ]},
+    c6: { opts:[
+      {t:"5√<span class='rad'>3</span>", ok:true, fb:"Right. &radic;12 = 2&radic;3 and &radic;27 = 3&radic;3. Then 2 + 3 = 5."},
+      {t:"√<span class='rad'>39</span>", fb:"Roots don't add like that: &radic;12 + &radic;27 is not &radic;39. Simplify each one first."},
+      {t:"6√<span class='rad'>3</span>", fb:"&radic;12 = 2&radic;3 (a pair of 2s) and &radic;27 = 3&radic;3 (a pair of 3s). 2 + 3 = 5."},
+      {t:"5√<span class='rad'>6</span>", fb:"When you add like roots, the number inside stays the same: 2&radic;3 + 3&radic;3 = 5&radic;3."}
+    ]},
+    c7: { opts:[
+      {t:F("4","3"), ok:true, fb:"Right. Flip: (16/9)<sup>1/2</sup>. Then &radic;16 / &radic;9 = 4/3."},
+      {t:F("3","4"), fb:"That's (9/16)<sup>1/2</sup>. The minus in the exponent flips the fraction."},
+      {t:"&minus;" + F("3","4"), fb:"A negative exponent doesn't make the value negative. It flips the fraction."},
+      {t:F("16","9"), fb:"You flipped it, but the 1/2 still means square root: &radic;16 / &radic;9."}
+    ]},
+
+    q1: { ask:"Simplify", m:"<i>x</i><sup>1/2</sup> <span class='op'>·</span> <i>x</i><sup>1/2</sup>", opts:[
+      {t:"<i>x</i>", ok:true, fb:"Product rule: 1/2 + 1/2 = 1."},
+      {t:"<i>x</i><sup>1/4</sup>", fb:"You multiplied the exponents. Side by side means add. See Lesson 1, section 2."},
+      {t:"<i>x</i><sup>2</sup>", fb:"The exponents add to 1, not 2."},
+      {t:"√<span class='rad'>2<i>x</i></span>", fb:"Add the exponents: 1/2 + 1/2 = 1."}
+    ]},
+    q2: { ask:"Write with an exponent:", m:"<span class='idx'>3</span>√<span class='rad'><i>x</i><sup>5</sup></span>", opts:[
+      {t:"<i>x</i><sup>5/3</sup>", ok:true, fb:"The root goes on the bottom, the power on top."},
+      {t:"<i>x</i><sup>3/5</sup>", fb:"Upside down. The root goes on the bottom. See section 3."},
+      {t:"<i>x</i><sup>15</sup>", fb:"That multiplied them. A root divides the exponent. See section 3."},
+      {t:"<i>x</i><sup>2</sup>", fb:"That subtracted. See section 3."}
+    ]},
+    q3: { ask:"Simplify", m:"√<span class='rad'>72</span>", opts:[
+      {t:"6√<span class='rad'>2</span>", ok:true, fb:"72 = 2&middot;2&middot;2&middot;3&middot;3. A pair of 2s and a pair of 3s send out 2 &middot; 3 = 6. One 2 stays in."},
+      {t:"2√<span class='rad'>6</span>", fb:"Wrong factor out. The pairs are two 2s and two 3s. See section 4."},
+      {t:"9√<span class='rad'>8</span>", fb:"Neither 9 nor 8 came from a pair, and 8 still has a pair inside. See section 4."},
+      {t:"36√<span class='rad'>2</span>", fb:"The pairs send out one copy each: 2 &middot; 3 = 6, not 36."}
+    ]},
+    q4: { ask:"Simplify", m:"(<i>x</i><sup>6</sup>)<sup>1/3</sup>", opts:[
+      {t:"<i>x</i><sup>2</sup>", ok:true, fb:"Power of a power: 6 &middot; 1/3 = 2."},
+      {t:"<i>x</i><sup>18</sup>", fb:"That's 6 &divide; (1/3). Multiply instead: 6 &middot; 1/3 = 2."},
+      {t:"<i>x</i><sup>1/2</sup>", fb:"The exponents multiply: 6 &middot; 1/3 = 2."},
+      {t:"<i>x</i><sup>3</sup>", fb:"Check the arithmetic: 6 &middot; 1/3 = 2."}
+    ]},
+    q5: { ask:"Evaluate", m:"81<sup>3/4</sup>", opts:[
+      {t:"27", ok:true, fb:"Fourth root of 81 is 3, and 3 cubed is 27."},
+      {t:"243", fb:"That's 3<sup>5</sup>. Fourth root first, then cube: 3<sup>3</sup> = 27."},
+      {t:"9", fb:"That's 81<sup>1/2</sup>. It's a fourth root, and the 3 on top is a power."},
+      {t:"60.75", fb:"That's 81 &times; 3/4. A fraction in the exponent is a root and a power."}
+    ]},
+    q6: { ask:"Simplify", m:"(8<i>x</i><sup>−6</sup>)<sup>−2/3</sup>", opts:[
+      {t:F("<i>x</i><sup>4</sup>","4"), ok:true, fb:"8<sup>−2/3</sup> = 1/4 and (<i>x</i><sup>−6</sup>)<sup>−2/3</sup> = <i>x</i><sup>4</sup>. Two negatives multiply to a positive, so <i>x</i> stays on top."},
+      {t:"4<i>x</i><sup>4</sup>", fb:"8<sup>−2/3</sup> is 1/4, not 4: the minus puts it under the bar. See Lesson 2, section 2."},
+      {t:F("1","4<i>x</i><sup>4</sup>"), fb:"(&minus;6)(&minus;2/3) = +4, so <i>x</i> stays on top. See Lesson 2, section 5."},
+      {t:F("<i>x</i><sup>4</sup>","16"), fb:"8<sup>2/3</sup> is 4: cube root of 8 is 2, then squared. See section 3."}
+    ]}
+  },
+
+  verdicts: {
+    all:"All six, across all three lessons. That's the whole exponent topic.",
+    most:"Close. Go to the section named in each miss, then redo those on paper.",
+    few:"Most misses here are Lesson 1 rules in disguise. Check you can still pick the right rule before worrying about the fractions."
+  },
+
+  rules: [
+    {id:"PROD", nm:"Product rule",         frm:"<i>a</i><sup>m</sup> · <i>a</i><sup>n</sup> = <i>a</i><sup>m+n</sup>"},
+    {id:"QUOT", nm:"Quotient rule",        frm:"<i>a</i><sup>m</sup> ÷ <i>a</i><sup>n</sup> = <i>a</i><sup>m−n</sup>"},
+    {id:"POW",  nm:"Power of a power",     frm:"(<i>a</i><sup>m</sup>)<sup>n</sup> = <i>a</i><sup>mn</sup>"},
+    {id:"DIST", nm:"Power of a product",   frm:"(<i>ab</i>)<sup>n</sup> = <i>a</i><sup>n</sup><i>b</i><sup>n</sup>"},
+    {id:"NEG",  nm:"Move across the bar",  frm:"<i>a</i><sup>−n</sup> = 1 / <i>a</i><sup>n</sup>"},
+    {id:"NUM",  nm:"Work out the numbers", frm:"16<sup>3/4</sup> = 8,  <i>x</i><sup>0</sup> = 1"}
+  ],
+
+  solver: {
+    ask: "Which rule can you use on this line?",
+    ok: "Yes, that rule works here."
+  },
+
+  generic: {
+    PROD:"The product rule needs two powers of the same base multiplied side by side, with no brackets around them.",
+    QUOT:"The quotient rule needs the same base on top and bottom of a fraction, each a single power.",
+    POW:"Power of a power needs a single power inside brackets, like (<i>x</i><sup>1/3</sup>)<sup>6</sup>.",
+    DIST:"Power of a product needs brackets holding more than one factor, with an exponent outside.",
+    NEG:"Nothing on this line has a negative exponent, so there's nothing to move.",
+    NUM:"There's no number to work out yet. The numbers here still have an exponent to deal with."
+  },
+
+  problems: [
+    {
+      start:F("<i>c</i><sup>3/4</sup><i>c</i><sup>7/4</sup>","<i>c</i><sup>1/4</sup>"),
+      steps:[
+        {rule:"PROD", result:F("<i>c</i><sup>10/4</sup>","<i>c</i><sup>1/4</sup>"),
+         note:"3/4 + 7/4 = 10/4. Same bottom number, so add the tops.",
+         wrong:{
+           QUOT:"There are two powers on top. Combine them first.",
+           POW:"There are no brackets here."
+         }},
+        {rule:"QUOT", result:"<i>c</i><sup>9/4</sup>",
+         note:"10/4 &minus; 1/4 = 9/4, which doesn't reduce.", wrong:{}}
+      ]
+    },
+    {
+      start:"(16<i>x</i><sup>8</sup>)<sup>3/4</sup>",
+      steps:[
+        {rule:"DIST", result:"16<sup>3/4</sup>(<i>x</i><sup>8</sup>)<sup>3/4</sup>",
+         note:"The outer 3/4 goes to both factors inside, 16 included.",
+         wrong:{
+           NUM:"The 16 is still inside the brackets, so the 3/4 hasn't reached it yet.",
+           POW:"Two factors are inside, so the outer exponent has to reach both first."
+         }},
+        {rule:"POW", result:"16<sup>3/4</sup><i>x</i><sup>6</sup>",
+         note:"8 &middot; 3/4 = 6.",
+         wrong:{PROD:"Different bases. 16 and <i>x</i> never combine."}},
+        {rule:"NUM", result:"8<i>x</i><sup>6</sup>",
+         note:"16<sup>3/4</sup>: fourth root of 16 is 2, and 2 cubed is 8.", wrong:{}}
+      ]
+    },
+    {
+      start:F("(<i>x</i><sup>1/3</sup><i>y</i><sup>−2/3</sup>)<sup>6</sup>","(<i>x</i><sup>−1/2</sup><i>y</i><sup>1/4</sup>)<sup>−4</sup>"),
+      steps:[
+        {rule:"DIST", result:F("(<i>x</i><sup>1/3</sup>)<sup>6</sup>(<i>y</i><sup>−2/3</sup>)<sup>6</sup>","(<i>x</i><sup>−1/2</sup>)<sup>−4</sup>(<i>y</i><sup>1/4</sup>)<sup>−4</sup>"),
+         note:"Clear both brackets, top and bottom.",
+         wrong:{
+           QUOT:"Not yet. Both top and bottom are still in brackets.",
+           NEG:"Those negatives are inside brackets, so they can't cross the main bar yet."
+         }},
+        {rule:"POW", result:F("<i>x</i><sup>2</sup><i>y</i><sup>−4</sup>","<i>x</i><sup>2</sup><i>y</i><sup>−1</sup>"),
+         note:"Top: (1/3)(6) = 2 and (&minus;2/3)(6) = &minus;4. Bottom: (&minus;1/2)(&minus;4) = 2 and (1/4)(&minus;4) = &minus;1.",
+         wrong:{
+           QUOT:"Clear the exponents off the brackets first.",
+           NUM:"There are no plain numbers here. Every exponent is on a letter."
+         }},
+        {rule:"QUOT", result:"<i>x</i><sup>0</sup><i>y</i><sup>−3</sup>",
+         note:"For <i>x</i>: 2 &minus; 2 = 0. For <i>y</i>: &minus;4 &minus; (&minus;1) = &minus;3.",
+         wrong:{NEG:"The <i>y</i>'s are on both sides of the bar. Combine them with the quotient rule first."}},
+        {rule:"NUM", result:"<i>y</i><sup>−3</sup>",
+         note:"<i>x</i><sup>0</sup> = 1, so the <i>x</i> disappears.",
+         wrong:{NEG:"Deal with <i>x</i><sup>0</sup> first. It's just 1."}},
+        {rule:"NEG", result:F("1","<i>y</i><sup>3</sup>"),
+         note:"The last negative moves across the bar.", wrong:{}}
+      ]
+    }
+  ],
+
+  traps: [
+    {bad:"√<span class='rad'><i>a</i> + <i>b</i></span> = √<span class='rad'><i>a</i></span> + √<span class='rad'><i>b</i></span>", badge:"Not a rule",
+     why:"A root is an exponent. Exponents spread over multiplication, not over addition.",
+     sub:"a = 9, b = 16", verdict:"not equal",
+     left:{lbl:"√(a + b)", val:"√25 = 5"},
+     right:{lbl:"√a + √b", val:"3 + 4 = 7"}},
+    {bad:"<i>a</i><sup>1/2</sup> = <i>a</i> ÷ 2", badge:"Not a rule",
+     why:"The fraction says which root to take. It doesn't mean divide.",
+     sub:"a = 16", verdict:"not equal",
+     left:{lbl:"16<sup>1/2</sup>", val:"√16 = 4"},
+     right:{lbl:"16 ÷ 2", val:"8"}},
+    {bad:"√<span class='rad'>20</span> = 4√<span class='rad'>5</span>", badge:"Not a rule",
+     why:"20 = 4 &middot; 5, but the 4 has to come out as its square root. A pair of 2s sends <em>one</em> 2 out: 2&radic;5.",
+     sub:"squaring both", verdict:"not equal",
+     left:{lbl:"(2√5)<sup>2</sup>", val:"4 · 5 = 20"},
+     right:{lbl:"(4√5)<sup>2</sup>", val:"16 · 5 = 80"}},
+    {bad:"√<span class='rad'><i>x</i><sup>2</sup></span> = <i>x</i>", badge:"Not always",
+     why:"9 has two square roots, 3 and &minus;3. The root sign means the <strong>principal</strong> one, which is defined to be the non-negative one. So &radic;(<i>x</i><sup>2</sup>) = |<i>x</i>|, which is &minus;<i>x</i> when <i>x</i> is negative.",
+     sub:"x = −3", verdict:"not equal when x is negative",
+     left:{lbl:"√(x<sup>2</sup>)", val:"√9 = 3"},
+     right:{lbl:"x", val:"−3"}}
+  ]
+});
+
+EXP.walks();
+
+/* ---- lesson-specific widgets ---- */
+var rep = EXP.rep, chipRow = EXP.chipRow, $ = EXP.$, $$ = EXP.$$;
+
+/* n copies of a^(1/n) multiply back to a */
+(function rootDemo(){
+  var n = 2;
+  var chips = $("#rtChips"), sum = $("#rtSum"), say = $("#rtSay"), eq = $("#rtEq");
+  var NAMES = {2:"square root", 3:"cube root", 4:"fourth root", 5:"fifth root"};
+  function draw(){
+    chipRow(chips, rep("a<sup>1/" + n + "</sup>", n, "a"));
+    sum.innerHTML = "<i>a</i><sup>" + Array(n + 1).join("1/" + n + " + ").slice(0, -3) + "</sup>";
+    say.textContent = n + " copies multiply back to a, so a^(1/" + n + ") is the " + NAMES[n];
+    eq.innerHTML = "<i>a</i><sup>1/" + n + "</sup> = <span class='idx'>" + n + "</span>√<span class='rad'><i>a</i></span>";
+  }
+  $$("[data-n]").forEach(function(b){
+    b.addEventListener("click", function(){
+      $$("[data-n]").forEach(function(o){ o.classList.remove("on"); });
+      b.classList.add("on"); n = parseInt(b.getAttribute("data-n"), 10); draw();
+    });
+  });
+  draw();
+})();
+
+/* factor-tree pair picker — the student groups the repeats themselves.
+   idx 2 = square root (pairs), idx 3 = cube root (triples). */
+(function pairPicker(){
+  var SVGNS = "http://www.w3.org/2000/svg";
+  var PROBS = [
+    {n:48,  idx:2, tree:[48,  [6,2,3],           [8,2,[4,2,2]]]},
+    {n:72,  idx:2, tree:[72,  [8,2,[4,2,2]],     [9,3,3]]},
+    {n:200, idx:2, tree:[200, 2,                 [100,[10,2,5],[10,2,5]]]},
+    {n:54,  idx:3, tree:[54,  2,                 [27,3,[9,3,3]]]},
+    {n:80,  idx:3, tree:[80,  [8,2,[4,2,2]],     [10,2,5]]},
+    {n:216, idx:3, tree:[216, [8,2,[4,2,2]],     [27,3,[9,3,3]]]}
+  ];
+
+  var GAP = 64, ROW = 58, TOP = 24, R = 15, MARG = 26;
+
+  var host = $("#ptSvg"), tabsEl = $("#ptTabs"), whichEl = $("#ptWhich"),
+      askEl = $("#ptAsk"), ruleEl = $("#ptRule"), liveEl = $("#ptLive"),
+      doneEl = $("#ptDone"), fbEl = $("#ptFb"),
+      resetB = $("#ptReset"), showB = $("#ptShow"), nextB = $("#ptNext");
+
+  var cur = 0, geo = null, sel = [], groups = [], solved = false;
+
+  /* ∛ is missing from a lot of fonts, so an index is drawn beside the √ */
+  function rad(idx, inner){
+    return (idx === 3 ? "<span class='idx'>3</span>" : "") +
+           "√<span class='rad'>" + inner + "</span>";
+  }
+
+  function build(spec){
+    var nodes = [], edges = [], byId = {}, li = 0, maxD = 0;
+    function walk(nd, d){
+      maxD = Math.max(maxD, d);
+      var o;
+      if(typeof nd === "number"){
+        o = {v:nd, d:d, leaf:true, i:li++};
+        byId[o.i] = o;
+      }else{
+        var L = walk(nd[1], d + 1), Rk = walk(nd[2], d + 1);
+        o = {v:nd[0], d:d, leaf:false, kids:[L, Rk]};
+        edges.push([o, L]); edges.push([o, Rk]);
+      }
+      nodes.push(o);
+      return o;
+    }
+    var root = walk(spec, 0);
+    /* leaves sit on an even pitch; a parent centres over its two children */
+    function place(n){
+      n.y = TOP + n.d * ROW;
+      n.x = n.leaf ? MARG + n.i * GAP
+                   : (place(n.kids[0]) + place(n.kids[1])) / 2;
+      return n.x;
+    }
+    place(root);
+    return {
+      nodes:nodes, edges:edges, byId:byId,
+      leaves:nodes.filter(function(n){ return n.leaf; }),
+      w: MARG * 2 + (li - 1) * GAP,
+      h: TOP * 2 + maxD * ROW
+    };
+  }
+
+  function groupOf(i){
+    for(var k = 0; k < groups.length; k++){
+      if(groups[k].ids.indexOf(i) !== -1) return k;
+    }
+    return -1;
+  }
+
+  function loose(){
+    var c = {};
+    geo.leaves.forEach(function(n){
+      if(groupOf(n.i) < 0) c[n.v] = (c[n.v] || 0) + 1;
+    });
+    return c;
+  }
+
+  function canGroup(){
+    var c = loose(), p = PROBS[cur], v;
+    for(v in c){ if(c[v] >= p.idx) return true; }
+    return false;
+  }
+
+  function svgEl(tag, attrs){
+    var n = document.createElementNS(SVGNS, tag), k;
+    for(k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  /* Shows the escaped factors unmultiplied first — "2 · 2 √3 = 4√3" — so it is
+     visible that each group contributes one copy, and the multiplying is a
+     separate, later step. With fewer than two groups the two forms are the
+     same, so only one is printed. */
+  function paintLive(){
+    var p = PROBS[cur], inn = 1;
+    var outs = groups.map(function(g){ return g.v; });
+    geo.leaves.forEach(function(n){ if(groupOf(n.i) < 0) inn *= n.v; });
+    var prod = outs.reduce(function(a, b){ return a * b; }, 1);
+
+    var tail = (inn === 1) ? "" : rad(p.idx, inn);
+    var raw  = outs.length
+      ? outs.join(" <span class='op'>·</span> ") + (tail ? " " + tail : "")
+      : (tail || "1");
+    var neat = (inn === 1) ? String(prod) : prod + " " + tail;
+
+    liveEl.innerHTML = rad(p.idx, p.n) + " = " + raw +
+      (outs.length > 1 ? " = " + neat : "");
+  }
+
+  function say(msg, kind){
+    fbEl.className = "ptfb" + (kind ? " " + kind : "");
+    fbEl.innerHTML = msg;
+  }
+
+  function render(){
+    var p = PROBS[cur];
+    host.innerHTML = "";
+    var svg = svgEl("svg", {
+      viewBox:"0 0 " + geo.w + " " + geo.h, width:geo.w, height:geo.h,
+      role:"img", "aria-label":"Factor tree for " + p.n
+    });
+
+    geo.edges.forEach(function(e){
+      svg.appendChild(svgEl("line", {"class":"tree-line",
+        x1:e[0].x, y1:e[0].y, x2:e[1].x, y2:e[1].y}));
+    });
+
+    geo.nodes.forEach(function(n){
+      if(n.leaf) return;
+      svg.appendChild(svgEl("circle", {cx:n.x, cy:n.y, r:R, fill:"var(--surface)"}));
+      var t = svgEl("text", {"class":"tree-node", x:n.x, y:n.y, dy:".35em", "text-anchor":"middle"});
+      t.textContent = n.v;
+      svg.appendChild(t);
+    });
+
+    geo.leaves.forEach(function(n){
+      var gi = groupOf(n.i);
+      var g = svgEl("g", {
+        "class":"leafgroup" + (gi >= 0 ? " locked" : ""),
+        tabindex: gi >= 0 ? "-1" : "0",
+        role:"button",
+        "aria-label":"prime factor " + n.v + (gi >= 0 ? ", already grouped" : "")
+      });
+      g.appendChild(svgEl("circle", {cx:n.x, cy:n.y, r:R, fill:"var(--chip)"}));
+      var cls = "ring";
+      if(gi >= 0) cls += " g" + (gi % 3);
+      else if(sel.indexOf(n.i) !== -1) cls += " sel";
+      g.appendChild(svgEl("circle", {"class":cls, cx:n.x, cy:n.y, r:R}));
+      var t = svgEl("text", {"class":"tree-node", x:n.x, y:n.y, dy:".35em", "text-anchor":"middle"});
+      t.textContent = n.v;
+      g.appendChild(t);
+      g.addEventListener("click", function(){ tap(n.i); });
+      g.addEventListener("keydown", function(ev){
+        if(ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); tap(n.i); }
+      });
+      svg.appendChild(g);
+    });
+
+    host.appendChild(svg);
+
+    $$(".tab", tabsEl).forEach(function(t, i){
+      t.className = "tab" + (i === cur ? " on" : "");
+    });
+    whichEl.textContent = "Problem " + (cur + 1) + " of " + PROBS.length;
+    askEl.innerHTML = "Simplify " + rad(p.idx, p.n);
+    ruleEl.textContent = p.idx === 2 ? "square root — group in 2s"
+                                     : "cube root — group in 3s";
+    paintLive();
+
+    solved = !canGroup();
+    doneEl.textContent = solved ? "fully simplified" : "";
+    nextB.style.display = solved ? "" : "none";
+    showB.style.display = solved ? "none" : "";
+    if(solved) nextB.textContent = (cur === PROBS.length - 1) ? "Back to the first" : "Next problem";
+  }
+
+  function tap(i){
+    var p = PROBS[cur];
+    if(groupOf(i) >= 0){ say("That one is already in a group.", "no"); return; }
+
+    var k = sel.indexOf(i);
+    if(k >= 0){ sel.splice(k, 1); render(); say("", ""); return; }
+    sel.push(i);
+
+    if(sel.length < p.idx){
+      render();
+      say("Selected. Pick " + (p.idx - sel.length) + " more of the same number.", "");
+      return;
+    }
+
+    var vals = sel.map(function(x){ return geo.byId[x].v; });
+    var same = vals.every(function(v){ return v === vals[0]; });
+    if(same){
+      groups.push({v:vals[0], ids:sel.slice()});
+      sel = [];
+      render();
+      say(solved
+        ? "That is it — nothing left inside has enough copies to come out."
+        : "Group of " + p.idx + " — one " + vals[0] + " moves outside the root.", "ok");
+    }else{
+      sel = [];
+      render();
+      say("Not a group: " + vals.join(" and ") + " are not the same number. A group has to be " +
+          p.idx + " identical copies.", "no");
+    }
+  }
+
+  function showMe(){
+    var p = PROBS[cur];
+    while(canGroup()){
+      var c = loose(), target = null, v;
+      for(v in c){ if(c[v] >= p.idx){ target = Number(v); break; } }
+      var ids = [];
+      geo.leaves.forEach(function(n){
+        if(ids.length < p.idx && groupOf(n.i) < 0 && n.v === target) ids.push(n.i);
+      });
+      groups.push({v:target, ids:ids});
+    }
+    sel = [];
+    render();
+    say("Every group is circled — the colours show which copies came out together.", "ok");
+  }
+
+  function load(i){
+    cur = i; sel = []; groups = [];
+    geo = build(PROBS[i].tree);
+    render();
+    say(PROBS[i].idx === 3
+      ? "This one is a <strong>cube</strong> root — click three identical factors to group them."
+      : "Click two identical factors to pair them.", "");
+  }
+
+  PROBS.forEach(function(p, i){
+    var t = EXP.el("button", "tab", rad(p.idx, p.n));
+    t.type = "button";
+    t.addEventListener("click", function(){ load(i); });
+    tabsEl.appendChild(t);
+  });
+
+  resetB.addEventListener("click", function(){ load(cur); });
+  showB.addEventListener("click", showMe);
+  nextB.addEventListener("click", function(){ load((cur + 1) % PROBS.length); });
+
+  load(0);
+})();
+
+
+/* positive, negative, or not real? */
+EXP.drill("#rDrill", {
+  choices:[{k:"pos", t:"Positive"}, {k:"neg", t:"Negative"}, {k:"none", t:"Not a real number"}],
+  end:"Even root of a negative: not real. Odd root of a negative: negative.",
+  items:[
+    {m:"√<span class='rad'>16</span>", a:"pos", why:"&radic;16 = 4."},
+    {m:"<span class='idx'>3</span>√<span class='rad'>&minus;27</span>", a:"neg", why:"Odd root of a negative: &minus;3, because (&minus;3)<sup>3</sup> = &minus;27."},
+    {m:"√<span class='rad'>&minus;16</span>", a:"none", why:"Even root of a negative. No real number squared gives &minus;16."},
+    {m:"&minus;√<span class='rad'>16</span>", a:"neg", why:"The minus is outside the root: &minus;4."},
+    {m:"<span class='idx'>4</span>√<span class='rad'>&minus;16</span>", a:"none", why:"Fourth root is even, so a negative inside is not real."},
+    {m:"(&minus;8)<sup>1/3</sup>", a:"neg", why:"A cube root, which is odd: &minus;2."},
+    {m:"(&minus;4)<sup>1/2</sup>", a:"none", why:"A square root of a negative: not real."},
+    {m:"<span class='idx'>5</span>√<span class='rad'>&minus;32</span>", a:"neg", why:"Fifth root is odd: &minus;2, because (&minus;2)<sup>5</sup> = &minus;32."}
+  ]
+});
+
+})();
+</script>
+</body>
+</html>

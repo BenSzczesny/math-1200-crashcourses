@@ -1,0 +1,2213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Completing the Square</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
+<style>
+/* Math 1200 · exponent crash course · shared theme
+   Neutral professional palette: graphite accent, warm-neutral paper.
+   Correctness colour is SEMANTIC (--ok / --wrong) and deliberately separate
+   from the accent, so "right" never reads as "emphasised". */
+
+:root{
+  --paper:#F6F6F4; --surface:#FFFFFF; --surface-2:#EDEDEA;
+  --ink:#1B1C1B; --ink-2:#4F524F; --ink-3:#858885;
+  --rule:#E0E0DB; --rule-strong:#C6C7C1;
+  --accent:#33403F; --accent-2:#1F2827; --accent-wash:#E9EBEA;
+  --on-accent:#FFFFFF;
+  --ok:#3D6B55; --ok-wash:#E8EEEB;
+  --wrong:#96453A; --wrong-wash:#F4E9E7;
+  --chip:#EEEEEB;
+  --shadow:0 1px 2px rgba(27,28,27,.05), 0 8px 24px -14px rgba(27,28,27,.20);
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"Karla", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+    --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+    --rule:#2D302E; --rule-strong:#3F423F;
+    --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+    --on-accent:#141514;
+    --ok:#7CBB9C; --ok-wash:#1B2721;
+    --wrong:#DA9184; --wrong-wash:#2B1D1A;
+    --chip:#212422;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+  --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+  --rule:#2D302E; --rule-strong:#3F423F;
+  --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+  --on-accent:#141514;
+  --ok:#7CBB9C; --ok-wash:#1B2721;
+  --wrong:#DA9184; --wrong-wash:#2B1D1A;
+  --chip:#212422;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--paper);
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.topbar-in{
+  max-width:820px; margin:0 auto; padding:10px 24px;
+  display:flex; align-items:center; gap:16px; justify-content:space-between;
+}
+.brandmark{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.brandmark b{color:var(--ink-2); font-weight:500}
+.brandmark a{color:var(--ink-2); text-decoration:none}
+.brandmark a:hover{color:var(--ink); text-decoration:underline}
+.brandmark a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.meter{display:flex; align-items:center; gap:10px}
+.meter-track{width:120px; height:5px; border-radius:99px; background:var(--rule); overflow:hidden}
+.meter-fill{height:100%; width:0%; background:var(--accent); transition:width .35s ease}
+.meter-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+/* phones: the bar keeps one line; the title truncates and the track goes */
+@media (max-width:560px){
+  .topbar-in{padding:9px 16px; gap:10px}
+  .brandmark{overflow:hidden; text-overflow:ellipsis; min-width:0}
+  .meter-track{display:none}
+  main{padding:0 16px 80px}
+}
+
+/* ---------- page frame ---------- */
+main{max-width:820px; margin:0 auto; padding:0 24px 96px}
+section{padding:44px 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(34px,6vw,52px);
+  line-height:1.08; margin:0 0 16px; letter-spacing:-.015em; text-wrap:balance;
+}
+h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(25px,3.6vw,32px);
+  line-height:1.2; margin:0 0 14px; letter-spacing:-.01em; text-wrap:balance;
+}
+h3{font-family:var(--sans); font-weight:700; font-size:15px; margin:0 0 8px}
+p{margin:0 0 16px; max-width:62ch; color:var(--ink-2)}
+p.lead{font-size:19px; color:var(--ink)}
+strong{color:var(--ink); font-weight:700}
+ul.plain{margin:0 0 16px; padding-left:20px; max-width:62ch; color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+
+/* ---------- math ---------- */
+.m{font-family:var(--serif); font-size:1.18em; line-height:1.35; white-space:nowrap}
+.m i{font-style:italic}
+.m sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.m .op{padding:0 .18em; color:var(--ink-2)}
+/* An inline-grid takes its baseline from the numerator, so anything written
+   after a fraction lands level with the top half. Centring the box on the
+   parent's x-height puts the bar where a reader expects it. */
+.fr{display:inline-grid; vertical-align:middle; text-align:center; margin:0 .14em}
+.fr > span{padding:0 .4em}
+.fr > span + span{border-top:1.6px solid currentColor; padding-top:.1em; margin-top:.1em}
+.rad{border-top:1.5px solid currentColor; padding:.06em .18em 0 .1em; margin-left:-.06em}
+.idx{font-size:.58em; vertical-align:.75em; margin-right:-.32em; line-height:0}
+.big{font-size:1.5em}
+
+/* ---------- factor chips ---------- */
+.expand{
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  padding:20px; margin:0 0 20px; box-shadow:var(--shadow);
+}
+.expand-row{display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px}
+.chiprow{display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:34px}
+.chip{
+  font-family:var(--mono); font-size:14px;
+  min-width:30px; height:32px; padding:0 8px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--chip); border:1px solid var(--rule-strong); border-radius:6px;
+  color:var(--ink);
+}
+.chip.a{background:var(--accent-wash); border-color:var(--accent); color:var(--accent-2)}
+.chip.b{background:var(--ok-wash); border-color:var(--ok); color:var(--ok)}
+.chip.gone{opacity:.3; text-decoration:line-through; text-decoration-color:var(--wrong)}
+.dot{font-family:var(--mono); color:var(--ink-3); font-size:13px}
+.count{
+  font-family:var(--mono); font-size:12px; color:var(--ink-2);
+  background:var(--surface-2); border-radius:6px; padding:3px 9px;
+}
+.stack{display:flex; flex-direction:column; gap:10px}
+.overline{border-top:1.6px solid var(--rule-strong); padding-top:10px}
+
+/* ---------- controls ---------- */
+button{font-family:inherit; font-size:inherit; cursor:pointer}
+.btn{
+  font-family:var(--sans); font-weight:500; font-size:14px;
+  padding:8px 15px; border-radius:8px; border:1px solid var(--rule-strong);
+  background:var(--surface); color:var(--ink); transition:background .15s, border-color .15s;
+}
+.btn:hover{background:var(--surface-2); border-color:var(--accent)}
+.btn.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn:focus-visible, .opt:focus-visible, .rulebtn:focus-visible, .tab:focus-visible{
+  outline:2.5px solid var(--accent); outline-offset:2px;
+}
+.ctrls{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px}
+.ctrl-label{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-right:4px}
+
+/* ---------- rule statement ---------- */
+.rulebox{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px;
+  background:var(--accent-wash); border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0; padding:18px 22px; margin:0 0 20px;
+}
+.rulebox .tag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-2);
+}
+.rulebox .m{font-size:1.5em; color:var(--ink)}
+/* a condition on a rule, e.g. (a ≠ 0): lower case matters, so never a .tag */
+.rulebox .cond{font-family:var(--serif); font-size:16px; color:var(--ink-2)}
+.rulebox .cond i{font-style:italic}
+@media (max-width:560px){ .rulebox .m{white-space:normal} }
+
+/* ---------- side-by-side compare ---------- */
+.compare{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; background:var(--surface)}
+.compare > div{padding:18px 20px}
+.compare > div + div{border-left:1px solid var(--rule)}
+.compare .hd{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* only the stacked statements are blocks — an inline .m inside a caption stays inline */
+.compare > div > .m{display:block; margin-bottom:8px}
+.compare small{color:var(--ink-2); font-size:13.5px; line-height:1.45; display:block}
+@media (max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .compare > div + div{border-left:0; border-top:1px solid var(--rule)}
+}
+
+/* ---------- traps ---------- */
+.trap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; margin:0 0 14px}
+.trap-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:6px}
+.never{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--wrong); background:var(--wrong-wash); border-radius:5px; padding:3px 8px; white-space:nowrap;
+}
+.trap p{margin:8px 0 12px; font-size:15px}
+.subst{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:12px; padding-top:14px; border-top:1px dashed var(--rule-strong)}
+.subst .side{display:flex; flex-direction:column; gap:4px}
+.subst .side .lbl{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.verdict{font-family:var(--mono); font-size:13px; color:var(--wrong); align-self:center}
+
+/* ---------- multiple choice ---------- */
+.check{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; margin:22px 0 0; box-shadow:var(--shadow)}
+.check-q{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin-bottom:14px}
+.check-q .ask{font-weight:700; color:var(--ink); font-size:15px}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px}
+.opt{
+  font-family:var(--sans); text-align:left; padding:11px 14px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  transition:border-color .15s, background .15s;
+}
+/* Options are mostly math (nowrap is right) but some are prose — "no solution",
+   "it cannot be simplified" — which must wrap rather than clip. */
+.opt .m{white-space:normal; display:inline-block}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok); background:var(--ok-wash)}
+.opt.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.fb{margin-top:12px; font-size:14.5px; line-height:1.5; display:none}
+.fb.show{display:block}
+.fb.ok{color:var(--ok)}
+.fb.no{color:var(--wrong)}
+
+/* ---------- two-button drill (factor-or-term, splits-or-not) ---------- */
+.drill{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:22px 20px; box-shadow:var(--shadow)}
+.drill-top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+.drill-q{font-family:var(--serif); font-size:clamp(22px,3.4vw,30px); line-height:1.35; padding:6px 0 14px}
+.drill-q i{font-style:italic}
+.drill-q.m{white-space:normal}
+.drill-q sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.drill-btns{display:flex; flex-wrap:wrap; gap:8px}
+.drill-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:3em}
+.drill-fb.ok{color:var(--ok)}
+.drill-fb.no{color:var(--wrong)}
+.pips{display:flex; flex-wrap:wrap; gap:5px}
+.pip{width:9px; height:9px; border-radius:99px; background:var(--rule); border:1px solid var(--rule-strong)}
+.pip.ok{background:var(--ok); border-color:var(--ok)}
+.pip.no{background:var(--wrong); border-color:var(--wrong)}
+.pip.now{box-shadow:0 0 0 3px var(--accent-wash); border-color:var(--accent)}
+
+/* ---------- rule chooser ---------- */
+.solver{background:var(--surface); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+.solver-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--rule); background:var(--surface-2)}
+.solver-head .which{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.tabs{display:flex; flex-wrap:wrap; gap:6px}
+.tab{font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:6px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink-2)}
+.tab.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.work{padding:22px 20px; display:flex; flex-direction:column; gap:2px; overflow-x:auto}
+.line{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:7px 0}
+.line .eq{font-family:var(--serif); font-size:1.18em; color:var(--ink-3); width:14px; flex:none}
+.line.now .m{color:var(--ink)}
+.line.past .m{color:var(--ink-2)}
+.line .note{color:var(--ink-3); font-size:13px; line-height:1.45}
+.usedtag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); background:var(--accent-wash); border-radius:5px; padding:2px 8px}
+.line.done .m{color:var(--ok); font-weight:600}
+.picker{padding:16px 20px 20px; border-top:1px solid var(--rule)}
+.picker .prompt{font-size:14px; font-weight:700; color:var(--ink); margin-bottom:12px}
+.rulegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px}
+.rulebtn{
+  font-family:var(--sans); text-align:left; padding:10px 13px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; gap:3px; transition:border-color .15s, background .15s;
+}
+.rulebtn:hover:not(:disabled){border-color:var(--accent); background:var(--surface-2)}
+.rulebtn:disabled{opacity:.5; cursor:default}
+.rulebtn .nm{font-weight:700; font-size:14px}
+.rulebtn .frm{font-family:var(--serif); font-size:14.5px; color:var(--ink-3)}
+.rulebtn .frm i{font-style:italic}
+.rulebtn .frm sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.solver-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:1.5em}
+.solver-fb.no{color:var(--wrong)}
+.solver-fb.ok{color:var(--ok)}
+.finish{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:16px}
+
+/* ---------- scoreboard ---------- */
+.score{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  border:1px solid var(--rule); border-radius:10px; padding:18px 22px; background:var(--surface); margin-top:26px;
+}
+.score .n{font-family:var(--serif); font-size:36px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1}
+.score .say{font-size:14.5px; color:var(--ink-2); max-width:44ch}
+
+/* ---------- factor tree (lesson 3) ---------- */
+.treewrap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
+.treewrap svg{display:block; max-width:100%; height:auto}
+.tree-line{stroke:var(--rule-strong); stroke-width:1.5}
+.tree-node{font-family:var(--mono); font-size:14px; fill:var(--ink)}
+.tree-leaf-ring{fill:none; stroke:var(--rule-strong); stroke-width:1.5}
+.tree-leaf-ring.p1{stroke:var(--accent); stroke-width:2.2}
+.tree-leaf-ring.p2{stroke:var(--ok); stroke-width:2.2}
+.tree-legend{display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--rule)}
+.swatch{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--ink-2)}
+.swatch i{width:13px; height:13px; border-radius:99px; border:2.2px solid var(--rule-strong); display:inline-block}
+.swatch.p1 i{border-color:var(--accent)}
+.swatch.p2 i{border-color:var(--ok)}
+
+/* ---------- closing ---------- */
+.next{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-top:20px}
+.nextcard{border:1px solid var(--rule); border-radius:10px; padding:16px 18px; background:var(--surface)}
+.nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
+.nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
+.nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
+.colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
+
+/* ---------- number lines (inequalities crash course) ---------- */
+.nlbox{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.nlrow{display:grid; grid-template-columns:minmax(96px,auto) 1fr; gap:6px 14px; align-items:center}
+.nlrow + .nlrow{margin-top:8px}
+.nlrow .lbl{font-family:var(--serif); font-size:17px; text-align:right; color:var(--ink); white-space:nowrap}
+.nlrow .lbl i{font-style:italic}
+.nlrow.res{border-top:1px solid var(--rule-strong); padding-top:12px; margin-top:12px}
+.nlrow.res .lbl{font-weight:600}
+.nlrow.res .lbl.none{color:var(--wrong)}
+svg.nl{display:block; width:100%; height:auto; overflow:visible}
+svg.nl .ax{stroke:var(--ink-3); stroke-width:1.6; fill:none}
+svg.nl .head{fill:var(--ink-3); stroke:none}
+svg.nl .tk{stroke:var(--ink-2); stroke-width:1.8}
+svg.nl .tk.minor{stroke:var(--ink-3); stroke-width:1.2}
+svg.nl text{font-family:var(--mono); text-anchor:middle}
+svg.nl text.key{font-size:17px; font-weight:500; fill:var(--ink)}
+svg.nl text.minor{font-size:13px; fill:var(--ink-3)}
+svg.nl .seg{stroke:var(--accent); stroke-width:7; stroke-linecap:butt; fill:none}
+svg.nl .pt{stroke:var(--accent); stroke-width:2.6}
+svg.nl .pt.open{fill:var(--surface)}
+svg.nl .pt.closed{fill:var(--accent)}
+svg.nl .pt.ghost{fill:none; stroke:var(--ink-3); stroke-dasharray:3 3}
+svg.nl.dim .seg{stroke:var(--ink-3)}
+svg.nl.dim .pt{stroke:var(--ink-3)}
+svg.nl.dim .pt.closed{fill:var(--ink-3)}
+svg.nl.ok .seg{stroke:var(--ok)}
+svg.nl.ok .pt{stroke:var(--ok)}
+svg.nl.ok .pt.closed{fill:var(--ok)}
+svg.nl .arc{fill:none; stroke:var(--accent); stroke-width:1.8}
+svg.nl .arclbl{font-size:15px; fill:var(--accent-2); font-weight:500}
+svg.nl .pin line{stroke-width:2}
+svg.nl .pin text{font-size:14px; font-weight:500}
+svg.nl .pin.yes line{stroke:var(--ok)}   svg.nl .pin.yes polygon, svg.nl .pin.yes circle{fill:var(--ok)}   svg.nl .pin.yes text{fill:var(--ok)}
+svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no circle{fill:var(--wrong)} svg.nl .pin.no text{fill:var(--wrong)}
+.nlnote{font-size:14.5px; color:var(--ink-2); margin-top:14px; padding-top:12px; border-top:1px solid var(--rule); line-height:1.5}
+.nlgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:26px}
+.nlgrid > div + div{padding-top:20px; border-top:1px solid var(--rule)}
+@media (min-width:1000px){ .nlgrid > div + div{padding-top:0; border-top:none} }
+@media (max-width:520px){ .nlgrid{grid-template-columns:1fr} .nlrow{grid-template-columns:minmax(72px,auto) 1fr} }
+.nlgrid .hd{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* a math statement heading a box: never uppercased, since x and X differ */
+.boxhd{font-family:var(--serif); font-size:21px; color:var(--ink); padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid var(--rule)}
+.boxhd i{font-style:italic}
+.hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
+
+/* ---------- page map ---------- */
+.pagemap{list-style:none; counter-reset:pm; margin:22px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px}
+.pagemap li{counter-increment:pm}
+.pagemap a{display:block; position:relative; padding:10px 14px 10px 38px; border:1px solid var(--rule); border-radius:8px; background:var(--surface); color:var(--ink); text-decoration:none; font-size:15px; line-height:1.35}
+.pagemap a::before{content:counter(pm); position:absolute; left:14px; top:12px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{border-color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+
+/* ---------- key idea / watch out ---------- */
+.keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
+.keybox .tag, .warn .tag{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin-bottom:6px}
+.keybox p, .warn p{margin:0; color:var(--ink); max-width:none}
+.keybox p + p, .warn p + p{margin-top:8px}
+.keybox ul{margin:4px 0 0; padding-left:20px; color:var(--ink)}
+.keybox li{margin-bottom:4px}
+.warn{background:var(--wrong-wash); border-left:3px solid var(--wrong); border-radius:0 10px 10px 0; padding:14px 20px; margin:0 0 20px}
+.warn .tag{color:var(--wrong)}
+
+/* ---------- symbol table ---------- */
+.symtab{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; font-size:15.5px}
+.symtab th{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:500; text-align:left; padding:10px 14px; background:var(--surface-2); border-bottom:1px solid var(--rule)}
+.symtab td{padding:10px 14px; border-bottom:1px solid var(--rule); color:var(--ink); vertical-align:middle}
+.symtab tr:last-child td{border-bottom:0}
+.symtab td.m, .symtab td .m{font-size:1.15em}
+.dotic{display:inline-block; width:14px; height:14px; border-radius:99px; border:2.4px solid var(--ok); vertical-align:-2px; margin-right:6px}
+.dotic.closed{background:var(--ok)}
+@media (max-width:560px){ .symtab{font-size:14px} .symtab th, .symtab td{padding:8px 9px} }
+
+/* ---------- worked example, one step at a time ---------- */
+.walk{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; box-shadow:var(--shadow); margin:0 0 20px}
+.walk-q{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; padding-bottom:12px; border-bottom:1px solid var(--rule)}
+.walk-q .ask{font-weight:700; font-size:15px}
+.walk-q .m{font-size:1.4em}
+.walk-steps{list-style:none; margin:0; padding:6px 0 0}
+.walk-steps li{display:grid; grid-template-columns:minmax(150px,auto) 1fr; gap:4px 20px; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--rule)}
+.walk-steps li:last-child{border-bottom:0}
+.walk-steps li .m{font-size:1.3em}
+.walk-steps li.ans .m{color:var(--ok); font-weight:600}
+.walk-steps .why{font-size:14.5px; color:var(--ink-2); line-height:1.45}
+.walk-steps .why b{color:var(--wrong)}
+@media (max-width:560px){ .walk-steps li{grid-template-columns:1fr} }
+.walk-ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:12px}
+.walk-hint{font-size:13.5px; color:var(--ink-3)}
+.walk + .walk{margin-top:-4px}
+
+/* ---------- test-a-number ---------- */
+.tester{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.tester .tp-probs{margin-bottom:10px}
+.tester .tp-line{cursor:crosshair}
+.tp-slide{display:flex; align-items:center; gap:12px; margin:10px 0 4px}
+.tp-slide input{flex:1; accent-color:var(--accent); min-width:0; height:28px}
+.tp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; margin:8px 0 12px; font-size:15px}
+.tp-out.yes{background:var(--ok-wash)}
+.tp-out.no{background:var(--wrong-wash)}
+.tp-verdict{font-weight:700}
+.tp-out.yes .tp-verdict{color:var(--ok)}
+.tp-out.no .tp-verdict{color:var(--wrong)}
+
+/* ---------- explorers (and/or, flip, distance) ---------- */
+.xp{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.xp-row{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px}
+.xp-row .ctrl-label{min-width:74px}
+.stepper{display:inline-flex; align-items:center; border:1px solid var(--rule-strong); border-radius:8px; overflow:hidden}
+.stepper button{border:0; background:var(--surface-2); color:var(--ink); width:34px; height:34px; font-size:17px}
+.stepper button:hover{background:var(--accent-wash)}
+.stepper button:focus-visible{outline:2.5px solid var(--accent); outline-offset:-2px}
+.stepper span{min-width:44px; text-align:center; font-family:var(--serif); font-size:18px}
+.xp-stmt{font-family:var(--serif); font-size:clamp(20px,3vw,26px); padding:10px 0 4px; border-top:1px solid var(--rule); margin-top:6px}
+.xp-stmt i{font-style:italic}
+.xp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; background:var(--ok-wash); margin-top:12px; font-size:15px}
+.xp-out .m{font-size:1.3em}
+.xp-out .shape{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); font-weight:500}
+.xp-out.empty{background:var(--wrong-wash)} .xp-out.empty .shape{color:var(--wrong)}
+.xp-say{font-size:14.5px; color:var(--ink-2); margin-top:10px}
+
+/* ---------- build-the-graph drill ---------- */
+.gb .drill-q{padding-bottom:6px}
+.gb .xp-row{margin:6px 0}
+.btn.right{border-color:var(--ok); background:var(--ok-wash)}
+.btn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.btn:disabled{cursor:default}
+.drill-end{margin-top:10px; padding-top:10px; border-top:1px solid var(--rule); color:var(--ink-2)}
+
+/* ---------- numbered method (steps-list) ---------- */
+.steps-list{list-style:none; counter-reset:rc; margin:0 0 20px; padding:0}
+.steps-list > li{counter-increment:rc; position:relative; padding:12px 16px 12px 52px; border:1px solid var(--rule); border-radius:10px; background:var(--surface); margin-bottom:8px; color:var(--ink)}
+.steps-list > li::before{content:counter(rc); position:absolute; left:14px; top:11px; width:26px; height:26px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-family:var(--mono); font-size:13px; display:flex; align-items:center; justify-content:center}
+.steps-list > li small{display:block; color:var(--ink-2); font-size:14px; margin-top:2px}
+
+/* ---------- cheat sheet ---------- */
+.cheat{border:1.5px solid var(--accent); border-radius:12px; padding:20px 22px; background:var(--surface)}
+.cheat h3{font-family:var(--serif); font-size:21px; font-weight:600; margin:0 0 12px}
+.cheat ul{margin:0; padding-left:20px; color:var(--ink)}
+.cheat li{margin-bottom:6px}
+.cheat .symtab{margin:10px 0 14px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important; scroll-behavior:auto !important}
+}
+</style>
+<style>
+/* completing-the-square lesson only */
+.sqrow{display:flex; flex-wrap:wrap; gap:24px; align-items:center}
+.sqrow .side{flex:1 1 240px; min-width:0}
+.sqrow svg{display:block; max-width:100%; height:auto}
+.cases{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); gap:10px; margin:0 0 20px}
+.case{border:1px solid var(--rule); border-radius:10px; background:var(--surface); padding:14px 16px}
+.case .when{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:8px}
+.crow{display:flex; flex-direction:column; gap:2px; padding:7px 0; border-bottom:1px dashed var(--rule); min-width:0}
+.crow .k{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.crow .m{white-space:normal; overflow-wrap:break-word}
+.crow .sw{display:block; font-family:var(--sans); font-size:14px; font-weight:400; color:var(--ink-2); margin-bottom:2px}
+.crow.res .m{color:var(--ok); font-weight:600}
+.case small{margin-top:10px}
+.case small{display:block; color:var(--ink-2); font-size:13.5px; line-height:1.5}
+.cwork{overflow-x:auto; min-width:0}
+.cw{font-family:var(--serif); font-size:clamp(16px,2.3vw,19px); padding:7px 0; border-bottom:1px dashed var(--rule); white-space:nowrap}
+.cw:last-child{border-bottom:0}
+.cw i{font-style:italic}
+.cw .lb{display:block; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); white-space:normal}
+.cw.fin{color:var(--ok); font-weight:600}
+.cplot{flex:0 1 300px; max-width:100%}
+.cp-g{stroke:var(--rule); stroke-width:1}
+.cp-a{stroke:var(--ink-3); stroke-width:1.4}
+.cp-c{fill:var(--ok-wash); stroke:var(--ok); stroke-width:2.4}
+.cp-r{stroke:var(--accent); stroke-width:1.6; stroke-dasharray:4 3}
+.cp-o{fill:var(--accent)}
+.cp-t{font-family:var(--mono); font-size:11px; fill:var(--ink-3); text-anchor:middle}
+.cp-l{font-family:var(--mono); font-size:12.5px; fill:var(--accent-2); font-weight:500}
+#cc .xp-row .btn{font-size:14px}
+#mvBuild{margin:0 0 24px}
+.ld-goal{font-weight:700; font-size:15.5px; color:var(--ink); margin:8px 0 0}
+.ld-goal:empty{display:none}
+.ld-q{font-size:clamp(22px,3.4vw,28px); margin:4px 0 12px}
+.ld-final{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; margin:12px 0 0; padding:12px 14px; border-radius:8px; background:var(--ok-wash)}
+.ld-final:empty{display:none}
+.ld-final .lbl{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ok)}
+.ld-final .m{font-size:1.3em; color:var(--ok); font-weight:600}
+.ld-final i{font-style:italic}
+.ld-final sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ld-done{display:flex; flex-direction:column; gap:4px; margin:0 0 10px}
+.ld-done:empty{display:none}
+.ld-line{display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline; font-size:15px; color:var(--ink-2)}
+.ld-line .m{color:var(--ok); font-weight:600; font-size:1.12em}
+.ld-ask{font-weight:700; font-size:15.5px; margin:0 0 10px; color:var(--ink)}
+.ld-step{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-right:10px}
+.ld-opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:0 0 6px}
+.drill.wide .ld-opts{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.ldbtn{font-family:var(--serif); font-size:18px; padding:11px 14px; border-radius:8px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink); cursor:pointer; text-align:center}
+.ldbtn i, .ld-q i, .ld-line i, .ld-ask i{font-style:italic}
+.ldbtn sup, .ld-q sup, .ld-line sup, .ld-ask sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ldbtn:hover:not(:disabled){border-color:var(--accent)}
+.ldbtn:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+.ldbtn:disabled{cursor:default}
+.ldbtn.right{border-color:var(--ok); background:var(--ok-wash)}
+.ldbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+@media (max-width:480px){ .drill.wide .ld-opts{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Completing the Square</b></div>
+    <div class="meter">
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-num" id="meterNum">0 / 12 correct</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<section id="top">
+  <div class="eyebrow">Circles · Module 8</div>
+  <h1>Half it, square it, add it to both sides</h1>
+  <p class="lead">A circle's equation often comes with its center and radius hidden. <strong>Completing the square</strong> rewrites it so you can read them off.</p>
+  <p>Work through it in order. It starts with squaring a bracket and builds up to circles. No calculator needed.</p>
+  <p style="font-size:14.5px">ALEKS topic: <em>Identifying the center and radius to graph a circle given its equation in general form: Basic</em> (§2.2). The same move comes back in Module 14: <em>Rewriting a quadratic function to find its vertex and sketch its graph</em>.</p>
+  <ol class="pagemap">
+    <li><a href="#s1">Why bother</a></li>
+    <li><a href="#s2">Squaring a bracket</a></li>
+    <li><a href="#s3">Half it, square it</a></li>
+    <li><a href="#s4">Practice: build the square</a></li>
+    <li><a href="#s5">Add to both sides</a></li>
+    <li><a href="#s6">Circles 1: read the answer</a></li>
+    <li><a href="#s7">Circles 2: one square</a></li>
+    <li><a href="#s8">Circles 3: two squares</a></li>
+    <li><a href="#s9">Special cases</a></li>
+    <li><a href="#s10">Try any circle</a></li>
+    <li><a href="#s11">Common mistakes</a></li>
+    <li><a href="#s12">Whole problems, move by move</a></li>
+    <li><a href="#s13">Check yourself</a></li>
+    <li><a href="#s14">Cheat sheet</a></li>
+  </ol>
+</section>
+
+<section id="s1">
+  <div class="eyebrow">1 · The goal</div>
+  <h2>Two ways to write the same circle</h2>
+
+  <div class="compare">
+    <div>
+      <div class="hd">General form</div>
+      <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 8<i>x</i> − 4<i>y</i> + 16 = 0</span>
+      <small>Center? Radius? You can't tell by looking.</small>
+    </div>
+    <div>
+      <div class="hd">Standard form</div>
+      <span class="m">(<i>x</i> − 4)<sup>2</sup> + (<i>y</i> − 2)<sup>2</sup> = 4</span>
+      <small>Center (4, 2), radius 2. You read them straight off.</small>
+    </div>
+  </div>
+
+  <p>Completing the square turns the left one into the right one.</p>
+</section>
+
+<section id="s2">
+  <div class="eyebrow">2 · Warm-up</div>
+  <h2>Squaring a bracket gives three terms, not two</h2>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Multiply out</span><span class="m">(<i>x</i> + 3)<sup>2</sup></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">(<i>x</i> + 3)(<i>x</i> + 3)</span><span class="why">Squared means times itself.</span></li>
+      <li><span class="m"><i>x</i><sup>2</sup> + 3<i>x</i> + 3<i>x</i> + 9</span><span class="why">Each term in the first bracket times each term in the second.</span></li>
+      <li class="ans"><span class="m"><i>x</i><sup>2</sup> + 6<i>x</i> + 9</span><span class="why">Middle: <span class="m">3<i>x</i> + 3<i>x</i> = 6<i>x</i></span>. End: <span class="m">3 × 3 = 9</span>.</span></li>
+    </ol>
+  </div>
+
+  <div class="rulebox">
+    <span class="tag">The pattern</span>
+    <span class="m">(<i>x</i> + <i>a</i>)<sup>2</sup> = <i>x</i><sup>2</sup> + 2<i>a</i><i>x</i> + <i>a</i><sup>2</sup></span>
+    <span class="m">(<i>x</i> − <i>a</i>)<sup>2</sup> = <i>x</i><sup>2</sup> − 2<i>a</i><i>x</i> + <i>a</i><sup>2</sup></span>
+  </div>
+
+  <p>An expression like <span class="m"><i>x</i><sup>2</sup> + 6<i>x</i> + 9</span>, which equals a bracket squared, is called a <strong>perfect square</strong>.</p>
+  <p>The <strong>middle number</strong> is the number in front of <span class="m"><i>x</i></span>. In <span class="m"><i>x</i><sup>2</sup> + 6<i>x</i> + 9</span> it's 6, which is twice the 3 in the bracket. So:</p>
+  <ul>
+    <li>the number in the bracket is <strong>half</strong> the middle number</li>
+    <li>the last number is that half, <strong>squared</strong></li>
+  </ul>
+  <p>That is the whole idea behind completing the square.</p>
+
+  <div class="check" data-q="c1">
+    <div class="check-q"><span class="ask">Multiply out</span><span class="m">(<i>x</i> − 5)<sup>2</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="eyebrow">3 · The move</div>
+  <h2>Half it, square it</h2>
+  <p>Now go backwards. Start with <span class="m"><i>x</i><sup>2</sup> + 6<i>x</i></span>. <strong>What number do you add to make a perfect square?</strong></p>
+  <p>Half of 6 is 3, so the bracket is <span class="m">(<i>x</i> + 3)</span>. The number to add is <span class="m">3<sup>2</sup> = 9</span>.</p>
+
+  <ol class="steps-list">
+    <li><strong>Half it.</strong> Take half of the middle number. Keep its sign.</li>
+    <li><strong>Square it.</strong> That's the number to add. It is never negative.</li>
+    <li><strong>Write the bracket.</strong> The bracket holds <span class="m"><i>x</i></span> and the half: <span class="m">(<i>x</i> + half)<sup>2</sup></span>.</li>
+  </ol>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Make a perfect square</span><span class="m"><i>x</i><sup>2</sup> + 6<i>x</i> + ___ = ( ___ )<sup>2</sup></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">half of 6 is 3</span><span class="why">Half it.</span></li>
+      <li><span class="m">3<sup>2</sup> = 9</span><span class="why">Square it. 9 goes in the blank.</span></li>
+      <li class="ans"><span class="m"><i>x</i><sup>2</sup> + 6<i>x</i> + 9 = (<i>x</i> + 3)<sup>2</sup></span><span class="why">The bracket holds the half. It's section 2's example, backwards.</span></li>
+    </ol>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Make a perfect square</span><span class="m"><i>x</i><sup>2</sup> − 8<i>x</i> + ___ = ( ___ )<sup>2</sup></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">half of −8 is −4</span><span class="why">Half of a negative number is negative.</span></li>
+      <li><span class="m">(−4)<sup>2</sup> = 16</span><span class="why">Negative times negative is positive: <span class="m">(−4)(−4) = 16</span>.</span></li>
+      <li class="ans"><span class="m"><i>x</i><sup>2</sup> − 8<i>x</i> + 16 = (<i>x</i> − 4)<sup>2</sup></span><span class="why">The bracket holds the half, minus sign and all. Check the middle term: <span class="m">2 · (−4) · <i>x</i> = −8<i>x</i></span>.</span></li>
+    </ol>
+  </div>
+
+  <div class="keybox">
+    <span class="tag">Watch the signs</span>
+    <ul>
+      <li>The half has the same sign as the middle number.</li>
+      <li>The number you add is always positive.</li>
+      <li>The sign in the bracket matches the middle number: <span class="m"><i>x</i><sup>2</sup> − 8<i>x</i></span> gives <span class="m">(<i>x</i> − 4)<sup>2</sup></span>.</li>
+    </ul>
+  </div>
+
+  <div class="check" data-q="c2">
+    <div class="check-q"><span class="ask">What number makes</span><span class="m"><i>x</i><sup>2</sup> + 10<i>x</i> + ___</span><span class="ask">a perfect square?</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+
+  <div class="check" data-q="c3">
+    <div class="check-q"><span class="ask">Fill both blanks</span><span class="m"><i>x</i><sup>2</sup> − 14<i>x</i> + ___ = ( ___ )<sup>2</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="eyebrow">4 · Practice</div>
+  <h2>Build the square, one step at a time</h2>
+  <p>Every one of these is the same three steps: <strong>half it, square it, write the bracket.</strong> Say them out loud as you go.</p>
+
+  <h3>Pick each move</h3>
+  <p>Click the next move and the page shows the working. Do it on paper too.</p>
+  <div class="solver" id="mvBuild">
+    <div class="solver-head">
+      <span class="which"></span>
+      <div class="tabs"></div>
+    </div>
+    <div class="work"></div>
+    <div class="picker">
+      <div class="prompt"></div>
+      <div class="rulegrid"></div>
+      <div class="solver-fb"></div>
+      <div class="finish" style="display:none">
+        <button type="button" class="btn on"></button>
+      </div>
+    </div>
+  </div>
+
+  <h3>On your own</h3>
+  <p>Now all three steps at once. Work it on paper, then pick the answer.</p>
+  <div id="ldSolo"></div>
+</section>
+
+<section id="s5">
+  <div class="eyebrow">5 · Keep it balanced</div>
+  <h2>In an equation, add it to both sides</h2>
+  <p>An equation is a balance. Whatever you add to the left side, add to the right side too.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Solve by completing the square</span><span class="m"><i>x</i><sup>2</sup> − 6<i>x</i> = 7</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">half of −6 is −3, and (−3)<sup>2</sup> = 9</span><span class="why">This is the number to add.</span></li>
+      <li><span class="m"><i>x</i><sup>2</sup> − 6<i>x</i> + 9 = 7 + 9</span><span class="why">Add 9 to <b>both</b> sides.</span></li>
+      <li><span class="m">(<i>x</i> − 3)<sup>2</sup> = 16</span><span class="why">The left side is now a perfect square.</span></li>
+      <li><span class="m"><i>x</i> − 3 = ±4</span><span class="why">Take the square root of both sides. Don't forget the ±.</span></li>
+      <li class="ans"><span class="m"><i>x</i> = 7 &nbsp;or&nbsp; <i>x</i> = −1</span><span class="why">Add 3. Check: <span class="m">49 − 42 = 7</span> and <span class="m">1 + 6 = 7</span>.</span></li>
+    </ol>
+  </div>
+
+  <h3>Practice</h3>
+  <p>Just the first part: complete the square, then pick the equation you get.</p>
+  <div id="ldSides"></div>
+
+</section>
+
+<section id="s6">
+  <div class="eyebrow">6 · Circles, step 1</div>
+  <h2>Read the center and radius off standard form</h2>
+  <p>Every circle problem ends with this form, so learn to read it first.</p>
+
+  <div class="rulebox">
+    <span class="tag">Standard form</span>
+    <span class="m">(<i>x</i> − <i>h</i>)<sup>2</sup> + (<i>y</i> − <i>k</i>)<sup>2</sup> = <i>r</i><sup>2</sup></span>
+    <span class="cond">center (<i>h</i>, <i>k</i>), &nbsp;radius <i>r</i></span>
+  </div>
+
+  <div class="warn">
+    <span class="tag">Two traps</span>
+    <ul>
+      <li><strong>The signs flip.</strong> <span class="m">(<i>x</i> + 3)<sup>2</sup></span> means <span class="m"><i>h</i> = −3</span>. <span class="m">(<i>x</i> − 3)<sup>2</sup></span> means <span class="m"><i>h</i> = 3</span>.</li>
+      <li><strong>The right side is <span class="m"><i>r</i><sup>2</sup></span>.</strong> If it says 25, the radius is 5.</li>
+    </ul>
+  </div>
+
+  <h3>Practice</h3>
+  <div id="ldRead"></div>
+
+  <div class="check" data-q="c5">
+    <div class="check-q"><span class="ask">Center and radius of</span><span class="m">(<i>x</i> − 2)<sup>2</sup> + (<i>y</i> + 7)<sup>2</sup> = 36</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="eyebrow">7 · Circles, step 2</div>
+  <h2>One square to complete</h2>
+  <p>Here only <span class="m"><i>x</i></span> has a middle term, so there is one square to complete. The number is already on the right.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Find the center and radius</span><span class="m"><i>x</i><sup>2</sup> − 4<i>x</i> + <i>y</i><sup>2</sup> = 5</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">half of −4 is −2, and (−2)<sup>2</sup> = 4</span><span class="why">Only <span class="m"><i>x</i></span> has a middle term. <span class="m"><i>y</i><sup>2</sup></span> is already a square.</span></li>
+      <li><span class="m">(<i>x</i><sup>2</sup> − 4<i>x</i> + 4) + <i>y</i><sup>2</sup> = 5 + 4</span><span class="why">Add 4 to both sides.</span></li>
+      <li><span class="m">(<i>x</i> − 2)<sup>2</sup> + <i>y</i><sup>2</sup> = 9</span><span class="why">Write the group as a square.</span></li>
+      <li class="ans"><span class="m">center (2, 0), &nbsp;<i>r</i> = 3</span><span class="why"><span class="m"><i>y</i><sup>2</sup> = (<i>y</i> − 0)<sup>2</sup></span>, so <span class="m"><i>k</i> = 0</span>. And <span class="m"><i>r</i> = √9 = 3</span>.</span></li>
+    </ol>
+  </div>
+
+  <h3>Practice</h3>
+  <div id="ldOne"></div>
+</section>
+
+<section id="s8">
+  <div class="eyebrow">8 · Circles, step 3</div>
+  <h2>Two squares, from general form</h2>
+  <p>Now the full problem. Move the number, then complete two squares: one for <span class="m"><i>x</i></span>, one for <span class="m"><i>y</i></span>.</p>
+
+  <ol class="steps-list">
+    <li>Group the <span class="m"><i>x</i></span>'s, group the <span class="m"><i>y</i></span>'s, move the number to the right.</li>
+    <li>For each letter: half the middle number, square it, add it to <strong>both</strong> sides.</li>
+    <li>Write each group as a square. Add up the right side.</li>
+    <li>Read the center from the brackets (flip the signs) and <span class="m"><i>r</i></span> from the square root.</li>
+  </ol>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Find the center and radius</span><span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + 6<i>x</i> − 10<i>y</i> + 18 = 0</span></div>
+    <ol class="walk-steps">
+      <li><span class="m"><i>x</i><sup>2</sup> + 6<i>x</i> + <i>y</i><sup>2</sup> − 10<i>y</i> = −18</span><span class="why">Group the letters. The +18 becomes −18 on the right.</span></li>
+      <li><span class="m">(<i>x</i><sup>2</sup> + 6<i>x</i> + 9) + (<i>y</i><sup>2</sup> − 10<i>y</i> + 25) = −18 + 9 + 25</span><span class="why">Half of 6 is 3, squared is 9. Half of −10 is −5, squared is 25. Both go on the right too.</span></li>
+      <li><span class="m">(<i>x</i> + 3)<sup>2</sup> + (<i>y</i> − 5)<sup>2</sup> = 16</span><span class="why">Each bracket is a square. <span class="m">−18 + 34 = 16</span>.</span></li>
+      <li class="ans"><span class="m">center (−3, 5), &nbsp;<i>r</i> = 4</span><span class="why">Flip the signs inside the brackets. <span class="m"><i>r</i> = √16 = 4</span>.</span></li>
+    </ol>
+  </div>
+
+  <h3>Practice, step by step</h3>
+  <div id="ldFull"></div>
+
+  <div class="check" data-q="c6">
+    <div class="check-q"><span class="ask">On your own: center and radius of</span><span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 4<i>x</i> + 10<i>y</i> + 20 = 0</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s9">
+  <div class="eyebrow">9 · Special cases</div>
+  <h2>Four that look different, but use the same steps</h2>
+
+  <div class="cases">
+    <div class="case">
+      <div class="when">A letter has no middle term</div>
+      <div class="crow"><span class="k">Start</span><span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 10<i>y</i> = 0</span></div>
+      <div class="crow"><span class="k">Step</span><span class="m"><span class="sw">Add 25 to both sides.</span><i>x</i><sup>2</sup> + (<i>y</i><sup>2</sup> − 10<i>y</i> + 25) = 25</span></div>
+      <div class="crow res"><span class="k">Result</span><span class="m"><i>x</i><sup>2</sup> + (<i>y</i> − 5)<sup>2</sup> = 25</span></div>
+      <small>Only <i>y</i> needs completing. <i>x</i>² is already (<i>x</i> − 0)², so the center is (0, 5) and the radius is 5.</small>
+    </div>
+    <div class="case">
+      <div class="when">A number in front of x² and y²</div>
+      <div class="crow"><span class="k">Start</span><span class="m">2<i>x</i><sup>2</sup> + 2<i>y</i><sup>2</sup> − 8<i>x</i> + 12<i>y</i> − 6 = 0</span></div>
+      <div class="crow"><span class="k">Step</span><span class="m"><span class="sw">Divide every term by 2.</span><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 4<i>x</i> + 6<i>y</i> − 3 = 0</span></div>
+      <div class="crow res"><span class="k">Result</span><span class="m">(<i>x</i> − 2)<sup>2</sup> + (<i>y</i> + 3)<sup>2</sup> = 16</span></div>
+      <small>Divide first, then complete the square as usual. Center (2, −3), radius 4.</small>
+    </div>
+    <div class="case">
+      <div class="when">The radius isn't a whole number</div>
+      <div class="crow"><span class="k">Start</span><span class="m">(<i>x</i> − 1)<sup>2</sup> + (<i>y</i> + 2)<sup>2</sup> = 20</span></div>
+      <div class="crow"><span class="k">Step</span><span class="m"><i>r</i> = √20 = √4 · √5</span></div>
+      <div class="crow res"><span class="k">Result</span><span class="m"><i>r</i> = 2√5</span></div>
+      <small>Simplify the root and leave it exact. Center (1, −2).</small>
+    </div>
+    <div class="case">
+      <div class="when">The middle number is odd</div>
+      <div class="crow"><span class="k">Start</span><span class="m"><i>x</i><sup>2</sup> + 5<i>x</i> + ___</span></div>
+      <div class="crow"><span class="k">Step</span><span class="m"><span class="sw">Half it, then square it.</span>half of 5 is <span class="fr"><span>5</span><span>2</span></span>, &nbsp;and (<span class="fr"><span>5</span><span>2</span></span>)<sup>2</sup> = <span class="fr"><span>25</span><span>4</span></span></span></div>
+      <div class="crow res"><span class="k">Result</span><span class="m"><i>x</i><sup>2</sup> + 5<i>x</i> + <span class="fr"><span>25</span><span>4</span></span> = (<i>x</i> + <span class="fr"><span>5</span><span>2</span></span>)<sup>2</sup></span></div>
+      <small>Same steps, with fractions. Keep them as fractions, not decimals.</small>
+    </div>
+  </div>
+
+  <div class="check" data-q="c7">
+    <div class="check-q"><span class="ask">Center and radius of</span><span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + 8<i>y</i> − 9 = 0</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s10">
+  <div class="eyebrow">10 · Your turn</div>
+  <h2>Try any circle</h2>
+  <p>Set <i>D</i>, <i>E</i> and <i>F</i> in <span class="m"><i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + <i>D</i><i>x</i> + <i>E</i><i>y</i> + <i>F</i> = 0</span>. The page completes both squares, finds the center and radius, and draws the circle. Use it to check homework you've done on paper.</p>
+  <p style="font-size:14.5px"><i>D</i> and <i>E</i> go up in 2s, so their halves are whole numbers.</p>
+
+  <div class="xp" id="cc"></div>
+
+  <div class="keybox">
+    <span class="tag">When the right side isn't positive</span>
+    <p>If the right side comes out <strong>0</strong>, only the center itself works: it's a single point, not a circle. If it comes out <strong>negative</strong>, nothing works, because two squares added together can't be negative. Try the last two examples above.</p>
+  </div>
+</section>
+
+<section id="s11">
+  <div class="eyebrow">11 · Common mistakes</div>
+  <h2>Five wrong moves</h2>
+  <p>Each card shows a wrong step. Click its button to test it with a number or a point. The two sides come out different, which proves the step is wrong.</p>
+  <div id="trapHost"></div>
+</section>
+
+<section id="s12">
+  <div class="eyebrow">12 · Putting it together</div>
+  <h2>Whole problems, one move at a time</h2>
+  <p>Click the next move and the page shows the working. Only divide if there's a number in front of <span class="m"><i>x</i><sup>2</sup></span> and <span class="m"><i>y</i><sup>2</sup></span>.</p>
+
+  <div class="solver">
+    <div class="solver-head">
+      <span class="which" id="solverWhich">Problem 1</span>
+      <div class="tabs" id="solverTabs"></div>
+    </div>
+    <div class="work" id="solverWork"></div>
+    <div class="picker">
+      <div class="prompt" id="solverPrompt">What's the next step?</div>
+      <div class="rulegrid" id="solverRules"></div>
+      <div class="solver-fb" id="solverFb"></div>
+      <div class="finish" id="solverFinish" style="display:none">
+        <button class="btn on" id="solverNext">Next problem</button>
+        <span class="count" id="solverDone"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="s13">
+  <div class="eyebrow">13 · Check yourself</div>
+  <h2>Six on your own</h2>
+  <p>If you miss one, the feedback names the section to go back to.</p>
+  <div id="quizHost"></div>
+  <div class="score">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span class="n" id="scoreN">0</span><span class="count">of 6</span>
+    </div>
+    <div class="say" id="scoreSay">Answer all six to see where you stand.</div>
+  </div>
+</section>
+
+<section id="s14">
+  <div class="eyebrow">14 · Keep this</div>
+  <h2>Cheat sheet</h2>
+  <div class="cheat">
+    <h3>Circle in general form → center and radius</h3>
+    <ol class="steps-list">
+      <li>A number in front of <span class="m"><i>x</i><sup>2</sup></span> and <span class="m"><i>y</i><sup>2</sup></span>? Divide every term by it.</li>
+      <li>Group the <span class="m"><i>x</i></span>'s, group the <span class="m"><i>y</i></span>'s, move the number to the right.<small>It changes sign when it moves.</small></li>
+      <li>Half the middle number, square it, add to <strong>both</strong> sides.<small>Once for <span class="m"><i>x</i></span>, once for <span class="m"><i>y</i></span>. A letter with no middle term needs nothing.</small></li>
+      <li>Write each group as <span class="m">(letter + half)<sup>2</sup></span>, keeping the half's sign. Add up the right side.</li>
+      <li>Center: flip the signs in the brackets. Radius: square root of the right side.<small>Right side 0: a single point. Negative: no graph at all.</small></li>
+    </ol>
+  </div>
+
+  <div class="next">
+    <div class="nextcard">
+      <div class="n">Now · Module 8</div><div class="t">Circles</div>
+      <p>Center and radius from general form.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Later · Module 14</div><div class="t">Parabolas</div>
+      <p>Same move finds the vertex: <span class="m"><i>x</i><sup>2</sup> − 6<i>x</i> + 5 = (<i>x</i> − 3)<sup>2</sup> − 4</span>.</p>
+    </div>
+  </div>
+  <div class="colophon">
+    Math 1200 · College Algebra · supplement to ALEKS §2.2<br>
+    Practice only. Nothing here is graded or submitted.<br>
+    Your progress is saved on this device only.
+  </div>
+</section>
+
+</main>
+<script>
+/* Math 1200 · exponent crash course · shared engine
+   A lesson supplies a LESSON config object; this builds the interactive parts.
+
+   LESSON = {
+     storeKey : localStorage key, unique per lesson
+     checks   : { key: {ask?, m?, opts:[{t, ok?, fb}]} }   all MC items
+     inline   : [keys]   rendered into existing .check[data-q="key"] hosts
+     quiz     : [keys]   rendered into #quizHost, scored together
+     traps    : [{bad, why, sub, left:{lbl,val}, right:{lbl,val}}]
+     rules    : [{id, nm, frm}]
+     generic  : { RULEID: "why that rule does not apply, generically" }
+     problems : [{start, steps:[{rule, result, note, wrong:{RULEID:msg}}]}]
+     verdicts : {all, most, few}   score copy
+     solver   : {connector, ask, ok, last, done}   optional solver wording;
+                connector "" suits inequalities, where "=" between lines is false
+   }                                                                        */
+
+var EXP = (function(){
+"use strict";
+
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+function el(tag, cls, html){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+
+function rep(sym, n, cls){
+  var a = [];
+  for(var i = 0; i < n; i++) a.push({t: sym, cls: cls});
+  return a;
+}
+
+function chipRow(host, items){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.innerHTML = "";
+  items.forEach(function(it, i){
+    if(i) host.appendChild(el("span", "dot", "·"));
+    host.appendChild(el("span", "chip" + (it.cls ? " " + it.cls : ""), it.t));
+  });
+}
+
+/* a fraction, as math HTML */
+function frac(n, d){
+  return "<span class='fr'><span>" + n + "</span><span>" + d + "</span></span>";
+}
+
+/* a radical: sqrt(inner), or nth root when idx is given */
+function root(inner, idx){
+  return (idx ? "<span class='idx'>" + idx + "</span>" : "") +
+         "√<span class='rad'>" + inner + "</span>";
+}
+
+function init(L){
+  var correct = {};
+  try{
+    var saved = window.localStorage.getItem(L.storeKey);
+    if(saved) correct = JSON.parse(saved) || {};
+  }catch(e){ correct = {}; }
+
+  function persist(){
+    try{ window.localStorage.setItem(L.storeKey, JSON.stringify(correct)); }catch(e){}
+  }
+
+  var TOTAL = L.inline.length + L.quiz.length;
+
+  function paintMeter(){
+    var n = 0, k;
+    for(k in correct){ if(correct[k]) n++; }
+    var fill = $("#meterFill"), num = $("#meterNum");
+    if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
+    if(num) num.textContent = n + " / " + TOTAL + " correct";
+  }
+
+  /* ---------------- multiple choice ---------------- */
+  /* Options are authored correct-first for reviewability, then shuffled here,
+     so the right answer is never in a predictable slot. */
+  function shuffled(arr){
+    var a = arr.slice(), i, j, t;
+    for(i = a.length - 1; i > 0; i--){
+      j = Math.floor(Math.random() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildCheck(host, key, cfg){
+    var optsHost = $(".opts", host), fb = $(".fb", host);
+    var order = shuffled(cfg.opts);
+    order.forEach(function(o){
+      var b = el("button", "opt", "<span class='m'>" + o.t + "</span>");
+      b.type = "button";
+      b._ok = !!o.ok;
+      b.addEventListener("click", function(){
+        $$(".opt", optsHost).forEach(function(c){ c.disabled = true; });
+        if(o.ok){
+          b.classList.add("right");
+          fb.className = "fb show ok";
+          correct[key] = true; persist(); paintMeter();
+        }else{
+          b.classList.add("wrongpick");
+          $$(".opt", optsHost).forEach(function(c){
+            if(c._ok) c.classList.add("right");
+          });
+          fb.className = "fb show no";
+        }
+        fb.innerHTML = o.fb;
+        if(L.quiz.indexOf(key) !== -1) paintScore();
+      });
+      optsHost.appendChild(b);
+    });
+  }
+
+  L.inline.forEach(function(key){
+    var host = $(".check[data-q='" + key + "']");
+    if(host) buildCheck(host, key, L.checks[key]);
+  });
+
+  var quizHost = $("#quizHost");
+  if(quizHost){
+    L.quiz.forEach(function(key, i){
+      var cfg = L.checks[key];
+      var card = el("div", "check");
+      card.innerHTML =
+        "<div class='check-q'><span class='ask'>" + (i + 1) + ". " + cfg.ask + "</span>" +
+        "<span class='m'>" + cfg.m + "</span></div>" +
+        "<div class='opts'></div><div class='fb'></div>";
+      quizHost.appendChild(card);
+      buildCheck(card, key, cfg);
+    });
+  }
+
+  function paintScore(){
+    var n = 0;
+    L.quiz.forEach(function(k){ if(correct[k]) n++; });
+    var nEl = $("#scoreN"), sEl = $("#scoreSay");
+    if(!nEl || !sEl) return;
+    nEl.textContent = n;
+    var answered = $$("#quizHost .fb.show").length;
+    var total = L.quiz.length;
+    if(answered < total){
+      sEl.textContent = answered + " of " + total + " answered. Keep going.";
+    }else if(n === total){
+      sEl.textContent = L.verdicts.all;
+    }else if(n >= total - 2){
+      sEl.textContent = L.verdicts.most;
+    }else{
+      sEl.textContent = L.verdicts.few;
+    }
+  }
+
+  /* ---------------- traps ---------------- */
+  var trapHost = $("#trapHost");
+  if(trapHost && L.traps){
+    L.traps.forEach(function(t){
+      var card = el("div", "trap");
+      card.innerHTML =
+        "<div class='trap-head'><span class='never'>" + (t.badge || "Never") + "</span>" +
+        "<span class='m'>" + t.bad + "</span></div><p>" + t.why + "</p>";
+      var btn = el("button", "btn", "Test it with " + t.sub);
+      btn.type = "button";
+      var out = el("div", "subst");
+      out.style.display = "none";
+      out.innerHTML =
+        "<div class='side'><span class='lbl'>" + t.left.lbl + "</span><span class='m'>" + t.left.val + "</span></div>" +
+        "<div class='side'><span class='lbl'>" + t.right.lbl + "</span><span class='m'>" + t.right.val + "</span></div>" +
+        "<span class='verdict'>" + (t.verdict || "not equal") + "</span>";
+      btn.addEventListener("click", function(){
+        var shown = out.style.display !== "none";
+        out.style.display = shown ? "none" : "flex";
+        btn.textContent = shown ? ("Test it with " + t.sub) : "Hide";
+      });
+      card.appendChild(btn);
+      card.appendChild(out);
+      trapHost.appendChild(card);
+    });
+  }
+
+  /* ---------------- rule chooser ---------------- */
+  var workEl = $("#solverWork");
+  if(workEl && L.problems){
+    var pi = 0, history = [];
+    var SV = L.solver || {};
+    var CONN = (SV.connector == null) ? "=" : SV.connector;
+    var ASK  = SV.ask  || "Which rule can you legally use on this line?";
+    var DONE = SV.done || "Fully simplified — every base appears once, nothing sits in a bracket, and no exponent is negative.";
+    var OKM  = SV.ok   || "Yes — that one is legal here.";
+    var LAST = SV.last || "That is the answer.";
+    var fbEl = $("#solverFb"), rulesEl = $("#solverRules");
+    var whichEl = $("#solverWhich"), tabsEl = $("#solverTabs");
+    var finishEl = $("#solverFinish"), doneEl = $("#solverDone"), nextEl = $("#solverNext");
+    var promptEl = $("#solverPrompt");
+
+    L.rules.forEach(function(r){
+      var b = el("button", "rulebtn",
+        "<span class='nm'>" + r.nm + "</span><span class='frm'>" + r.frm + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){ pick(r.id); });
+      rulesEl.appendChild(b);
+    });
+
+    L.problems.forEach(function(p, i){
+      var t = el("button", "tab", String(i + 1));
+      t.type = "button";
+      t.addEventListener("click", function(){ load(i); });
+      tabsEl.appendChild(t);
+    });
+
+    function render(){
+      var p = L.problems[pi];
+      workEl.innerHTML = "";
+      var first = el("div", history.length ? "line past" : "line now");
+      first.innerHTML = "<span class='eq'></span><span class='m'>" + p.start + "</span>";
+      workEl.appendChild(first);
+
+      history.forEach(function(h, i){
+        var isLast = (i === history.length - 1) && (history.length === p.steps.length);
+        var ln = el("div", "line " + (isLast ? "done" : "past"));
+        ln.innerHTML = "<span class='eq'>" + CONN + "</span><span class='m'>" + h.result + "</span>" +
+                       "<span class='usedtag'>" + h.nm + "</span>";
+        workEl.appendChild(ln);
+        if(h.note){
+          var nt = el("div", "line");
+          nt.innerHTML = "<span class='eq'></span><span class='note'>" + h.note + "</span>";
+          workEl.appendChild(nt);
+        }
+      });
+
+      $$(".tab", tabsEl).forEach(function(t, i){
+        t.className = "tab" + (i === pi ? " on" : "");
+      });
+      whichEl.textContent = "Problem " + (pi + 1) + " of " + L.problems.length;
+
+      var finished = history.length === p.steps.length;
+      $$(".rulebtn", rulesEl).forEach(function(b){ b.disabled = finished; });
+      finishEl.style.display = finished ? "flex" : "none";
+      promptEl.innerHTML = finished ? DONE : ASK;
+      if(finished){
+        doneEl.textContent = p.steps.length + " steps, " + p.steps.length + " decisions";
+        nextEl.textContent = (pi === L.problems.length - 1) ? "Back to problem 1" : "Next problem";
+      }
+    }
+
+    function pick(id){
+      var p = L.problems[pi];
+      if(history.length >= p.steps.length) return;
+      var step = p.steps[history.length];
+      if(id === step.rule){
+        var r = L.rules.filter(function(x){ return x.id === id; })[0];
+        history.push({result: step.result, note: step.note, nm: r.nm});
+        fbEl.className = "solver-fb ok";
+        fbEl.innerHTML = (history.length === p.steps.length) ? LAST : OKM;
+        render();
+      }else{
+        fbEl.className = "solver-fb no";
+        fbEl.innerHTML = (step.wrong && step.wrong[id]) ? step.wrong[id] : L.generic[id];
+      }
+    }
+
+    function load(i){
+      pi = i; history = [];
+      fbEl.className = "solver-fb"; fbEl.innerHTML = "";
+      render();
+    }
+
+    nextEl.addEventListener("click", function(){
+      load((pi + 1) % L.problems.length);
+      $(".solver").scrollIntoView({behavior: "smooth", block: "start"});
+    });
+
+    load(0);
+  }
+
+  paintMeter();
+  paintScore();
+}
+
+/* ---------------- numbers ----------------
+   A value as it should read on the page: true minus sign, halves written as
+   fractions, no floating-point dust. plain=true keeps decimals (slider read-outs). */
+var HALF = {"0.5":"&frac12;", "1.5":"3/2", "2.5":"5/2", "3.5":"7/2", "4.5":"9/2",
+            "5.5":"11/2", "6.5":"13/2", "7.5":"15/2"};
+function num(v, plain){
+  var r = Math.round(v * 100) / 100;
+  var s = String(Math.abs(r));
+  if(!plain && HALF[s]) s = HALF[s];
+  return (r < 0 ? "−" : "") + s;
+}
+
+/* ---------------- sets of numbers ----------------
+   A SET is a list of pieces [left, right, openLeft, openRight] — the same
+   shape nline draws. null on a side = runs off to infinity. [] = empty.
+
+   SET.fromTest(test, crit) builds the exact set where test(x) is true, given
+   every point where the truth could change (the critical values). Between
+   two neighbouring critical values the truth cannot change, so testing one
+   number per gap and each critical value itself decides everything.       */
+var SET = (function(){
+  function fromTest(test, crit){
+    var c = crit.slice().sort(function(a, b){ return a - b; })
+                .filter(function(v, i, a){ return i === 0 || v !== a[i - 1]; });
+    if(!c.length) return test(0) ? [[null, null, false, false]] : [];
+    var regions = [{lo:null, hi:c[0], x:c[0] - 1}];
+    c.forEach(function(v, i){
+      var nx = c[i + 1];
+      regions.push({pt:true, lo:v, hi:v, x:v});
+      regions.push({lo:v, hi:(nx == null ? null : nx), x:(nx == null ? v + 1 : (v + nx) / 2)});
+    });
+    var out = [], cur = null;
+    regions.forEach(function(r){
+      if(test(r.x)){
+        if(!cur) cur = [r.lo, r.hi, !r.pt, !r.pt];
+        else { cur[1] = r.hi; cur[3] = !r.pt; }
+      }else if(cur){ out.push(cur); cur = null; }
+    });
+    if(cur) out.push(cur);
+    return out;
+  }
+
+  var SYM = {lt:"&lt;", le:"&le;", gt:"&gt;", ge:"&ge;"};
+  function rel(r, v){
+    return {lt:function(x){ return x < v; }, le:function(x){ return x <= v; },
+            gt:function(x){ return x > v; }, ge:function(x){ return x >= v; }}[r];
+  }
+
+  function fmt(P){
+    if(!P.length) return "no solution";
+    return P.map(function(p){
+      if(p[0] == null && p[1] == null) return "(&minus;&infin;, &infin;)";
+      if(p[0] != null && p[0] === p[1]) return "{" + num(p[0]) + "}";
+      var L = (p[0] == null) ? "(&minus;&infin;" : (p[2] ? "(" : "[") + num(p[0]);
+      var R = (p[1] == null) ? "&infin;)" : num(p[1]) + (p[3] ? ")" : "]");
+      return L + ", " + R;
+    }).join(" &cup; ");
+  }
+
+  /* "one piece" / "two pieces" / "no solution" / "all real numbers" */
+  function shape(P){
+    if(!P.length) return "no solution";
+    if(P.length === 1 && P[0][0] == null && P[0][1] == null) return "all real numbers";
+    if(P.length === 1 && P[0][0] != null && P[0][0] === P[0][1]) return "a single number";
+    return P.length === 1 ? "one piece" : "two pieces";
+  }
+
+  function has(P, x){
+    return P.some(function(p){
+      var okL = (p[0] == null) || (p[2] ? x > p[0] : x >= p[0]);
+      var okR = (p[1] == null) || (p[3] ? x < p[1] : x <= p[1]);
+      return okL && okR;
+    });
+  }
+
+  return {fromTest:fromTest, rel:rel, SYM:SYM, fmt:fmt, shape:shape, has:has};
+})();
+
+/* ---------------- number lines ----------------
+   One axis, with zero or more shaded pieces on it.
+
+     nline({ticks:[-1,4], pieces:[[-1,null,true,false]]})
+
+   A PIECE is [left, right, openLeft, openRight] in axis coordinates; null on a
+   side means the shading runs off that end. No pieces at all = the empty set.
+   A fifth entry of true draws the shading without its endpoint dots.
+   Returns an SVG string, so it drops straight into innerHTML.
+
+     ticks : key values, labelled bold. An entry may be [value, "label"].
+     grid  : small tick + light label at every integer (default on when the
+             axis spans 24 or fewer units), so a student can count along it
+     ghost : a value to mark with a dashed ring (an endpoint not yet decided)
+     pin   : {v, ok, label}  a marker above the axis for a tested number
+     arc   : {a, b, label}   a bracket above the axis, for a distance
+     cls   : "dim" for an input row, "ok" for a result worth colouring      */
+var NL = {W:560, PAD:26};
+function nlGeom(cfg){
+  var lo = (cfg.lo == null) ? -6 : cfg.lo;
+  var hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var span = NL.W - 2 * NL.PAD;
+  return {lo:lo, hi:hi, x:function(v){ return NL.PAD + (v - lo) / (hi - lo) * span; }};
+}
+/* the axis value under a click, from its horizontal fraction across the svg */
+function nlValueAt(cfg, frac){
+  var g = nlGeom(cfg);
+  return g.lo + (frac * NL.W - NL.PAD) / (NL.W - 2 * NL.PAD) * (g.hi - g.lo);
+}
+function nline(cfg){
+  var g = nlGeom(cfg), lo = g.lo, hi = g.hi, x = g.x, W = NL.W, PAD = NL.PAD;
+  var top = (cfg.pin || cfg.arc) ? 40 : 6;
+  var Y = top + 12, H = Y + 34, R = 7;
+  var s = '<svg class="nl' + (cfg.cls ? " " + cfg.cls : "") +
+          '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">';
+  s += '<line class="ax" x1="' + PAD + '" y1="' + Y + '" x2="' + (W - PAD) + '" y2="' + Y + '"/>';
+  s += '<polygon class="head" points="' + (PAD - 15) + ',' + Y + ' ' +
+       (PAD - 3) + ',' + (Y - 5.5) + ' ' + (PAD - 3) + ',' + (Y + 5.5) + '"/>';
+  s += '<polygon class="head" points="' + (W - PAD + 15) + ',' + Y + ' ' +
+       (W - PAD + 3) + ',' + (Y - 5.5) + ' ' + (W - PAD + 3) + ',' + (Y + 5.5) + '"/>';
+
+  var keys = (cfg.ticks || []).map(function(t){
+    return (t instanceof Array) ? {v:t[0], t:t[1]} : {v:t, t:num(t)};
+  });
+  var grid = (cfg.grid == null) ? (hi - lo <= 24) : cfg.grid;
+  if(grid){
+    for(var k = Math.ceil(lo); k <= Math.floor(hi); k++){
+      var near = keys.some(function(kk){ return Math.abs(kk.v - k) < 0.6; });
+      s += '<line class="tk minor" x1="' + x(k) + '" y1="' + (Y - 4) + '" x2="' + x(k) + '" y2="' + (Y + 4) + '"/>';
+      if(!near) s += '<text class="minor" x="' + x(k) + '" y="' + (Y + 24) + '">' + num(k) + '</text>';
+    }
+  }
+
+  /* ticks go under the shading, so an open circle stays visibly open */
+  keys.forEach(function(t){
+    s += '<line class="tk" x1="' + x(t.v) + '" y1="' + (Y - 6) + '" x2="' + x(t.v) +
+         '" y2="' + (Y + 6) + '"/>';
+  });
+
+  (cfg.pieces || []).forEach(function(p){
+    var a = (p[0] == null) ? PAD - 13 : x(p[0]);
+    var b = (p[1] == null) ? W - PAD + 13 : x(p[1]);
+    s += '<line class="seg" x1="' + a + '" y1="' + Y + '" x2="' + b + '" y2="' + Y + '"/>';
+  });
+  (cfg.pieces || []).forEach(function(p){
+    if(p[4]) return;                       /* [.., true] = shading only, no dots */
+    if(p[0] != null){
+      s += '<circle class="pt ' + (p[2] ? "open" : "closed") + '" cx="' + x(p[0]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+    if(p[1] != null && p[1] !== p[0]){
+      s += '<circle class="pt ' + (p[3] ? "open" : "closed") + '" cx="' + x(p[1]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+  });
+  if(cfg.ghost != null){
+    s += '<circle class="pt ghost" cx="' + x(cfg.ghost) + '" cy="' + Y + '" r="' + R + '"/>';
+  }
+
+  keys.forEach(function(t){
+    s += '<text class="key" x="' + x(t.v) + '" y="' + (Y + 25) + '">' + t.t + '</text>';
+  });
+
+  if(cfg.arc){
+    var xa = x(cfg.arc.a), xb = x(cfg.arc.b), ay = Y - 20;
+    s += '<path class="arc" d="M' + xa + ',' + (Y - 9) + ' V' + ay + ' H' + xb + ' V' + (Y - 9) + '"/>';
+    if(cfg.arc.label){
+      s += '<text class="arclbl" x="' + ((xa + xb) / 2) + '" y="' + (ay - 7) + '">' + cfg.arc.label + '</text>';
+    }
+  }
+  if(cfg.pin){
+    var px = x(Math.max(lo, Math.min(hi, cfg.pin.v)));
+    s += '<g class="pin ' + (cfg.pin.ok ? "yes" : "no") + '">' +
+         '<line x1="' + px + '" y1="' + (Y - 26) + '" x2="' + px + '" y2="' + (Y - 10) + '"/>' +
+         '<polygon points="' + (px - 6) + ',' + (Y - 12) + ' ' + (px + 6) + ',' + (Y - 12) + ' ' + px + ',' + (Y - 3) + '"/>' +
+         '<circle cx="' + px + '" cy="' + Y + '" r="4.5"/>';
+    if(cfg.pin.label) s += '<text x="' + px + '" y="' + (Y - 31) + '">' + cfg.pin.label + '</text>';
+    s += '</g>';
+  }
+  return s + '</svg>';
+}
+
+/* A labelled stack: input rows, a rule, then the result row.
+   rows = [[label, nlineCfg], ...]; the LAST row is the result.          */
+function nstack(host, rows){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var last = rows.length - 1;
+  host.innerHTML = rows.map(function(r, i){
+    var cfg = r[1] || {};
+    if(i < last && cfg.cls == null) cfg.cls = "dim";
+    var none = (i === last) && !(cfg.pieces && cfg.pieces.length);
+    return '<div class="nlrow' + (i === last ? " res" : "") + '">' +
+           '<span class="lbl' + (none ? " none" : "") + '">' + r[0] + '</span>' +
+           nline(cfg) + '</div>';
+  }).join("");
+}
+
+/* ---------------- worked examples, one line at a time ----------------
+   <div class="walk">
+     <div class="walk-q"><span class="m">2x + 3 &gt; 7</span></div>
+     <ol class="walk-steps">
+       <li><span class="m">2x &gt; 4</span><span class="why">Subtract 3.</span></li>
+     </ol>
+   </div>
+   Lines stay hidden until asked for, so a student can try each one on paper
+   first.                                                                 */
+function walks(){
+  $$(".walk").forEach(function(w){
+    var steps = $$(".walk-steps > li", w);
+    if(!steps.length) return;
+    var shown = 0;
+    var bar = el("div", "walk-ctrls");
+    var nextB = el("button", "btn on", ""); nextB.type = "button";
+    var allB = el("button", "btn", "Show all"); allB.type = "button";
+    var hint = el("span", "walk-hint", "");
+    bar.appendChild(nextB); bar.appendChild(allB); bar.appendChild(hint);
+    w.appendChild(bar);
+    function paint(){
+      steps.forEach(function(li, i){ li.style.display = (i < shown) ? "" : "none"; });
+      var done = shown >= steps.length;
+      nextB.textContent = done ? "Start over" : (shown ? "Next step" : "Show first step");
+      allB.style.display = done ? "none" : "";
+      hint.textContent = done ? "Could you do it again without looking?"
+                              : shown + " of " + steps.length + " steps shown. Try the next one on paper first.";
+    }
+    nextB.addEventListener("click", function(){
+      shown = (shown >= steps.length) ? 0 : shown + 1; paint();
+    });
+    allB.addEventListener("click", function(){ shown = steps.length; paint(); });
+    paint();
+  });
+}
+
+/* ---------------- quick-fire drill ----------------
+   drill("#host", {
+     items   : [{m, a, why}]          a = the key of the right choice
+     choices : [{k, t}]               the buttons
+     end     : "closing line"
+   })                                                                   */
+function drill(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.classList.add("drill");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='drill-q m'></div><div class='drill-btns'></div><div class='drill-fb'></div>";
+  var q = $(".drill-q", host), fb = $(".drill-fb", host), cnt = $(".count", host);
+  var pips = $(".pips", host), btns = $(".drill-btns", host);
+  var i = 0, marks = [], label = {};
+  var choiceBtns = cfg.choices.map(function(c){
+    label[c.k] = c.t;
+    var b = el("button", "btn", c.t); b.type = "button";
+    b.addEventListener("click", function(){ answer(c.k); });
+    btns.appendChild(b);
+    return b;
+  });
+  var nextB = el("button", "btn on", "Next"); nextB.type = "button";
+  btns.appendChild(nextB);
+  nextB.addEventListener("click", function(){
+    if(i === cfg.items.length - 1){ i = 0; marks = []; } else { i++; }
+    draw();
+  });
+
+  function drawPips(){
+    pips.innerHTML = "";
+    cfg.items.forEach(function(_, k){
+      pips.appendChild(el("span", "pip" +
+        (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") + (k === i ? " now" : "")));
+    });
+  }
+  function draw(){
+    q.innerHTML = cfg.items[i].m;
+    cnt.textContent = (i + 1) + " of " + cfg.items.length;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    choiceBtns.forEach(function(b){ b.disabled = false; b.classList.remove("right", "wrongpick"); });
+    nextB.style.display = "none";
+    drawPips();
+  }
+  function answer(k){
+    var it = cfg.items[i], right = (k === it.a);
+    if(marks[i] === undefined) marks[i] = right;
+    choiceBtns.forEach(function(b, j){
+      b.disabled = true;
+      var ck = cfg.choices[j].k;
+      if(ck === it.a) b.classList.add("right");
+      else if(ck === k) b.classList.add("wrongpick");
+    });
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not this one &mdash; it's <strong>" + label[it.a] + "</strong>. ") + it.why;
+    var lastOne = (i === cfg.items.length - 1);
+    nextB.textContent = lastOne ? "Start again" : "Next";
+    nextB.style.display = "";
+    if(lastOne){
+      var n = marks.filter(function(v){ return v; }).length;
+      fb.innerHTML += "<div class='drill-end'>" + n + " of " + cfg.items.length +
+        " right first time. " + (cfg.end || "") + "</div>";
+    }
+    drawPips();
+  }
+  draw();
+}
+
+/* ---------------- test-a-number ----------------
+   tester("#host", {
+     problems : [{label, set, ticks, test(x) -> {html, ok}}]
+     lo, hi, step, start
+     hidden   : true = the shading starts hidden, so the student predicts it
+   })
+   A slider (or a click on the line) moves a pin; the page substitutes that
+   number and says whether it lands in the set.                          */
+function tester(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var pi = 0, xv = (cfg.start == null) ? 0 : cfg.start, show = !cfg.hidden;
+  var lo = (cfg.lo == null) ? -6 : cfg.lo, hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var step = cfg.step || 0.5;
+  host.classList.add("tester");
+  host.innerHTML =
+    (cfg.problems.length > 1 ? "<div class='ctrls tp-probs'></div>" : "") +
+    "<div class='tp-line'></div>" +
+    "<div class='tp-slide'><span class='ctrl-label'>Move the point</span>" +
+      "<input type='range' min='" + lo + "' max='" + hi + "' step='" + step + "' value='" + xv +
+      "' aria-label='the number to test'></div>" +
+    "<div class='tp-out'></div>" +
+    "<div class='ctrls'><button type='button' class='btn tp-show'></button></div>";
+  var probs = $(".tp-probs", host), lineEl = $(".tp-line", host);
+  var range = $("input", host), out = $(".tp-out", host), showB = $(".tp-show", host);
+
+  if(probs){
+    probs.appendChild(el("span", "ctrl-label", "Inequality"));
+    cfg.problems.forEach(function(p, i){
+      var b = el("button", "btn" + (i === 0 ? " on" : ""), "<span class='m'>" + p.label + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){
+        $$(".btn", probs).forEach(function(o){ o.classList.remove("on"); });
+        b.classList.add("on"); pi = i; show = !cfg.hidden; draw();
+      });
+      probs.appendChild(b);
+    });
+  }
+  function lineCfg(){
+    var p = cfg.problems[pi];
+    return {lo:lo, hi:hi, ticks:p.ticks || [], pieces:show ? p.set : [], cls:"ok",
+            pin:{v:xv, ok:p.test(xv).ok, label:"x = " + num(xv, true)}};
+  }
+  function draw(){
+    var p = cfg.problems[pi], r = p.test(xv), n = num(xv, true);
+    lineEl.innerHTML = nline(lineCfg());
+    out.className = "tp-out " + (r.ok ? "yes" : "no");
+    out.innerHTML = "<span class='m'>" + r.html + "</span>" +
+      "<span class='tp-verdict'>" + (r.ok ? "true, so " + n + " is in the set"
+                                          : "false, so " + n + " is not in the set") + "</span>";
+    showB.textContent = show ? "Hide the shading" : "Show every number that works";
+  }
+  range.addEventListener("input", function(){ xv = parseFloat(range.value); draw(); });
+  lineEl.addEventListener("click", function(e){
+    var svg = $("svg", lineEl); if(!svg) return;
+    var r = svg.getBoundingClientRect();
+    var v = Math.round(nlValueAt(lineCfg(), (e.clientX - r.left) / r.width) / step) * step;
+    xv = Math.max(lo, Math.min(hi, v)); range.value = xv; draw();
+  });
+  showB.addEventListener("click", function(){ show = !show; draw(); });
+  draw();
+}
+
+return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
+        root: root, num: num, SET: SET, nline: nline, nlValueAt: nlValueAt,
+        nstack: nstack, walks: walks, drill: drill, tester: tester, init: init};
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var $ = EXP.$, $$ = EXP.$$;
+
+var X = "<i>x</i>", Y = "<i>y</i>", X2 = X + "<sup>2</sup>", Y2 = Y + "<sup>2</sup>";
+
+/* a signed term: tm(-6, X) -> " − 6x"; first=true drops the leading " + " */
+function tm(c, v, first){
+  if(!c) return "";
+  var a = Math.abs(c);
+  var body = (a === 1 && v ? "" : String(a)) + v;
+  if(first) return (c < 0 ? "−" : "") + body;
+  return (c < 0 ? " − " : " + ") + body;
+}
+/* (x − h)², written the way it's read: h = -3 gives (x + 3)² */
+function sqb(v, h){
+  if(!h) return v + "<sup>2</sup>";
+  return "(" + v + (h > 0 ? " − " + h : " + " + (-h)) + ")<sup>2</sup>";
+}
+/* √n in simplest form, as plain text (for SVG) or HTML */
+function surd(n, html){
+  var k = 1, i;
+  for(i = Math.floor(Math.sqrt(n)); i >= 1; i--){ if(n % (i * i) === 0){ k = i; break; } }
+  var m = n / (k * k);
+  if(m === 1) return String(k);
+  return (k === 1 ? "" : String(k)) + (html ? EXP.root(String(m)) : "√" + m);
+}
+
+/* x² + y² + Dx + Ey + F = 0  ->  (x − h)² + (y − k)² = R */
+function solveCircle(D, E, F){
+  var h = -D / 2, k = -E / 2;
+  return {h:h, k:k, a:h * h, b:k * k, R:-F + h * h + k * k};
+}
+
+EXP.init({
+  storeKey: "m1200-square-01",
+  inline: ["c1","c2","c3","c5","c6","c7"],
+  quiz:   ["q1","q2","q3","q4","q5","q6"],
+
+  checks: {
+    c1: { opts:[
+      {t:"<i>x</i><sup>2</sup> − 10<i>x</i> + 25", ok:true, fb:"Right. (<i>x</i> − 5)(<i>x</i> − 5) = <i>x</i><sup>2</sup> − 5<i>x</i> − 5<i>x</i> + 25."},
+      {t:"<i>x</i><sup>2</sup> − 25", fb:"That squares each piece and loses the middle term. Multiply (<i>x</i> − 5)(<i>x</i> − 5) out."},
+      {t:"<i>x</i><sup>2</sup> + 25", fb:"That squares each piece. There's a middle term: −5<i>x</i> − 5<i>x</i>."},
+      {t:"<i>x</i><sup>2</sup> − 5<i>x</i> + 25", fb:"The middle term comes twice: −5<i>x</i> − 5<i>x</i> = −10<i>x</i>."}
+    ]},
+    c2: { opts:[
+      {t:"25", ok:true, fb:"Right. Half of 10 is 5, and 5<sup>2</sup> = 25. So <i>x</i><sup>2</sup> + 10<i>x</i> + 25 = (<i>x</i> + 5)<sup>2</sup>."},
+      {t:"100", fb:"That's 10 squared. Halve first, then square."},
+      {t:"5", fb:"That's half of 10. Now square it."},
+      {t:"20", fb:"That doubles 10. Half of 10 is 5, and 5<sup>2</sup> = 25."}
+    ]},
+    c3: { opts:[
+      {t:"49 &nbsp;and&nbsp; <i>x</i> − 7", ok:true, fb:"Right. Half of −14 is −7, and (−7)<sup>2</sup> = 49. The bracket keeps the minus."},
+      {t:"49 &nbsp;and&nbsp; <i>x</i> + 7", fb:"(<i>x</i> + 7)<sup>2</sup> has +14<i>x</i> in the middle. The bracket keeps the sign of the half."},
+      {t:"−49 &nbsp;and&nbsp; <i>x</i> − 7", fb:"A square is never negative: (−7)<sup>2</sup> = +49."},
+      {t:"196 &nbsp;and&nbsp; <i>x</i> − 14", fb:"That squares −14 without halving it."}
+    ]},
+    c5: { opts:[
+      {t:"center (2, −7), &nbsp;<i>r</i> = 6", ok:true, fb:"Right. Flip both signs, and <i>r</i> = √36 = 6."},
+      {t:"center (−2, 7), &nbsp;<i>r</i> = 6", fb:"Flipped the wrong way. (<i>x</i> − 2)<sup>2</sup> means <i>h</i> = 2."},
+      {t:"center (2, −7), &nbsp;<i>r</i> = 36", fb:"36 is <i>r</i><sup>2</sup>. The radius is √36 = 6."},
+      {t:"center (2, 7), &nbsp;<i>r</i> = 6", fb:"The signs flip: (<i>y</i> + 7)<sup>2</sup> means <i>k</i> = −7."}
+    ]},
+    c6: { opts:[
+      {t:"center (2, −5), &nbsp;<i>r</i> = 3", ok:true, fb:"Right. <i>x</i><sup>2</sup> − 4<i>x</i> + <i>y</i><sup>2</sup> + 10<i>y</i> = −20. Add 4 and 25: (<i>x</i> − 2)<sup>2</sup> + (<i>y</i> + 5)<sup>2</sup> = 9."},
+      {t:"center (−2, 5), &nbsp;<i>r</i> = 3", fb:"The squares are right, but the center's signs are the wrong way round: (<i>x</i> − 2)<sup>2</sup> means <i>h</i> = 2."},
+      {t:"center (2, −5), &nbsp;<i>r</i> = 9", fb:"9 is <i>r</i><sup>2</sup>. The radius is 3."},
+      {t:"center (2, −5), &nbsp;<i>r</i> = 7", fb:"The 20 changes sign when it moves across: −20 + 4 + 25 = 9, not 20 + 4 + 25."}
+    ]},
+    c7: { opts:[
+      {t:"center (0, −4), &nbsp;<i>r</i> = 5", ok:true, fb:"Right. <i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + 8<i>y</i> = 9. Add 16 to both sides: <i>x</i><sup>2</sup> + (<i>y</i> + 4)<sup>2</sup> = 25."},
+      {t:"center (0, 4), &nbsp;<i>r</i> = 5", fb:"(<i>y</i> + 4)<sup>2</sup> means <i>k</i> = −4."},
+      {t:"center (−4, 0), &nbsp;<i>r</i> = 5", fb:"The 8<i>y</i> is a <i>y</i> term, so only <i>k</i> changes. <i>x</i><sup>2</sup> alone means <i>h</i> = 0."},
+      {t:"center (0, −4), &nbsp;<i>r</i> = 3", fb:"The 16 goes on the right as well: 9 + 16 = 25."}
+    ]},
+
+    q1: { ask:"Fill the blank so it's a perfect square", m:"<i>x</i><sup>2</sup> − 12<i>x</i> + ___", opts:[
+      {t:"36", ok:true, fb:"Half of −12 is −6, and (−6)<sup>2</sup> = 36."},
+      {t:"144", fb:"That squares 12 without halving. See section 3."},
+      {t:"−36", fb:"A square is never negative. See section 3."},
+      {t:"6", fb:"Halved but not squared. See section 3."}
+    ]},
+    q2: { ask:"Center and radius of", m:"(<i>x</i> + 1)<sup>2</sup> + (<i>y</i> − 6)<sup>2</sup> = 49", opts:[
+      {t:"center (−1, 6), &nbsp;<i>r</i> = 7", ok:true, fb:"Flip the signs: (−1, 6). And <i>r</i> = √49 = 7."},
+      {t:"center (1, −6), &nbsp;<i>r</i> = 7", fb:"The signs flip: (<i>x</i> + 1) means <i>h</i> = −1. See section 6."},
+      {t:"center (−1, 6), &nbsp;<i>r</i> = 49", fb:"49 is <i>r</i><sup>2</sup>. See section 6."},
+      {t:"center (−1, −6), &nbsp;<i>r</i> = 7", fb:"(<i>y</i> − 6)<sup>2</sup> means <i>k</i> = +6. See section 6."}
+    ]},
+    q3: { ask:"Solve by completing the square", m:"<i>x</i><sup>2</sup> + 2<i>x</i> = 8", opts:[
+      {t:"<i>x</i> = 2 &nbsp;or&nbsp; <i>x</i> = −4", ok:true, fb:"Add 1 to both sides: (<i>x</i> + 1)<sup>2</sup> = 9. So <i>x</i> + 1 = ±3, and <i>x</i> = 2 or −4."},
+      {t:"<i>x</i> = −1 ± 2√2", fb:"The 1 went on the left only. It's 8 + 1 = 9 on the right. See section 5."},
+      {t:"<i>x</i> = 4 &nbsp;or&nbsp; <i>x</i> = −2", fb:"That's (<i>x</i> − 1)<sup>2</sup>. Half of +2 is +1, so (<i>x</i> + 1)<sup>2</sup>. See section 3."},
+      {t:"<i>x</i> = 3 &nbsp;or&nbsp; <i>x</i> = −3", fb:"<i>x</i> + 1 = ±3 still has the 1 to move: <i>x</i> = −1 ± 3. See section 5."}
+    ]},
+    q4: { ask:"Center and radius of", m:"<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 6<i>x</i> + 2<i>y</i> + 6 = 0", opts:[
+      {t:"center (3, −1), &nbsp;<i>r</i> = 2", ok:true, fb:"Move the 6: right side −6. Add 9 and 1: (<i>x</i> − 3)<sup>2</sup> + (<i>y</i> + 1)<sup>2</sup> = 4."},
+      {t:"center (3, −1), &nbsp;<i>r</i> = 4", fb:"4 is <i>r</i><sup>2</sup>. The radius is 2. See section 6."},
+      {t:"center (−3, 1), &nbsp;<i>r</i> = 2", fb:"(<i>x</i> − 3)<sup>2</sup> means <i>h</i> = 3. See section 6."},
+      {t:"center (3, −1), &nbsp;<i>r</i> = √10", fb:"The 6 moves to the right as −6: −6 + 9 + 1 = 4. See section 8."}
+    ]},
+    q5: { ask:"Center and radius of", m:"2<i>x</i><sup>2</sup> + 2<i>y</i><sup>2</sup> + 4<i>y</i> − 16 = 0", opts:[
+      {t:"center (0, −1), &nbsp;<i>r</i> = 3", ok:true, fb:"Divide by 2: <i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + 2<i>y</i> = 8. Add 1: <i>x</i><sup>2</sup> + (<i>y</i> + 1)<sup>2</sup> = 9."},
+      {t:"center (0, −2), &nbsp;<i>r</i> = 2√5", fb:"Divide every term by 2 first, so <i>x</i><sup>2</sup> and <i>y</i><sup>2</sup> stand alone. See section 9."},
+      {t:"center (0, 1), &nbsp;<i>r</i> = 3", fb:"(<i>y</i> + 1)<sup>2</sup> means <i>k</i> = −1. See section 6."},
+      {t:"center (−1, 0), &nbsp;<i>r</i> = 3", fb:"The 4<i>y</i> is a <i>y</i> term, so only <i>k</i> changes. See section 7."}
+    ]},
+    q6: { ask:"Which is the standard form of", m:"<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + 10<i>x</i> − 4<i>y</i> + 4 = 0", opts:[
+      {t:"(<i>x</i> + 5)<sup>2</sup> + (<i>y</i> − 2)<sup>2</sup> = 25", ok:true, fb:"Right side: −4 + 25 + 4 = 25."},
+      {t:"(<i>x</i> + 5)<sup>2</sup> + (<i>y</i> − 2)<sup>2</sup> = 33", fb:"The 4 changes sign when it moves: −4, not +4. See section 8."},
+      {t:"(<i>x</i> + 5)<sup>2</sup> + (<i>y</i> − 2)<sup>2</sup> = −4", fb:"25 and 4 go on the right too. See section 5."},
+      {t:"(<i>x</i> − 5)<sup>2</sup> + (<i>y</i> + 2)<sup>2</sup> = 25", fb:"The bracket keeps the sign of the half: half of +10 is +5. See section 3."}
+    ]}
+  },
+
+  verdicts: {
+    all:"All six. You can take any circle from general form to its center and radius.",
+    most:"Close. Redo the misses on paper, using the section each one names.",
+    few:"Go back to section 4 and redo the practice there. Then work section 12, one step at a time."
+  },
+
+  solver: {
+    connector: "",
+    ask: "What's the next step?",
+    ok: "Yes, that's the next move.",
+    last: "Standard form. Read the center and radius off it.",
+    done: "Standard form: flip the signs in the brackets for the center, and take the square root of the right side for the radius."
+  },
+
+  rules: [
+    {id:"DIV",  nm:"Divide by the number in front", frm:"only if x² and y² have one"},
+    {id:"MOVE", nm:"Group the letters",          frm:"x's together, y's together, number right"},
+    {id:"ADD",  nm:"Add (half)² to both sides",  frm:"once for x, once for y"},
+    {id:"SQ",   nm:"Write each group as a square", frm:"then add up the right side"}
+  ],
+
+  generic: {
+    DIV:"There's no number in front of x² and y². Nothing to divide.",
+    MOVE:"Already done: x's together, y's together, number on the right.",
+    ADD:"Not yet. Group the letters and get the number to the right first.",
+    SQ:"Not yet. Add (half)² to each group first. Until then, neither group is a perfect square."
+  },
+
+  problems: [
+    {
+      start:"<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 2<i>x</i> + 4<i>y</i> − 4 = 0",
+      steps:[
+        {rule:"MOVE", result:"<i>x</i><sup>2</sup> − 2<i>x</i> + <i>y</i><sup>2</sup> + 4<i>y</i> = 4",
+         note:"The −4 becomes +4 on the right."},
+        {rule:"ADD", result:"(<i>x</i><sup>2</sup> − 2<i>x</i> + 1) + (<i>y</i><sup>2</sup> + 4<i>y</i> + 4) = 4 + 1 + 4",
+         note:"Half of −2 is −1, squared is 1. Half of 4 is 2, squared is 4."},
+        {rule:"SQ", result:"(<i>x</i> − 1)<sup>2</sup> + (<i>y</i> + 2)<sup>2</sup> = 9",
+         note:"Center (1, −2), radius 3.",
+         wrong:{ADD:"You've already added both numbers, on both sides."}}
+      ]
+    },
+    {
+      start:"<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + 8<i>x</i> − 6<i>y</i> = 0",
+      steps:[
+        {rule:"MOVE", result:"<i>x</i><sup>2</sup> + 8<i>x</i> + <i>y</i><sup>2</sup> − 6<i>y</i> = 0",
+         note:"No number to move. The right side is 0."},
+        {rule:"ADD", result:"(<i>x</i><sup>2</sup> + 8<i>x</i> + 16) + (<i>y</i><sup>2</sup> − 6<i>y</i> + 9) = 0 + 16 + 9",
+         note:"Half of 8 is 4, squared is 16. Half of −6 is −3, squared is 9."},
+        {rule:"SQ", result:"(<i>x</i> + 4)<sup>2</sup> + (<i>y</i> − 3)<sup>2</sup> = 25",
+         note:"Center (−4, 3), radius 5.",
+         wrong:{ADD:"You've already added both numbers, on both sides."}}
+      ]
+    },
+    {
+      start:"3<i>x</i><sup>2</sup> + 3<i>y</i><sup>2</sup> − 12<i>x</i> − 15 = 0",
+      steps:[
+        {rule:"DIV", result:"<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> − 4<i>x</i> − 5 = 0",
+         note:"Every term divided by 3.",
+         wrong:{
+           MOVE:"Divide by 3 first, so x² and y² stand alone.",
+           ADD:"Divide by 3 first. Half it, square it only works when x² stands alone.",
+           SQ:"Divide by 3 first."
+         }},
+        {rule:"MOVE", result:"<i>x</i><sup>2</sup> − 4<i>x</i> + <i>y</i><sup>2</sup> = 5",
+         note:"No <i>y</i> term, so <i>y</i><sup>2</sup> sits on its own."},
+        {rule:"ADD", result:"(<i>x</i><sup>2</sup> − 4<i>x</i> + 4) + <i>y</i><sup>2</sup> = 5 + 4",
+         note:"Half of −4 is −2, squared is 4. <i>y</i><sup>2</sup> is already a square."},
+        {rule:"SQ", result:"(<i>x</i> − 2)<sup>2</sup> + <i>y</i><sup>2</sup> = 9",
+         note:"Center (2, 0), radius 3.",
+         wrong:{ADD:"You've already added 4 on both sides, and y² needs nothing."}}
+      ]
+    },
+    {
+      start:"<i>x</i><sup>2</sup> + <i>y</i><sup>2</sup> + 10<i>x</i> + 2<i>y</i> + 17 = 0",
+      steps:[
+        {rule:"MOVE", result:"<i>x</i><sup>2</sup> + 10<i>x</i> + <i>y</i><sup>2</sup> + 2<i>y</i> = −17",
+         note:"The +17 becomes −17. A negative right side is fine for now."},
+        {rule:"ADD", result:"(<i>x</i><sup>2</sup> + 10<i>x</i> + 25) + (<i>y</i><sup>2</sup> + 2<i>y</i> + 1) = −17 + 25 + 1",
+         note:"Half of 10 is 5, squared is 25. Half of 2 is 1, squared is 1."},
+        {rule:"SQ", result:"(<i>x</i> + 5)<sup>2</sup> + (<i>y</i> + 1)<sup>2</sup> = 9",
+         note:"Center (−5, −1), radius 3.",
+         wrong:{ADD:"You've already added both numbers, on both sides."}}
+      ]
+    }
+  ],
+
+  traps: [
+    {bad:"(<i>x</i> + 3)<sup>2</sup> = <i>x</i><sup>2</sup> + 9", badge:"Wrong",
+     why:"The middle term is missing. (<i>x</i> + 3)(<i>x</i> + 3) = <i>x</i><sup>2</sup> + 6<i>x</i> + 9.",
+     sub:"x = 1", verdict:"not equal",
+     left:{lbl:"(x + 3)²", val:"16"},
+     right:{lbl:"x² + 9", val:"10"}},
+    {bad:"<i>x</i><sup>2</sup> + 8<i>x</i> + 64 = (<i>x</i> + 8)<sup>2</sup>", badge:"Wrong",
+     why:"8 was squared without halving. Half of 8 is 4: <i>x</i><sup>2</sup> + 8<i>x</i> + 16 = (<i>x</i> + 4)<sup>2</sup>.",
+     sub:"x = 1", verdict:"not equal",
+     left:{lbl:"x² + 8x + 64", val:"73"},
+     right:{lbl:"(x + 8)²", val:"81"}},
+    {bad:"<i>x</i><sup>2</sup> − 6<i>x</i> + 9 = (<i>x</i> + 3)<sup>2</sup>", badge:"Wrong",
+     why:"The bracket keeps the sign of the half. Half of −6 is −3, so it's (<i>x</i> − 3)<sup>2</sup>.",
+     sub:"x = 1", verdict:"not equal",
+     left:{lbl:"x² − 6x + 9", val:"4"},
+     right:{lbl:"(x + 3)²", val:"16"}},
+    {bad:"<i>x</i><sup>2</sup> + 6<i>x</i> + <i>y</i><sup>2</sup> = 7 &nbsp;becomes&nbsp; (<i>x</i> + 3)<sup>2</sup> + <i>y</i><sup>2</sup> = 7", badge:"Wrong",
+     why:"9 went on the left only. It goes on both sides: (<i>x</i> + 3)<sup>2</sup> + <i>y</i><sup>2</sup> = 16.",
+     sub:"the point (1, 0)", verdict:"different circles",
+     left:{lbl:"x² + 6x + y² at (1, 0)", val:"7"},
+     right:{lbl:"(x + 3)² + y² at (1, 0)", val:"16"}},
+    {bad:"(<i>x</i> − 1)<sup>2</sup> + (<i>y</i> + 2)<sup>2</sup> = 9 &nbsp;has radius 9", badge:"Wrong",
+     why:"The right side is <i>r</i><sup>2</sup>. The radius is √9 = 3.",
+     sub:"(10, −2), 9 units right of the center", verdict:"not on the circle",
+     left:{lbl:"(x − 1)² + (y + 2)² at (10, −2)", val:"81"},
+     right:{lbl:"right side", val:"9"}}
+  ]
+});
+
+EXP.walks();
+
+/* ---- stepped practice ----------------------------------------------------
+   ladder(host, items, {wide, end})
+   items: [{m, parts:[{ask, opts:[right first, ...], why}]}]
+   A problem with several parts shows one step at a time; each answered step
+   stays on screen above the next, so the working builds up like it would on
+   paper. Options are authored right-first and shuffled here.               */
+function ladder(sel, items, cfg){
+  var host = $(sel); if(!host) return;
+  cfg = cfg || {};
+  host.className = "drill" + (cfg.wide ? " wide" : "");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='ld-goal'></div><div class='ld-q m'></div><div class='ld-done'></div><div class='ld-ask'></div>" +
+    "<div class='ld-opts'></div><div class='drill-fb'></div><div class='ld-final'></div>" +
+    "<div class='drill-btns'><button type='button' class='btn on ld-next'></button></div>";
+  var goalEl = $(".ld-goal", host), finEl = $(".ld-final", host), qEl = $(".ld-q", host), doneEl = $(".ld-done", host), askEl = $(".ld-ask", host),
+      optsEl = $(".ld-opts", host), fb = $(".drill-fb", host), cnt = $(".count", host),
+      pips = $(".pips", host), next = $(".ld-next", host);
+  var i = 0, p = 0, clean = true, marks = [];
+
+  function shuffled(n){
+    var a = [], j, t, k;
+    for(k = 0; k < n; k++) a.push(k);
+    for(k = n - 1; k > 0; k--){ j = Math.floor(Math.random() * (k + 1)); t = a[k]; a[k] = a[j]; a[j] = t; }
+    return a;
+  }
+  function drawPips(){
+    pips.innerHTML = "";
+    items.forEach(function(_, k){
+      pips.appendChild(EXP.el("span", "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
+                                     (k === i ? " now" : "")));
+    });
+  }
+  function drawItem(){
+    p = 0; clean = true;
+    goalEl.innerHTML = items[i].goal || cfg.goal || "";
+    qEl.innerHTML = items[i].m;
+    doneEl.innerHTML = "";
+    finEl.innerHTML = "";
+    cnt.textContent = "Problem " + (i + 1) + " of " + items.length;
+    drawPips();
+    drawPart();
+  }
+  function drawPart(){
+    var it = items[i], part = it.parts[p], n = it.parts.length;
+    askEl.innerHTML = (n > 1 ? "<span class='ld-step'>Step " + (p + 1) + " of " + n + "</span>" : "") + part.ask;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    next.style.display = "none";
+    optsEl.innerHTML = "";
+    shuffled(part.opts.length).forEach(function(k){
+      var b = EXP.el("button", "ldbtn", part.opts[k]);
+      b.type = "button"; b._k = k;
+      b.addEventListener("click", function(){ answer(k, b); });
+      optsEl.appendChild(b);
+    });
+  }
+  function answer(k, b){
+    var it = items[i], part = it.parts[p], right = (k === 0), last = (p === it.parts.length - 1);
+    if(!right) clean = false;
+    $$(".ldbtn", optsEl).forEach(function(c){ c.disabled = true; if(c._k === 0) c.classList.add("right"); });
+    if(!right) b.classList.add("wrongpick");
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not quite. ") + part.why;
+    if(last){
+      if(it.done) finEl.innerHTML = "<span class='lbl'>" + (it.doneLbl || cfg.doneLbl || "Finished") +
+        "</span><span class='m'>" + it.done + "</span>";
+      if(marks[i] === undefined) marks[i] = clean;
+      drawPips();
+      if(i === items.length - 1){
+        var got = marks.filter(function(v){ return v; }).length;
+        fb.innerHTML += "<div class='drill-end'>" + got + " of " + items.length + " right first time. " + (cfg.end || "") + "</div>";
+      }
+    }
+    next.textContent = !last ? "Next step" : (i < items.length - 1 ? "Next problem" : "Start again");
+    next.style.display = "";
+  }
+  next.addEventListener("click", function(){
+    var it = items[i];
+    if(p < it.parts.length - 1){
+      doneEl.insertAdjacentHTML("beforeend", "<div class='ld-line'><span>" + it.parts[p].ask +
+        "</span><span class='m'>" + it.parts[p].opts[0] + "</span></div>");
+      p++; drawPart();
+    }else{
+      if(i < items.length - 1) i++; else { i = 0; marks = []; }
+      drawItem();
+    }
+  });
+  drawItem();
+}
+
+/* (x + n)²  — n = -4 gives (x − 4)² */
+function B(n){ return "(" + X + (n < 0 ? " − " + (-n) : " + " + n) + ")<sup>2</sup>"; }
+/* a number in brackets when negative, for "2 · (−4) · x" and "(−4)²" */
+function par(n){ return n < 0 ? "(" + EXP.num(n) + ")" : EXP.num(n); }
+
+/* x² + bx + sq = (x + n)², the whole line */
+function line(b, sq, n){ return X2 + tm(b, X) + (sq < 0 ? " − " + (-sq) : " + " + sq) + " = " + B(n); }
+function solo(b, opts){
+  var h = b / 2;
+  return {m: X2 + tm(b, X) + " + ___ = ( ___ )<sup>2</sup>", done: line(b, h * h, h),
+          parts:[{ask:"Fill both blanks.", opts:opts,
+                  why:"Half of " + EXP.num(b) + " is " + EXP.num(h) + ", and " + par(h) + "<sup>2</sup> = " + (h * h) + ". The bracket keeps the half's sign."}]};
+}
+function one(m, ask, opts, why){ return {m:m, parts:[{ask:ask, opts:opts, why:why}]}; }
+
+/* x² + bx + ___ as a move-picker, like section 12's. The engine's solver is
+   tied to one set of element ids, so this is a small local copy using the
+   same classes. "Square the middle number" is there because it is the
+   commonest wrong move; picking it explains why.                          */
+(function movePicker(){
+  var host = $("#mvBuild"), BS = [4, 2, -4, 10, -8, -12], pi = 0, done = 0;
+  var MOVES = [
+    {id:"HALF", nm:"Half it",                  frm:"half of the middle number"},
+    {id:"SQ",   nm:"Square it",                frm:"that's the number to add"},
+    {id:"BR",   nm:"Write the bracket",        frm:"(x + half)²"},
+    {id:"SQB",  nm:"Square the middle number", frm:"the number in front of x"}
+  ];
+  var ORDER = ["HALF", "SQ", "BR"];
+  var which = $(".which", host), tabs = $(".tabs", host), work = $(".work", host),
+      prompt = $(".prompt", host), grid = $(".rulegrid", host), fb = $(".solver-fb", host),
+      finish = $(".finish", host), nextB = $(".finish .btn", host);
+
+  function info(b){
+    var h = b / 2, c = h * h, bs = EXP.num(b), hs = EXP.num(h);
+    var RHS = " = ( ___ )<sup>2</sup>";
+    var start = X2 + tm(b, X) + " + ___" + RHS;
+    return {
+      start: start,
+      steps: [
+        {result:"half of " + bs + " is " + hs,
+         note:"Half it." + (b < 0 ? " Half of a negative number is negative." : "")},
+        {result:X2 + tm(b, X) + " + " + c + RHS,
+         note:par(h) + "<sup>2</sup> = " + c + ". That goes in the blank." + (h < 0 ? " Negative times negative is positive." : "")},
+        {result:line(b, c, h),
+         note:"The bracket holds the half" + (b < 0 ? ", minus sign and all" : "") +
+              ". Check the middle term: 2 · " + par(h) + " · " + X + " = " + tm(b, X, true) + "."}
+      ],
+      wrong: [
+        {SQ:"Square what? Half the middle number first.",
+         BR:"You need the half to write the bracket. Half it first.",
+         SQB:"Squaring " + bs + " gives " + (b * b) + ", which is too big. Half it first."},
+        {HALF:"Already done: the half is " + hs + ".",
+         BR:"Not yet. The blank needs a number first. Square the half.",
+         SQB:"Square the half (" + hs + "), not the middle number (" + bs + ")."},
+        {HALF:"Already done: the half is " + hs + ".",
+         SQ:"Already done: " + c + " is in the blank.",
+         SQB:"The blank is filled. Now write the bracket."}
+      ]
+    };
+  }
+
+  MOVES.forEach(function(m){
+    var b = EXP.el("button", "rulebtn", "<span class='nm'>" + m.nm + "</span><span class='frm'>" + m.frm + "</span>");
+    b.type = "button";
+    b.addEventListener("click", function(){ pick(m.id); });
+    grid.appendChild(b);
+  });
+  BS.forEach(function(_, k){
+    var b = EXP.el("button", "tab", String(k + 1));
+    b.type = "button";
+    b.addEventListener("click", function(){ load(k); });
+    tabs.appendChild(b);
+  });
+
+  function render(){
+    var P = info(BS[pi]), finished = done === ORDER.length;
+    var s = "<div class='line " + (done ? "past" : "now") + "'><span class='eq'></span><span class='m'>" + P.start + "</span></div>";
+    for(var k = 0; k < done; k++){
+      var mv = MOVES.filter(function(m){ return m.id === ORDER[k]; })[0];
+      s += "<div class='line " + (finished && k === done - 1 ? "done" : "past") + "'><span class='eq'></span><span class='m'>" +
+           P.steps[k].result + "</span><span class='usedtag'>" + mv.nm + "</span></div>" +
+           "<div class='line'><span class='eq'></span><span class='note'>" + P.steps[k].note + "</span></div>";
+    }
+    work.innerHTML = s;
+    $$(".tab", tabs).forEach(function(b, k){ b.className = "tab" + (k === pi ? " on" : ""); });
+    which.textContent = "Make a perfect square · problem " + (pi + 1) + " of " + BS.length;
+    $$(".rulebtn", grid).forEach(function(b){ b.disabled = finished; });
+    prompt.innerHTML = finished ? "Perfect square. Could you do it again without the buttons?" : "What's the next move?";
+    finish.style.display = finished ? "flex" : "none";
+    nextB.textContent = (pi === BS.length - 1) ? "Back to problem 1" : "Next problem";
+  }
+  function pick(id){
+    if(done >= ORDER.length) return;
+    if(id === ORDER[done]){
+      done++;
+      fb.className = "solver-fb ok";
+      fb.innerHTML = done === ORDER.length ? "That's the perfect square." : "Yes, that's the next move.";
+    }else{
+      fb.className = "solver-fb no";
+      fb.innerHTML = info(BS[pi]).wrong[done][id];
+    }
+    render();
+  }
+  function load(k){
+    pi = k; done = 0;
+    fb.className = "solver-fb"; fb.innerHTML = "";
+    render();
+  }
+  nextB.addEventListener("click", function(){ load((pi + 1) % BS.length); });
+  load(0);
+})();
+
+
+ladder("#ldSolo", [
+  solo(8,   [line(8, 16, 4),    line(8, 64, 8),      line(8, 16, -4),    line(8, 8, 4)]),
+  solo(-10, [line(-10, 25, -5), line(-10, 25, 5),    line(-10, -25, -5), line(-10, 100, -10)]),
+  solo(18,  [line(18, 81, 9),   line(18, 324, 18),   line(18, 81, -9),   line(18, 18, 9)]),
+  solo(-2,  [line(-2, 1, -1),   line(-2, 1, 1),      line(-2, 4, -2),    line(-2, -1, -1)]),
+  solo(16,  [line(16, 64, 8),   line(16, 256, 16),   line(16, 32, 8),    line(16, 64, -8)])
+], {wide:true, goal:"Make a perfect square.", doneLbl:"Perfect square", end:"Missed some? Redo the stepped set above."});
+
+ladder("#ldSides", [
+  one(X2 + " + 6" + X + " = 7", "Complete the square. You get:",
+      [B(3) + " = 16", B(3) + " = 7", B(3) + " = −2", B(6) + " = 43"],
+      "Half of 6 is 3, and 3<sup>2</sup> = 9. Add 9 to both sides: 7 + 9 = 16."),
+  one(X2 + " − 4" + X + " = 12", "Complete the square. You get:",
+      [B(-2) + " = 16", B(-2) + " = 12", B(2) + " = 16", B(-4) + " = 28"],
+      "Half of −4 is −2, and (−2)<sup>2</sup> = 4. Add 4 to both sides: 12 + 4 = 16."),
+  one(X2 + " + 10" + X + " = −9", "Complete the square. You get:",
+      [B(5) + " = 16", B(5) + " = −9", B(5) + " = −34", B(5) + " = 34"],
+      "Half of 10 is 5, and 5<sup>2</sup> = 25. Add 25 to both sides: −9 + 25 = 16."),
+  one(X2 + " − 2" + X + " = 3", "Complete the square. You get:",
+      [B(-1) + " = 4", B(-1) + " = 3", B(1) + " = 4", B(-1) + " = 2"],
+      "Half of −2 is −1, and (−1)<sup>2</sup> = 1. Add 1 to both sides: 3 + 1 = 4.")
+], {wide:true, goal:"Complete the square. Add the same number to both sides.", end:"Whatever goes on the left goes on the right."});
+
+var R = function(h, k, r){ return "center (" + EXP.num(h) + ", " + EXP.num(k) + "), &nbsp;<i>r</i> = " + r; };
+ladder("#ldRead", [
+  one("(" + X + " − 3)<sup>2</sup> + (" + Y + " − 1)<sup>2</sup> = 25", "Center and radius:",
+      [R(3, 1, 5), R(-3, -1, 5), R(3, 1, 25), R(1, 3, 5)],
+      "Flip both signs: (3, 1). The radius is √25 = 5."),
+  one("(" + X + " + 2)<sup>2</sup> + (" + Y + " − 4)<sup>2</sup> = 9", "Center and radius:",
+      [R(-2, 4, 3), R(2, -4, 3), R(-2, 4, 9), R(-2, -4, 3)],
+      "(" + X + " + 2) means <i>h</i> = −2. (" + Y + " − 4) means <i>k</i> = 4. The radius is √9 = 3."),
+  one(X2 + " + (" + Y + " + 6)<sup>2</sup> = 4", "Center and radius:",
+      [R(0, -6, 2), R(0, 6, 2), R(-6, 0, 2), R(0, -6, 4)],
+      X2 + " is (" + X + " − 0)<sup>2</sup>, so <i>h</i> = 0. (" + Y + " + 6) means <i>k</i> = −6. The radius is √4 = 2."),
+  one("(" + X + " − 5)<sup>2</sup> + " + Y2 + " = 49", "Center and radius:",
+      [R(5, 0, 7), R(-5, 0, 7), R(5, 0, 49), R(0, 5, 7)],
+      "<i>h</i> = 5, and " + Y2 + " means <i>k</i> = 0. The radius is √49 = 7.")
+], {goal:"Read off the center and radius.", end:"Flip the signs; square-root the right side."});
+
+ladder("#ldOne", [
+  one(X2 + " + 6" + X + " + " + Y2 + " = 16", "Complete the square in <i>x</i>. You get:",
+      [B(3) + " + " + Y2 + " = 25", B(3) + " + " + Y2 + " = 16", B(6) + " + " + Y2 + " = 52", B(-3) + " + " + Y2 + " = 25"],
+      "Half of 6 is 3, and 3<sup>2</sup> = 9. Add 9 to both sides: 16 + 9 = 25. Center (−3, 0), radius 5."),
+  one(X2 + " + " + Y2 + " − 8" + Y + " = 9", "Complete the square in <i>y</i>. You get:",
+      [X2 + " + (" + Y + " − 4)<sup>2</sup> = 25", X2 + " + (" + Y + " − 4)<sup>2</sup> = 9",
+       X2 + " + (" + Y + " + 4)<sup>2</sup> = 25", "(" + X + " − 4)<sup>2</sup> + " + Y2 + " = 25"],
+      "Half of −8 is −4, and (−4)<sup>2</sup> = 16. Add 16 to both sides: 9 + 16 = 25. Center (0, 4), radius 5."),
+  one(X2 + " − 2" + X + " + " + Y2 + " = 8", "Center and radius:",
+      [R(1, 0, 3), R(-1, 0, 3), R(1, 0, 9), R(1, 0, "2√2")],
+      "Add 1 to both sides: (" + X + " − 1)<sup>2</sup> + " + Y2 + " = 9. Center (1, 0), radius 3.")
+], {wide:true, goal:"Complete the square to get standard form.", end:"One number to add, on both sides."});
+
+ladder("#ldFull", [
+  {m: X2 + " + " + Y2 + " + 2" + X + " − 6" + Y + " + 6 = 0",
+   done: B(1) + " + (" + Y + " − 3)<sup>2</sup> = 4 &nbsp;&nbsp; center (−1, 3), <i>r</i> = 2", parts:[
+    {ask:"Group the letters and move the number.",
+     opts:[X2 + " + 2" + X + " + " + Y2 + " − 6" + Y + " = −6", X2 + " + 2" + X + " + " + Y2 + " − 6" + Y + " = 6",
+           X2 + " + 2" + X + " + " + Y2 + " − 6" + Y + " = 0", X2 + " + " + Y2 + " = −2" + X + " + 6" + Y + " − 6"],
+     why:"<i>x</i>'s together, <i>y</i>'s together. The +6 becomes −6 when it moves to the right."},
+    {ask:"Number to add for " + X2 + " + 2" + X + " is", opts:["1", "2", "4", "−1"],
+     why:"Half of 2 is 1, and 1<sup>2</sup> = 1."},
+    {ask:"Number to add for " + Y2 + " − 6" + Y + " is", opts:["9", "−9", "36", "3"],
+     why:"Half of −6 is −3, and (−3)<sup>2</sup> = 9."},
+    {ask:"Both numbers go on the right too. −6 + 1 + 9 =", opts:["4", "16", "10", "−6"],
+     why:"−6 + 1 + 9 = 4. So (" + X + " + 1)<sup>2</sup> + (" + Y + " − 3)<sup>2</sup> = 4."},
+    {ask:"So the circle has", opts:[R(-1, 3, 2), R(1, -3, 2), R(-1, 3, 4), R(-1, -3, 2)],
+     why:"Flip the signs: center (−1, 3). The radius is √4 = 2."}
+  ]},
+  {m: X2 + " + " + Y2 + " − 4" + X + " + 8" + Y + " + 11 = 0",
+   done: B(-2) + " + (" + Y + " + 4)<sup>2</sup> = 9 &nbsp;&nbsp; center (2, −4), <i>r</i> = 3", parts:[
+    {ask:"Group the letters and move the number.",
+     opts:[X2 + " − 4" + X + " + " + Y2 + " + 8" + Y + " = −11", X2 + " − 4" + X + " + " + Y2 + " + 8" + Y + " = 11",
+           X2 + " − 4" + X + " + " + Y2 + " + 8" + Y + " = 0", X2 + " + " + Y2 + " = 4" + X + " − 8" + Y + " − 11"],
+     why:"The +11 becomes −11 on the right."},
+    {ask:"Number to add for " + X2 + " − 4" + X + " is", opts:["4", "−4", "16", "2"],
+     why:"Half of −4 is −2, and (−2)<sup>2</sup> = 4."},
+    {ask:"Number to add for " + Y2 + " + 8" + Y + " is", opts:["16", "64", "8", "4"],
+     why:"Half of 8 is 4, and 4<sup>2</sup> = 16."},
+    {ask:"Both numbers go on the right too. −11 + 4 + 16 =", opts:["9", "31", "20", "−11"],
+     why:"−11 + 4 + 16 = 9. So (" + X + " − 2)<sup>2</sup> + (" + Y + " + 4)<sup>2</sup> = 9."},
+    {ask:"So the circle has", opts:[R(2, -4, 3), R(-2, 4, 3), R(2, -4, 9), R(2, 4, 3)],
+     why:"Flip the signs: center (2, −4). The radius is √9 = 3."}
+  ]}
+], {wide:true, goal:"Find the center and radius.", doneLbl:"Standard form", end:"Group, add to both sides, write the squares, read."});
+
+/* ---- widgets ---- */
+
+/* try any circle: x² + y² + Dx + Ey + F = 0 */
+(function circleUI(){
+  var st = {D:-8, E:-4, F:16};
+  var PRE = [[-8,-4,16],[6,-10,18],[0,-10,0],[-4,6,-7],[4,2,5],[2,2,10]];
+  var host = $("#cc");
+
+  function general(D, E, F){ return X2 + " + " + Y2 + tm(D, X) + tm(E, Y) + tm(F, "") + " = 0"; }
+  function stepper(k){
+    return "<span class='m' style='margin-left:6px'><i>" + k + "</i> =</span><span class='stepper'>" +
+      "<button type='button' data-k='" + k + "' data-d='-1' aria-label='smaller " + k + "'>&minus;</button><span id='cc" + k + "'></span>" +
+      "<button type='button' data-k='" + k + "' data-d='1' aria-label='bigger " + k + "'>+</button></span>";
+  }
+  host.innerHTML =
+    "<div class='xp-row'><span class='ctrl-label'>Examples</span>" +
+      PRE.map(function(p, i){ return "<button type='button' class='btn' data-pre='" + i + "'>" + general(p[0], p[1], p[2]) + "</button>"; }).join("") + "</div>" +
+    "<div class='xp-row'>" + stepper("D") + stepper("E") + stepper("F") + "</div>" +
+    "<div class='xp-stmt m' id='ccQ'></div>" +
+    "<div class='sqrow' style='margin-top:10px; align-items:flex-start'>" +
+      "<div class='side cwork' id='ccWork'></div>" +
+      "<div class='cplot' id='ccPlot'></div>" +
+    "</div>" +
+    "<div class='xp-out' id='ccOut'></div>";
+
+  function plot(h, k, R){
+    var r = R > 0 ? Math.sqrt(R) : 0;
+    var E = Math.min(20, Math.max(6, Math.ceil(Math.max(Math.abs(h), Math.abs(k)) + r + 1)));
+    var S = 300, P = 16, sc = (S - 2 * P) / (2 * E), i, s = "";
+    function px(x){ return P + (x + E) * sc; }
+    function py(y){ return P + (E - y) * sc; }
+    var step = E <= 10 ? 1 : 2;
+    for(i = -E; i <= E; i++){
+      if(i % step) continue;
+      s += "<line class='cp-g' x1='" + px(i) + "' y1='" + py(-E) + "' x2='" + px(i) + "' y2='" + py(E) + "'/>";
+      s += "<line class='cp-g' x1='" + px(-E) + "' y1='" + py(i) + "' x2='" + px(E) + "' y2='" + py(i) + "'/>";
+    }
+    s += "<line class='cp-a' x1='" + px(-E) + "' y1='" + py(0) + "' x2='" + px(E) + "' y2='" + py(0) + "'/>";
+    s += "<line class='cp-a' x1='" + px(0) + "' y1='" + py(-E) + "' x2='" + px(0) + "' y2='" + py(E) + "'/>";
+    for(i = -E; i <= E; i++){
+      if(!i || i % 5) continue;
+      s += "<text class='cp-t' x='" + px(i) + "' y='" + (py(0) + 13) + "'>" + EXP.num(i) + "</text>";
+      s += "<text class='cp-t' x='" + (px(0) - 11) + "' y='" + (py(i) + 4) + "'>" + EXP.num(i) + "</text>";
+    }
+    if(R > 0){
+      s += "<circle class='cp-c' cx='" + px(h) + "' cy='" + py(k) + "' r='" + (r * sc) + "' fill-opacity='.55'/>";
+      s += "<line class='cp-r' x1='" + px(h) + "' y1='" + py(k) + "' x2='" + px(h + r) + "' y2='" + py(k) + "'/>";
+      s += "<text class='cp-l' text-anchor='middle' x='" + ((px(h) + px(h + r)) / 2) + "' y='" + (py(k) - 6) + "'>r = " + surd(R) + "</text>";
+    }
+    if(R >= 0){
+      s += "<circle class='cp-o' cx='" + px(h) + "' cy='" + py(k) + "' r='4'/>";
+      s += "<text class='cp-l' text-anchor='middle' x='" + px(h) + "' y='" + (py(k) + 18) + "'>(" + EXP.num(h) + ", " + EXP.num(k) + ")</text>";
+    }
+    return "<svg viewBox='0 0 " + S + " " + S + "' width='" + S + "' role='img' aria-label='" +
+      (R > 0 ? "Circle with center (" + h + ", " + k + ") and radius " + surd(R) : R === 0 ? "A single point at (" + h + ", " + k + ")" : "Empty grid: no points") +
+      "'>" + s + "</svg>";
+  }
+
+  function draw(){
+    var D = st.D, E = st.E, F = st.F, c = solveCircle(D, E, F);
+    $("#ccD").textContent = EXP.num(D); $("#ccE").textContent = EXP.num(E); $("#ccF").textContent = EXP.num(F);
+    $("#ccQ").innerHTML = "Center and radius of " + general(D, E, F);
+
+    var lines = [];
+    lines.push(["Group the letters, number to the right",
+      X2 + tm(D, X) + " + " + Y2 + tm(E, Y) + " = " + EXP.num(-F)]);
+    if(D || E){
+      var why = [];
+      if(D) why.push("half of " + EXP.num(D) + " is " + EXP.num(D / 2) + ", squared is " + c.a);
+      if(E) why.push("half of " + EXP.num(E) + " is " + EXP.num(E / 2) + ", squared is " + c.b);
+      lines.push(["Add to both sides: " + why.join("; "),
+        (D ? "(" + X2 + tm(D, X) + " + " + c.a + ")" : X2) + " + " +
+        (E ? "(" + Y2 + tm(E, Y) + " + " + c.b + ")" : Y2) + " = " +
+        EXP.num(-F) + (D ? " + " + c.a : "") + (E ? " + " + c.b : "")]);
+    }
+    lines.push(["Write each group as a square", sqb(X, c.h) + " + " + sqb(Y, c.k) + " = " + EXP.num(c.R)]);
+    $("#ccWork").innerHTML = lines.map(function(l, i){
+      return "<div class='cw" + (i === lines.length - 1 ? " fin" : "") + "'><span class='lb'>" + l[0] + "</span>" + l[1] + "</div>";
+    }).join("");
+
+    $("#ccPlot").innerHTML = plot(c.h, c.k, c.R);
+
+    var out = $("#ccOut"), ctr = "(" + EXP.num(c.h) + ", " + EXP.num(c.k) + ")";
+    if(c.R > 0){
+      var rs = surd(c.R, true), exact = Math.sqrt(c.R) % 1 === 0;
+      out.className = "xp-out";
+      out.innerHTML = "<span class='shape'>circle</span><span class='m'>center " + ctr + ", &nbsp;<i>r</i> = " +
+        (exact ? "√" + c.R + " = " + rs : EXP.root(String(c.R)) + (rs !== EXP.root(String(c.R)) ? " = " + rs : "")) +
+        "</span><span>Flip the signs in the brackets. The radius is the square root of the right side.</span>";
+    }else if(c.R === 0){
+      out.className = "xp-out empty";
+      out.innerHTML = "<span class='shape'>not a circle</span><span>The right side is 0, so only the point " + ctr + " works.</span>";
+    }else{
+      out.className = "xp-out empty";
+      out.innerHTML = "<span class='shape'>no graph</span><span>The right side is " + EXP.num(c.R) + ". Two squares added together can't be negative, so no point works.</span>";
+    }
+
+    $$("[data-pre]", host).forEach(function(b){
+      var p = PRE[+b.getAttribute("data-pre")];
+      b.classList.toggle("on", p[0] === D && p[1] === E && p[2] === F);
+    });
+  }
+
+  host.addEventListener("click", function(e){
+    var b = e.target.closest("button"); if(!b) return;
+    var a;
+    if((a = b.getAttribute("data-pre")) != null){ var p = PRE[+a]; st = {D:p[0], E:p[1], F:p[2]}; }
+    else if((a = b.getAttribute("data-k"))){
+      var d = +b.getAttribute("data-d");
+      if(a === "F") st.F = Math.max(-40, Math.min(40, st.F + d));
+      else st[a] = Math.max(-12, Math.min(12, st[a] + 2 * d));
+    }else return;
+    draw();
+  });
+  draw();
+})();
+
+})();
+</script>
+</body>
+</html>
