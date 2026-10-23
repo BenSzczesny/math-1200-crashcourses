@@ -1,0 +1,1741 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>End Behavior of Polynomials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
+<style>
+/* Math 1200 · exponent crash course · shared theme
+   Neutral professional palette: graphite accent, warm-neutral paper.
+   Correctness colour is SEMANTIC (--ok / --wrong) and deliberately separate
+   from the accent, so "right" never reads as "emphasised". */
+
+:root{
+  --paper:#F6F6F4; --surface:#FFFFFF; --surface-2:#EDEDEA;
+  --ink:#1B1C1B; --ink-2:#4F524F; --ink-3:#858885;
+  --rule:#E0E0DB; --rule-strong:#C6C7C1;
+  --accent:#33403F; --accent-2:#1F2827; --accent-wash:#E9EBEA;
+  --on-accent:#FFFFFF;
+  --ok:#3D6B55; --ok-wash:#E8EEEB;
+  --wrong:#96453A; --wrong-wash:#F4E9E7;
+  --chip:#EEEEEB;
+  --shadow:0 1px 2px rgba(27,28,27,.05), 0 8px 24px -14px rgba(27,28,27,.20);
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"Karla", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+    --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+    --rule:#2D302E; --rule-strong:#3F423F;
+    --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+    --on-accent:#141514;
+    --ok:#7CBB9C; --ok-wash:#1B2721;
+    --wrong:#DA9184; --wrong-wash:#2B1D1A;
+    --chip:#212422;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+  --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+  --rule:#2D302E; --rule-strong:#3F423F;
+  --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+  --on-accent:#141514;
+  --ok:#7CBB9C; --ok-wash:#1B2721;
+  --wrong:#DA9184; --wrong-wash:#2B1D1A;
+  --chip:#212422;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--paper);
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.topbar-in{
+  max-width:820px; margin:0 auto; padding:10px 24px;
+  display:flex; align-items:center; gap:16px; justify-content:space-between;
+}
+.brandmark{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.brandmark b{color:var(--ink-2); font-weight:500}
+.brandmark a{color:var(--ink-2); text-decoration:none}
+.brandmark a:hover{color:var(--ink); text-decoration:underline}
+.brandmark a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.meter{display:flex; align-items:center; gap:10px}
+.meter-track{width:120px; height:5px; border-radius:99px; background:var(--rule); overflow:hidden}
+.meter-fill{height:100%; width:0%; background:var(--accent); transition:width .35s ease}
+.meter-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+/* phones: the bar keeps one line; the title truncates and the track goes */
+@media (max-width:560px){
+  .topbar-in{padding:9px 16px; gap:10px}
+  .brandmark{overflow:hidden; text-overflow:ellipsis; min-width:0}
+  .meter-track{display:none}
+  main{padding:0 16px 80px}
+}
+
+/* ---------- page frame ---------- */
+main{max-width:820px; margin:0 auto; padding:0 24px 96px}
+section{padding:44px 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(34px,6vw,52px);
+  line-height:1.08; margin:0 0 16px; letter-spacing:-.015em; text-wrap:balance;
+}
+h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(25px,3.6vw,32px);
+  line-height:1.2; margin:0 0 14px; letter-spacing:-.01em; text-wrap:balance;
+}
+h3{font-family:var(--sans); font-weight:700; font-size:15px; margin:0 0 8px}
+p{margin:0 0 16px; max-width:62ch; color:var(--ink-2)}
+p.lead{font-size:19px; color:var(--ink)}
+strong{color:var(--ink); font-weight:700}
+ul.plain{margin:0 0 16px; padding-left:20px; max-width:62ch; color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+
+/* ---------- math ---------- */
+.m{font-family:var(--serif); font-size:1.18em; line-height:1.35; white-space:nowrap}
+.m i{font-style:italic}
+.m sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.m .op{padding:0 .18em; color:var(--ink-2)}
+/* An inline-grid takes its baseline from the numerator, so anything written
+   after a fraction lands level with the top half. Centring the box on the
+   parent's x-height puts the bar where a reader expects it. */
+.fr{display:inline-grid; vertical-align:middle; text-align:center; margin:0 .14em}
+.fr > span{padding:0 .4em}
+.fr > span + span{border-top:1.6px solid currentColor; padding-top:.1em; margin-top:.1em}
+.rad{border-top:1.5px solid currentColor; padding:.06em .18em 0 .1em; margin-left:-.06em}
+.idx{font-size:.58em; vertical-align:.75em; margin-right:-.32em; line-height:0}
+.big{font-size:1.5em}
+
+/* ---------- factor chips ---------- */
+.expand{
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  padding:20px; margin:0 0 20px; box-shadow:var(--shadow);
+}
+.expand-row{display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px}
+.chiprow{display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:34px}
+.chip{
+  font-family:var(--mono); font-size:14px;
+  min-width:30px; height:32px; padding:0 8px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--chip); border:1px solid var(--rule-strong); border-radius:6px;
+  color:var(--ink);
+}
+.chip.a{background:var(--accent-wash); border-color:var(--accent); color:var(--accent-2)}
+.chip.b{background:var(--ok-wash); border-color:var(--ok); color:var(--ok)}
+.chip.gone{opacity:.3; text-decoration:line-through; text-decoration-color:var(--wrong)}
+.dot{font-family:var(--mono); color:var(--ink-3); font-size:13px}
+.count{
+  font-family:var(--mono); font-size:12px; color:var(--ink-2);
+  background:var(--surface-2); border-radius:6px; padding:3px 9px;
+}
+.stack{display:flex; flex-direction:column; gap:10px}
+.overline{border-top:1.6px solid var(--rule-strong); padding-top:10px}
+
+/* ---------- controls ---------- */
+button{font-family:inherit; font-size:inherit; cursor:pointer}
+.btn{
+  font-family:var(--sans); font-weight:500; font-size:14px;
+  padding:8px 15px; border-radius:8px; border:1px solid var(--rule-strong);
+  background:var(--surface); color:var(--ink); transition:background .15s, border-color .15s;
+}
+.btn:hover{background:var(--surface-2); border-color:var(--accent)}
+.btn.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn:focus-visible, .opt:focus-visible, .rulebtn:focus-visible, .tab:focus-visible{
+  outline:2.5px solid var(--accent); outline-offset:2px;
+}
+.ctrls{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px}
+.ctrl-label{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-right:4px}
+
+/* ---------- rule statement ---------- */
+.rulebox{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px;
+  background:var(--accent-wash); border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0; padding:18px 22px; margin:0 0 20px;
+}
+.rulebox .tag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-2);
+}
+.rulebox .m{font-size:1.5em; color:var(--ink)}
+/* a condition on a rule, e.g. (a ≠ 0): lower case matters, so never a .tag */
+.rulebox .cond{font-family:var(--serif); font-size:16px; color:var(--ink-2)}
+.rulebox .cond i{font-style:italic}
+@media (max-width:560px){ .rulebox .m{white-space:normal} }
+
+/* ---------- side-by-side compare ---------- */
+.compare{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; background:var(--surface)}
+.compare > div{padding:18px 20px}
+.compare > div + div{border-left:1px solid var(--rule)}
+.compare .hd{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* only the stacked statements are blocks — an inline .m inside a caption stays inline */
+.compare > div > .m{display:block; margin-bottom:8px}
+.compare small{color:var(--ink-2); font-size:13.5px; line-height:1.45; display:block}
+@media (max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .compare > div + div{border-left:0; border-top:1px solid var(--rule)}
+}
+
+/* ---------- traps ---------- */
+.trap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; margin:0 0 14px}
+.trap-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:6px}
+.never{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--wrong); background:var(--wrong-wash); border-radius:5px; padding:3px 8px; white-space:nowrap;
+}
+.trap p{margin:8px 0 12px; font-size:15px}
+.subst{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:12px; padding-top:14px; border-top:1px dashed var(--rule-strong)}
+.subst .side{display:flex; flex-direction:column; gap:4px}
+.subst .side .lbl{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.verdict{font-family:var(--mono); font-size:13px; color:var(--wrong); align-self:center}
+
+/* ---------- multiple choice ---------- */
+.check{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; margin:22px 0 0; box-shadow:var(--shadow)}
+.check-q{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin-bottom:14px}
+.check-q .ask{font-weight:700; color:var(--ink); font-size:15px}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px}
+.opt{
+  font-family:var(--sans); text-align:left; padding:11px 14px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  transition:border-color .15s, background .15s;
+}
+/* Options are mostly math (nowrap is right) but some are prose — "no solution",
+   "it cannot be simplified" — which must wrap rather than clip. */
+.opt .m{white-space:normal; display:inline-block}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok); background:var(--ok-wash)}
+.opt.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.fb{margin-top:12px; font-size:14.5px; line-height:1.5; display:none}
+.fb.show{display:block}
+.fb.ok{color:var(--ok)}
+.fb.no{color:var(--wrong)}
+
+/* ---------- two-button drill (factor-or-term, splits-or-not) ---------- */
+.drill{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:22px 20px; box-shadow:var(--shadow)}
+.drill-top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+.drill-q{font-family:var(--serif); font-size:clamp(22px,3.4vw,30px); line-height:1.35; padding:6px 0 14px}
+.drill-q i{font-style:italic}
+.drill-q.m{white-space:normal}
+.drill-q sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.drill-btns{display:flex; flex-wrap:wrap; gap:8px}
+.drill-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:3em}
+.drill-fb.ok{color:var(--ok)}
+.drill-fb.no{color:var(--wrong)}
+.pips{display:flex; flex-wrap:wrap; gap:5px}
+.pip{width:9px; height:9px; border-radius:99px; background:var(--rule); border:1px solid var(--rule-strong)}
+.pip.ok{background:var(--ok); border-color:var(--ok)}
+.pip.no{background:var(--wrong); border-color:var(--wrong)}
+.pip.now{box-shadow:0 0 0 3px var(--accent-wash); border-color:var(--accent)}
+
+/* ---------- rule chooser ---------- */
+.solver{background:var(--surface); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+.solver-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--rule); background:var(--surface-2)}
+.solver-head .which{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.tabs{display:flex; flex-wrap:wrap; gap:6px}
+.tab{font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:6px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink-2)}
+.tab.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.work{padding:22px 20px; display:flex; flex-direction:column; gap:2px; overflow-x:auto}
+.line{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:7px 0}
+.line .eq{font-family:var(--serif); font-size:1.18em; color:var(--ink-3); width:14px; flex:none}
+.line.now .m{color:var(--ink)}
+.line.past .m{color:var(--ink-2)}
+.line .note{color:var(--ink-3); font-size:13px; line-height:1.45}
+.usedtag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); background:var(--accent-wash); border-radius:5px; padding:2px 8px}
+.line.done .m{color:var(--ok); font-weight:600}
+.picker{padding:16px 20px 20px; border-top:1px solid var(--rule)}
+.picker .prompt{font-size:14px; font-weight:700; color:var(--ink); margin-bottom:12px}
+.rulegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px}
+.rulebtn{
+  font-family:var(--sans); text-align:left; padding:10px 13px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; gap:3px; transition:border-color .15s, background .15s;
+}
+.rulebtn:hover:not(:disabled){border-color:var(--accent); background:var(--surface-2)}
+.rulebtn:disabled{opacity:.5; cursor:default}
+.rulebtn .nm{font-weight:700; font-size:14px}
+.rulebtn .frm{font-family:var(--serif); font-size:14.5px; color:var(--ink-3)}
+.rulebtn .frm i{font-style:italic}
+.rulebtn .frm sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.solver-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:1.5em}
+.solver-fb.no{color:var(--wrong)}
+.solver-fb.ok{color:var(--ok)}
+.finish{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:16px}
+
+/* ---------- scoreboard ---------- */
+.score{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  border:1px solid var(--rule); border-radius:10px; padding:18px 22px; background:var(--surface); margin-top:26px;
+}
+.score .n{font-family:var(--serif); font-size:36px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1}
+.score .say{font-size:14.5px; color:var(--ink-2); max-width:44ch}
+
+/* ---------- factor tree (lesson 3) ---------- */
+.treewrap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
+.treewrap svg{display:block; max-width:100%; height:auto}
+.tree-line{stroke:var(--rule-strong); stroke-width:1.5}
+.tree-node{font-family:var(--mono); font-size:14px; fill:var(--ink)}
+.tree-leaf-ring{fill:none; stroke:var(--rule-strong); stroke-width:1.5}
+.tree-leaf-ring.p1{stroke:var(--accent); stroke-width:2.2}
+.tree-leaf-ring.p2{stroke:var(--ok); stroke-width:2.2}
+.tree-legend{display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--rule)}
+.swatch{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--ink-2)}
+.swatch i{width:13px; height:13px; border-radius:99px; border:2.2px solid var(--rule-strong); display:inline-block}
+.swatch.p1 i{border-color:var(--accent)}
+.swatch.p2 i{border-color:var(--ok)}
+
+/* ---------- closing ---------- */
+.next{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-top:20px}
+.nextcard{border:1px solid var(--rule); border-radius:10px; padding:16px 18px; background:var(--surface)}
+.nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
+.nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
+.nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
+.colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
+
+/* ---------- number lines (inequalities crash course) ---------- */
+.nlbox{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.nlrow{display:grid; grid-template-columns:minmax(96px,auto) 1fr; gap:6px 14px; align-items:center}
+.nlrow + .nlrow{margin-top:8px}
+.nlrow .lbl{font-family:var(--serif); font-size:17px; text-align:right; color:var(--ink); white-space:nowrap}
+.nlrow .lbl i{font-style:italic}
+.nlrow.res{border-top:1px solid var(--rule-strong); padding-top:12px; margin-top:12px}
+.nlrow.res .lbl{font-weight:600}
+.nlrow.res .lbl.none{color:var(--wrong)}
+svg.nl{display:block; width:100%; height:auto; overflow:visible}
+svg.nl .ax{stroke:var(--ink-3); stroke-width:1.6; fill:none}
+svg.nl .head{fill:var(--ink-3); stroke:none}
+svg.nl .tk{stroke:var(--ink-2); stroke-width:1.8}
+svg.nl .tk.minor{stroke:var(--ink-3); stroke-width:1.2}
+svg.nl text{font-family:var(--mono); text-anchor:middle}
+svg.nl text.key{font-size:17px; font-weight:500; fill:var(--ink)}
+svg.nl text.minor{font-size:13px; fill:var(--ink-3)}
+svg.nl .seg{stroke:var(--accent); stroke-width:7; stroke-linecap:butt; fill:none}
+svg.nl .pt{stroke:var(--accent); stroke-width:2.6}
+svg.nl .pt.open{fill:var(--surface)}
+svg.nl .pt.closed{fill:var(--accent)}
+svg.nl .pt.ghost{fill:none; stroke:var(--ink-3); stroke-dasharray:3 3}
+svg.nl.dim .seg{stroke:var(--ink-3)}
+svg.nl.dim .pt{stroke:var(--ink-3)}
+svg.nl.dim .pt.closed{fill:var(--ink-3)}
+svg.nl.ok .seg{stroke:var(--ok)}
+svg.nl.ok .pt{stroke:var(--ok)}
+svg.nl.ok .pt.closed{fill:var(--ok)}
+svg.nl .arc{fill:none; stroke:var(--accent); stroke-width:1.8}
+svg.nl .arclbl{font-size:15px; fill:var(--accent-2); font-weight:500}
+svg.nl .pin line{stroke-width:2}
+svg.nl .pin text{font-size:14px; font-weight:500}
+svg.nl .pin.yes line{stroke:var(--ok)}   svg.nl .pin.yes polygon, svg.nl .pin.yes circle{fill:var(--ok)}   svg.nl .pin.yes text{fill:var(--ok)}
+svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no circle{fill:var(--wrong)} svg.nl .pin.no text{fill:var(--wrong)}
+.nlnote{font-size:14.5px; color:var(--ink-2); margin-top:14px; padding-top:12px; border-top:1px solid var(--rule); line-height:1.5}
+.nlgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:26px}
+.nlgrid > div + div{padding-top:20px; border-top:1px solid var(--rule)}
+@media (min-width:1000px){ .nlgrid > div + div{padding-top:0; border-top:none} }
+@media (max-width:520px){ .nlgrid{grid-template-columns:1fr} .nlrow{grid-template-columns:minmax(72px,auto) 1fr} }
+.nlgrid .hd{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* a math statement heading a box: never uppercased, since x and X differ */
+.boxhd{font-family:var(--serif); font-size:21px; color:var(--ink); padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid var(--rule)}
+.boxhd i{font-style:italic}
+.hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
+
+/* ---------- page map ---------- */
+/* A contents list, not tiles: numbered rows on hairlines, reading down two
+   columns on wide screens and one on phones. */
+.pagemap{list-style:none; counter-reset:pm; margin:26px 0 0; padding:0; columns:2 250px; column-gap:44px}
+.pagemap::before{content:"On this page"; display:block; column-span:all; margin:0 0 6px; padding-bottom:8px;
+  border-bottom:1px solid var(--rule-strong); font-family:var(--mono); font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3)}
+.pagemap li{counter-increment:pm; break-inside:avoid}
+.pagemap a{display:block; position:relative; padding:8px 2px 8px 36px; border-bottom:1px solid var(--rule);
+  color:var(--ink); text-decoration:none; font-size:15.5px; line-height:1.35}
+.pagemap a::before{content:counter(pm, decimal-leading-zero); position:absolute; left:2px; top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{color:var(--accent-2); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.pagemap a:hover::before{color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:3px}
+
+/* ---------- key idea / watch out ---------- */
+.keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
+.keybox .tag, .warn .tag{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin-bottom:6px}
+.keybox p, .warn p{margin:0; color:var(--ink); max-width:none}
+.keybox p + p, .warn p + p{margin-top:8px}
+.keybox ul{margin:4px 0 0; padding-left:20px; color:var(--ink)}
+.keybox li{margin-bottom:4px}
+.warn{background:var(--wrong-wash); border-left:3px solid var(--wrong); border-radius:0 10px 10px 0; padding:14px 20px; margin:0 0 20px}
+.warn .tag{color:var(--wrong)}
+
+/* ---------- symbol table ---------- */
+.symtab{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; font-size:15.5px}
+.symtab th{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:500; text-align:left; padding:10px 14px; background:var(--surface-2); border-bottom:1px solid var(--rule)}
+.symtab td{padding:10px 14px; border-bottom:1px solid var(--rule); color:var(--ink); vertical-align:middle}
+.symtab tr:last-child td{border-bottom:0}
+.symtab td.m, .symtab td .m{font-size:1.15em}
+.dotic{display:inline-block; width:14px; height:14px; border-radius:99px; border:2.4px solid var(--ok); vertical-align:-2px; margin-right:6px}
+.dotic.closed{background:var(--ok)}
+@media (max-width:560px){ .symtab{font-size:14px} .symtab th, .symtab td{padding:8px 9px} }
+
+/* ---------- worked example, one step at a time ---------- */
+.walk{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; box-shadow:var(--shadow); margin:0 0 20px}
+.walk-q{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; padding-bottom:12px; border-bottom:1px solid var(--rule)}
+.walk-q .ask{font-weight:700; font-size:15px}
+.walk-q .m{font-size:1.4em}
+.walk-steps{list-style:none; margin:0; padding:6px 0 0}
+.walk-steps li{display:grid; grid-template-columns:minmax(150px,auto) 1fr; gap:4px 20px; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--rule)}
+.walk-steps li:last-child{border-bottom:0}
+.walk-steps li .m{font-size:1.3em}
+.walk-steps li.ans .m{color:var(--ok); font-weight:600}
+.walk-steps .why{font-size:14.5px; color:var(--ink-2); line-height:1.45}
+.walk-steps .why b{color:var(--wrong)}
+@media (max-width:560px){ .walk-steps li{grid-template-columns:1fr} }
+.walk-ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:12px}
+.walk-hint{font-size:13.5px; color:var(--ink-3)}
+.walk + .walk{margin-top:-4px}
+
+/* ---------- test-a-number ---------- */
+.tester{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.tester .tp-probs{margin-bottom:10px}
+.tester .tp-line{cursor:crosshair}
+.tp-slide{display:flex; align-items:center; gap:12px; margin:10px 0 4px}
+.tp-slide input{flex:1; accent-color:var(--accent); min-width:0; height:28px}
+.tp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; margin:8px 0 12px; font-size:15px}
+.tp-out.yes{background:var(--ok-wash)}
+.tp-out.no{background:var(--wrong-wash)}
+.tp-verdict{font-weight:700}
+.tp-out.yes .tp-verdict{color:var(--ok)}
+.tp-out.no .tp-verdict{color:var(--wrong)}
+
+/* ---------- explorers (and/or, flip, distance) ---------- */
+.xp{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.xp-row{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px}
+.xp-row .ctrl-label{min-width:74px}
+.stepper{display:inline-flex; align-items:center; border:1px solid var(--rule-strong); border-radius:8px; overflow:hidden}
+.stepper button{border:0; background:var(--surface-2); color:var(--ink); width:34px; height:34px; font-size:17px}
+.stepper button:hover{background:var(--accent-wash)}
+.stepper button:focus-visible{outline:2.5px solid var(--accent); outline-offset:-2px}
+.stepper span{min-width:44px; text-align:center; font-family:var(--serif); font-size:18px}
+.xp-stmt{font-family:var(--serif); font-size:clamp(20px,3vw,26px); padding:10px 0 4px; border-top:1px solid var(--rule); margin-top:6px}
+.xp-stmt i{font-style:italic}
+.xp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; background:var(--ok-wash); margin-top:12px; font-size:15px}
+.xp-out .m{font-size:1.3em}
+.xp-out .shape{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); font-weight:500}
+.xp-out.empty{background:var(--wrong-wash)} .xp-out.empty .shape{color:var(--wrong)}
+.xp-say{font-size:14.5px; color:var(--ink-2); margin-top:10px}
+
+/* ---------- build-the-graph drill ---------- */
+.gb .drill-q{padding-bottom:6px}
+.gb .xp-row{margin:6px 0}
+.btn.right{border-color:var(--ok); background:var(--ok-wash)}
+.btn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.btn:disabled{cursor:default}
+.drill-end{margin-top:10px; padding-top:10px; border-top:1px solid var(--rule); color:var(--ink-2)}
+
+/* ---------- numbered method (steps-list) ---------- */
+.steps-list{list-style:none; counter-reset:rc; margin:0 0 20px; padding:0}
+.steps-list > li{counter-increment:rc; position:relative; padding:12px 16px 12px 52px; border:1px solid var(--rule); border-radius:10px; background:var(--surface); margin-bottom:8px; color:var(--ink)}
+.steps-list > li::before{content:counter(rc); position:absolute; left:14px; top:11px; width:26px; height:26px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-family:var(--mono); font-size:13px; display:flex; align-items:center; justify-content:center}
+.steps-list > li small{display:block; color:var(--ink-2); font-size:14px; margin-top:2px}
+
+/* ---------- cheat sheet ---------- */
+.cheat{border:1.5px solid var(--accent); border-radius:12px; padding:20px 22px; background:var(--surface)}
+.cheat h3{font-family:var(--serif); font-size:21px; font-weight:600; margin:0 0 12px}
+.cheat ul{margin:0; padding-left:20px; color:var(--ink)}
+.cheat li{margin-bottom:6px}
+.cheat .symtab{margin:10px 0 14px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important; scroll-behavior:auto !important}
+}
+</style>
+<style>
+/* end-behavior lesson only */
+.gp{display:block; width:100%; height:auto}
+.gp-g{stroke:var(--rule); stroke-width:1}
+.gp-a{stroke:var(--ink-3); stroke-width:1.4}
+.gp-t{font-family:var(--mono); font-size:10.5px; fill:var(--ink-3); text-anchor:middle}
+.gp-new{fill:none; stroke:var(--accent-2); stroke-width:2.8; stroke-linejoin:round; stroke-linecap:round}
+.gfig{margin:6px 0 20px; max-width:320px}
+.gcap{font-size:13.5px; color:var(--ink-2); margin-top:6px; line-height:1.45}
+.pgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin:0 0 24px}
+.pcard{border:1px solid var(--rule); border-radius:10px; background:var(--surface); padding:12px 14px}
+.pcard .gp{max-width:200px; margin:0 auto 8px}
+.pc-eq{display:block; font-size:1.3em; margin-bottom:2px}
+.pc-d{font-size:14px; color:var(--ink-2); line-height:1.45}
+.check-q svg.gp{max-width:260px; margin-top:6px}
+#drEnds .drill-btns .btn{font-size:14.5px}
+.check + h3{margin-top:32px}
+/* a polynomial with its parts labelled: one grid column per piece, labels
+   and arrows above, brackets and labels below */
+.anat{display:grid; grid-template-columns:1fr repeat(9, auto) 1fr; align-items:end; margin:0 0 22px;
+  padding:16px 12px 14px; background:var(--surface); border:1px solid var(--rule); border-radius:10px}
+.an-e{grid-row:3; font-family:var(--serif); font-size:clamp(28px, 6vw, 40px); line-height:1.15; text-align:center; color:var(--ink); padding:0 .03em}
+.an-e i{font-style:italic}
+.an-e sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.an-op{padding:0 .22em; color:var(--ink-2)}
+.an-sup{align-self:start; font-size:clamp(17px, 3.6vw, 24px)}
+.an-lead{color:var(--accent-2); font-weight:600}
+.an-lb{grid-row:1; font-size:14px; line-height:1.25; color:var(--ink-2); white-space:nowrap}
+.an-ar{grid-row:2; justify-self:center; font-size:20px; line-height:1.1; color:var(--ink-2)}
+.an-br{grid-row:4; height:9px; margin:4px .12em 0; border:1.6px solid var(--rule-strong); border-top:0; border-radius:0 0 5px 5px}
+.an-br.an-lead{border-color:var(--accent)}
+.an-bot{grid-row:5; justify-self:center; text-align:center; margin-top:4px}
+@media (max-width:480px){ .an-lb{font-size:12px} }
+/* stepped practice: vertex-01's ladder */
+.ld-goal{font-weight:700; font-size:15.5px; color:var(--ink); margin:8px 0 0}
+.ld-goal:empty{display:none}
+.ld-q{font-size:clamp(22px,3.4vw,28px); margin:4px 0 12px; white-space:normal}
+.ld-final{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; margin:12px 0 0; padding:12px 14px; border-radius:8px; background:var(--ok-wash)}
+.ld-final:empty{display:none}
+.ld-final .lbl{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ok)}
+.ld-final .m{font-size:1.3em; color:var(--ok); font-weight:600}
+.ld-final i{font-style:italic}
+.ld-final sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ld-done{display:flex; flex-direction:column; gap:4px; margin:0 0 10px}
+.ld-done:empty{display:none}
+.ld-line{display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline; font-size:15px; color:var(--ink-2)}
+.ld-line .m{color:var(--ok); font-weight:600; font-size:1.12em}
+.ld-ask{font-weight:700; font-size:15.5px; margin:0 0 10px; color:var(--ink)}
+.ld-step{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-right:10px}
+.ld-opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:0 0 6px}
+.ldbtn{font-family:var(--serif); font-size:18px; padding:11px 14px; border-radius:8px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink); cursor:pointer; text-align:center}
+.ldbtn i, .ld-q i, .ld-line i, .ld-ask i{font-style:italic}
+.ldbtn sup, .ld-q sup, .ld-line sup, .ld-ask sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ldbtn:hover:not(:disabled){border-color:var(--accent)}
+.ldbtn:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+.ldbtn:disabled{cursor:default}
+.ldbtn.right{border-color:var(--ok); background:var(--ok-wash)}
+.ldbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>End Behavior</b></div>
+    <div class="meter">
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-num" id="meterNum">0 / 10 correct</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<section id="top">
+  <div class="eyebrow">Polynomials · Module 15</div>
+  <h1>Which way do the ends go?</h1>
+  <p class="lead">Far to the left and far to the right, a polynomial's graph heads up or down. <strong>The leading term decides which.</strong></p>
+  <p>Next: <strong>Zeros and Multiplicity</strong>, which fills in the middle of the graph. No calculator needed.</p>
+  <p style="font-size:14.5px">Module 15 (§3.2): <em>Determining the end behavior of the graph of a polynomial function</em>, <em>Determining end behavior and intercepts to graph a polynomial function</em>, and <em>Matching graphs with polynomial functions</em>.</p>
+  <ol class="pagemap">
+    <li><a href="#s1">The leading term</a></li>
+    <li><a href="#s2">From factored form</a></li>
+    <li><a href="#s3">Why only the leading term</a></li>
+    <li><a href="#s4">The four shapes</a></li>
+    <li><a href="#s5">Practice</a></li>
+    <li><a href="#s6">Common mistakes</a></li>
+    <li><a href="#s7">Check yourself</a></li>
+    <li><a href="#s8">Cheat sheet</a></li>
+  </ol>
+</section>
+
+<section id="s1">
+  <div class="eyebrow">1 · The leading term</div>
+  <h2>The term with the highest power of <i>x</i></h2>
+  <div class="rulebox">
+    <span class="tag">Standard form</span>
+    <span>Multiplied out, like terms combined, and written from the highest power of <i>x</i> down to the lowest.</span>
+    <span class="cond">for example &nbsp;<span class="m">4<i>x</i><sup>3</sup> − 2<i>x</i><sup>2</sup> + <i>x</i> − 7</span></span>
+  </div>
+  <p>In standard form, the <strong>leading term</strong> is the first term: the one with the highest power of <span class="m"><i>x</i></span>.</p>
+  <ul>
+    <li>The <strong>degree</strong> is that power.</li>
+    <li>The <strong>leading coefficient</strong> is the number in front of it, sign included.</li>
+  </ul>
+  <div class="anat" role="img" aria-label="4x cubed minus 2x squared plus x minus 7. The leading term is 4x cubed: its number, 4, is the leading coefficient, and its power, 3, is the degree. Minus 2x squared and x are the other terms. Minus 7 is the constant term.">
+    <span class="an-lb" style="grid-column:1/3; justify-self:end; text-align:right">leading<br>coefficient</span>
+    <span class="an-lb" style="grid-column:4/9; justify-self:start">degree</span>
+    <span class="an-ar" style="grid-column:2">↓</span>
+    <span class="an-ar" style="grid-column:4">↓</span>
+    <span class="an-e an-lead" style="grid-column:2">4</span>
+    <span class="an-e an-lead" style="grid-column:3"><i>x</i></span>
+    <span class="an-e an-lead an-sup" style="grid-column:4">3</span>
+    <span class="an-e an-op" style="grid-column:5">−</span>
+    <span class="an-e" style="grid-column:6">2<i>x</i><sup>2</sup></span>
+    <span class="an-e an-op" style="grid-column:7">+</span>
+    <span class="an-e" style="grid-column:8"><i>x</i></span>
+    <span class="an-e an-op" style="grid-column:9">−</span>
+    <span class="an-e" style="grid-column:10">7</span>
+    <span class="an-br an-lead" style="grid-column:2/5"></span>
+    <span class="an-br" style="grid-column:5/9"></span>
+    <span class="an-br" style="grid-column:9/11"></span>
+    <span class="an-lb an-bot" style="grid-column:2/5">leading<br>term</span>
+    <span class="an-lb an-bot" style="grid-column:5/9">other<br>terms</span>
+    <span class="an-lb an-bot" style="grid-column:9/11">constant<br>term</span>
+  </div>
+
+  <h3>Not in standard form? The first term may not lead.</h3>
+  <p>Each of these is written another way. Put it in standard form, and a different term comes first.</p>
+  <table class="symtab">
+    <tr><th>As written</th><th>Standard form</th><th>Leading term</th></tr>
+    <tr><td class="m">5 − <i>x</i><sup>2</sup> + 3<i>x</i><sup>3</sup></td><td class="m">3<i>x</i><sup>3</sup> − <i>x</i><sup>2</sup> + 5</td><td><span class="m">3<i>x</i><sup>3</sup></span>, not 5</td></tr>
+    <tr><td class="m">4<i>x</i> − <i>x</i><sup>4</sup> + 2</td><td class="m">−<i>x</i><sup>4</sup> + 4<i>x</i> + 2</td><td><span class="m">−<i>x</i><sup>4</sup></span>, not <span class="m">4<i>x</i></span></td></tr>
+    <tr><td class="m"><i>x</i>(3<i>x</i> + 2)<sup>2</sup></td><td class="m">9<i>x</i><sup>3</sup> + 12<i>x</i><sup>2</sup> + 4<i>x</i></td><td><span class="m">9<i>x</i><sup>3</sup></span>, not <span class="m"><i>x</i></span></td></tr>
+    <tr><td class="m">(<i>x</i> + 3)(1 − <i>x</i>)</td><td class="m">−<i>x</i><sup>2</sup> − 2<i>x</i> + 3</td><td><span class="m">−<i>x</i><sup>2</sup></span>, not <span class="m"><i>x</i><sup>2</sup></span></td></tr>
+  </table>
+  <p>The first two only need reordering: look at the powers, not the order. The last two have to be multiplied out, which is slow. Section 2 has a shortcut.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Leading term of</span><span class="m"><i>f</i>(<i>x</i>) = 3<i>x</i><sup>2</sup> − 5<i>x</i><sup>4</sup> + <i>x</i></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">powers: 2, 4, 1</span><span class="why">The highest is 4.</span></li>
+      <li class="ans"><span class="m">leading term −5<i>x</i><sup>4</sup></span><span class="why">Degree 4, leading coefficient −5. The minus belongs to it.</span></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c1">
+    <div class="check-q"><span class="ask">The leading term of</span><span class="m">7 + 2<i>x</i> − <i>x</i><sup>3</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="eyebrow">2 · From factored form</div>
+  <h2>Don't multiply it all out</h2>
+  <p>You could multiply it out to standard form, but you don't need to. To find the leading term of a product, <strong>multiply the leading term of each factor</strong>. The other terms only make smaller powers.</p>
+  <p>A power on a bracket applies to its leading term too: the leading term of <span class="m">(2<i>x</i> − 5)<sup>2</sup></span> is <span class="m">(2<i>x</i>)<sup>2</sup> = 4<i>x</i><sup>2</sup></span>.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Leading term of</span><span class="m"><i>f</i>(<i>x</i>) = −5<i>x</i>(2<i>x</i> − 5)<sup>2</sup></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">−5<i>x</i> &nbsp;and&nbsp; (2<i>x</i>)<sup>2</sup> = 4<i>x</i><sup>2</sup></span><span class="why">The leading term of each factor. Square the 2 as well as the <i>x</i>.</span></li>
+      <li class="ans"><span class="m">−5<i>x</i> · 4<i>x</i><sup>2</sup> = −20<i>x</i><sup>3</sup></span><span class="why">Degree 3, leading coefficient −20.</span></li>
+    </ol>
+  </div>
+
+  <div class="keybox">
+    <span class="tag">Watch for a hidden minus</span>
+    <p>In <span class="m">(3 − <i>x</i>)</span> the leading term is <span class="m">−<i>x</i></span>, not 3. The <i>x</i> term leads, minus sign and all.</p>
+  </div>
+
+  <div class="check" data-q="c2">
+    <div class="check-q"><span class="ask">The leading term of</span><span class="m">4(<i>x</i> + 1)<sup>2</sup>(3 − <i>x</i>)</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+
+  <h3>More practice</h3>
+  <p>The leading term of each factor first, then multiply them.</p>
+  <div id="ldLead"></div>
+</section>
+
+<section id="s3">
+  <div class="eyebrow">3 · Why it works</div>
+  <h2>Far from 0, the leading term wins</h2>
+  <p>Take <span class="m"><i>f</i>(<i>x</i>) = <i>x</i><sup>3</sup> − 10<i>x</i><sup>2</sup></span>. Near 0 the second term matters. Far out, it doesn't:</p>
+  <table class="symtab">
+    <tr><th><i>x</i></th><th><i>x</i><sup>3</sup></th><th>−10<i>x</i><sup>2</sup></th><th><i>f</i>(<i>x</i>)</th></tr>
+    <tr><td>100</td><td>1,000,000</td><td>−100,000</td><td>900,000</td></tr>
+    <tr><td>1,000</td><td>1,000,000,000</td><td>−10,000,000</td><td>990,000,000</td></tr>
+  </table>
+  <p>The higher power grows much faster, so it takes over. That is why the ends of the graph follow the leading term, and only the leading term.</p>
+</section>
+
+<section id="s4">
+  <div class="eyebrow">4 · The rule</div>
+  <h2>Two questions: even or odd? Plus or minus?</h2>
+  <p>Every polynomial's ends look like one of these four.</p>
+  <div class="pgrid" data-g="four"></div>
+
+  <div class="rulebox">
+    <span class="tag">End behavior</span>
+    <span><strong>Even degree:</strong> both ends go the same way.</span>
+    <span><strong>Odd degree:</strong> the ends go opposite ways.</span>
+    <span><strong>Positive leading coefficient:</strong> rises on the right. <strong>Negative:</strong> falls on the right.</span>
+  </div>
+  <p>So read the right end from the sign, then get the left end from even or odd.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">End behavior of</span><span class="m"><i>f</i>(<i>x</i>) = 2<i>x</i><sup>3</sup> − <i>x</i><sup>4</sup> + 6</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">leading term −<i>x</i><sup>4</sup></span><span class="why">The highest power is 4. It's written second, and the minus belongs to it.</span></li>
+      <li><span class="m">negative: falls on the right</span><span class="why">The sign decides the right end.</span></li>
+      <li><span class="m">4 is even: the left end matches, so it falls too</span><span class="why">Even degree sends both ends the same way.</span></li>
+      <li class="ans"><span class="m">falls left, falls right</span><span class="why">The same ends as <span class="m"><i>y</i> = −<i>x</i><sup>2</sup></span>.</span></li>
+    </ol>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">End behavior of</span><span class="m"><i>f</i>(<i>x</i>) = 5<i>x</i><sup>3</sup> − <i>x</i> + 1</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">leading term 5<i>x</i><sup>3</sup></span><span class="why">Degree 3, leading coefficient 5.</span></li>
+      <li><span class="m">positive: rises on the right</span><span class="why">The sign decides the right end.</span></li>
+      <li><span class="m">3 is odd: the left end is the opposite, so it falls</span><span class="why">Odd degree sends the ends opposite ways.</span></li>
+      <li class="ans"><span class="m">falls left, rises right</span><span class="why">The same ends as <span class="m"><i>y</i> = <i>x</i><sup>3</sup></span>.</span></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c3">
+    <div class="check-q"><span class="ask">End behavior of</span><span class="m"><i>f</i>(<i>x</i>) = −2<i>x</i><sup>5</sup> + <i>x</i><sup>2</sup></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+
+  <p>It works backwards too. From a graph, the ends tell you even or odd, and plus or minus.</p>
+  <div class="check" data-q="c4">
+    <div class="check-q"><span class="ask">This is the graph of a polynomial. Its leading term has</span><span class="m" data-g="c4fig"></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="eyebrow">5 · Practice</div>
+  <h2>Leading term, then the ends</h2>
+  <p>For each one, find the leading term on paper first. Then pick the end behavior.</p>
+  <div id="drEnds"></div>
+</section>
+
+<section id="s6">
+  <div class="eyebrow">6 · Common mistakes</div>
+  <h2>Four wrong claims</h2>
+  <p>Each card shows a wrong claim. Click its button to try <i>x</i> = 10, which is far enough out to show what the ends really do.</p>
+  <div id="trapHost"></div>
+</section>
+
+<section id="s7">
+  <div class="eyebrow">7 · Check yourself</div>
+  <h2>Six on your own</h2>
+  <p>If you miss one, the feedback names the section to go back to.</p>
+  <div id="quizHost"></div>
+  <div class="score">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span class="n" id="scoreN">0</span><span class="count">of 6</span>
+    </div>
+    <div class="say" id="scoreSay">Answer all six to see where you stand.</div>
+  </div>
+</section>
+
+<section id="s8">
+  <div class="eyebrow">8 · Keep this</div>
+  <h2>Cheat sheet</h2>
+  <div class="cheat">
+    <h3>End behavior of a polynomial</h3>
+    <ol class="steps-list">
+      <li><strong>Find the leading term.</strong> The highest power of <i>x</i>, with its number and sign.<small><span class="m">3<i>x</i><sup>2</sup> − 5<i>x</i><sup>4</sup> + <i>x</i></span>: <span class="m">−5<i>x</i><sup>4</sup></span></small></li>
+      <li><strong>Factored form:</strong> multiply the leading term of each factor.<small><span class="m">−5<i>x</i>(2<i>x</i> − 5)<sup>2</sup></span>: <span class="m">−5<i>x</i> · 4<i>x</i><sup>2</sup> = −20<i>x</i><sup>3</sup></span></small></li>
+      <li><strong>Sign:</strong> positive rises on the right, negative falls on the right.</li>
+      <li><strong>Degree:</strong> even, the left end matches the right. Odd, it's the opposite.</li>
+    </ol>
+  </div>
+
+  <div class="next">
+    <div class="nextcard">
+      <div class="n">Done</div><div class="t">End behavior</div>
+      <p>The leading term decides the ends.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Next · Module 15</div><div class="t">Zeros and multiplicity</div>
+      <p>Where the graph meets the <i>x</i>-axis, and whether it crosses.</p>
+    </div>
+  </div>
+  <div class="colophon">
+    Math 1200 · College Algebra · supplement to ALEKS §3.2<br>
+    Practice only. Nothing here is graded or submitted.<br>
+    Your progress is saved on this device only.
+  </div>
+</section>
+
+</main>
+<script>
+/* Math 1200 · exponent crash course · shared engine
+   A lesson supplies a LESSON config object; this builds the interactive parts.
+
+   LESSON = {
+     storeKey : localStorage key, unique per lesson
+     checks   : { key: {ask?, m?, opts:[{t, ok?, fb}]} }   all MC items
+     inline   : [keys]   rendered into existing .check[data-q="key"] hosts
+     quiz     : [keys]   rendered into #quizHost, scored together
+     traps    : [{bad, why, sub, left:{lbl,val}, right:{lbl,val}}]
+     rules    : [{id, nm, frm}]
+     generic  : { RULEID: "why that rule does not apply, generically" }
+     problems : [{start, steps:[{rule, result, note, wrong:{RULEID:msg}}]}]
+     verdicts : {all, most, few}   score copy
+     solver   : {connector, ask, ok, last, done}   optional solver wording;
+                connector "" suits inequalities, where "=" between lines is false
+   }                                                                        */
+
+var EXP = (function(){
+"use strict";
+
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+function el(tag, cls, html){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+
+function rep(sym, n, cls){
+  var a = [];
+  for(var i = 0; i < n; i++) a.push({t: sym, cls: cls});
+  return a;
+}
+
+function chipRow(host, items){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.innerHTML = "";
+  items.forEach(function(it, i){
+    if(i) host.appendChild(el("span", "dot", "·"));
+    host.appendChild(el("span", "chip" + (it.cls ? " " + it.cls : ""), it.t));
+  });
+}
+
+/* a fraction, as math HTML */
+function frac(n, d){
+  return "<span class='fr'><span>" + n + "</span><span>" + d + "</span></span>";
+}
+
+/* a radical: sqrt(inner), or nth root when idx is given */
+function root(inner, idx){
+  return (idx ? "<span class='idx'>" + idx + "</span>" : "") +
+         "√<span class='rad'>" + inner + "</span>";
+}
+
+function init(L){
+  var correct = {};
+  try{
+    var saved = window.localStorage.getItem(L.storeKey);
+    if(saved) correct = JSON.parse(saved) || {};
+  }catch(e){ correct = {}; }
+
+  function persist(){
+    try{ window.localStorage.setItem(L.storeKey, JSON.stringify(correct)); }catch(e){}
+  }
+
+  var TOTAL = L.inline.length + L.quiz.length;
+
+  /* Count only this page's questions. A saved store can hold keys from an
+     older version of the lesson (a split moves questions out), and counting
+     those would push the meter past TOTAL. */
+  function paintMeter(){
+    var n = 0;
+    L.inline.concat(L.quiz).forEach(function(k){ if(correct[k]) n++; });
+    var fill = $("#meterFill"), num = $("#meterNum");
+    if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
+    if(num) num.textContent = n + " / " + TOTAL + " correct";
+  }
+
+  /* ---------------- multiple choice ---------------- */
+  /* Options are authored correct-first for reviewability, then shuffled here,
+     so the right answer is never in a predictable slot. */
+  function shuffled(arr){
+    var a = arr.slice(), i, j, t;
+    for(i = a.length - 1; i > 0; i--){
+      j = Math.floor(Math.random() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildCheck(host, key, cfg){
+    var optsHost = $(".opts", host), fb = $(".fb", host);
+    var order = shuffled(cfg.opts);
+    order.forEach(function(o){
+      var b = el("button", "opt", "<span class='m'>" + o.t + "</span>");
+      b.type = "button";
+      b._ok = !!o.ok;
+      b.addEventListener("click", function(){
+        $$(".opt", optsHost).forEach(function(c){ c.disabled = true; });
+        if(o.ok){
+          b.classList.add("right");
+          fb.className = "fb show ok";
+          correct[key] = true; persist(); paintMeter();
+        }else{
+          b.classList.add("wrongpick");
+          $$(".opt", optsHost).forEach(function(c){
+            if(c._ok) c.classList.add("right");
+          });
+          fb.className = "fb show no";
+        }
+        fb.innerHTML = o.fb;
+        if(L.quiz.indexOf(key) !== -1) paintScore();
+      });
+      optsHost.appendChild(b);
+    });
+  }
+
+  L.inline.forEach(function(key){
+    var host = $(".check[data-q='" + key + "']");
+    if(host) buildCheck(host, key, L.checks[key]);
+  });
+
+  var quizHost = $("#quizHost");
+  if(quizHost){
+    L.quiz.forEach(function(key, i){
+      var cfg = L.checks[key];
+      var card = el("div", "check");
+      card.innerHTML =
+        "<div class='check-q'><span class='ask'>" + (i + 1) + ". " + cfg.ask + "</span>" +
+        "<span class='m'>" + cfg.m + "</span></div>" +
+        "<div class='opts'></div><div class='fb'></div>";
+      quizHost.appendChild(card);
+      buildCheck(card, key, cfg);
+    });
+  }
+
+  function paintScore(){
+    var n = 0;
+    L.quiz.forEach(function(k){ if(correct[k]) n++; });
+    var nEl = $("#scoreN"), sEl = $("#scoreSay");
+    if(!nEl || !sEl) return;
+    nEl.textContent = n;
+    var answered = $$("#quizHost .fb.show").length;
+    var total = L.quiz.length;
+    if(answered < total){
+      sEl.textContent = answered + " of " + total + " answered. Keep going.";
+    }else if(n === total){
+      sEl.textContent = L.verdicts.all;
+    }else if(n >= total - 2){
+      sEl.textContent = L.verdicts.most;
+    }else{
+      sEl.textContent = L.verdicts.few;
+    }
+  }
+
+  /* ---------------- traps ---------------- */
+  var trapHost = $("#trapHost");
+  if(trapHost && L.traps){
+    L.traps.forEach(function(t){
+      var card = el("div", "trap");
+      card.innerHTML =
+        "<div class='trap-head'><span class='never'>" + (t.badge || "Never") + "</span>" +
+        "<span class='m'>" + t.bad + "</span></div><p>" + t.why + "</p>";
+      var btn = el("button", "btn", "Test it with " + t.sub);
+      btn.type = "button";
+      var out = el("div", "subst");
+      out.style.display = "none";
+      out.innerHTML =
+        "<div class='side'><span class='lbl'>" + t.left.lbl + "</span><span class='m'>" + t.left.val + "</span></div>" +
+        "<div class='side'><span class='lbl'>" + t.right.lbl + "</span><span class='m'>" + t.right.val + "</span></div>" +
+        "<span class='verdict'>" + (t.verdict || "not equal") + "</span>";
+      btn.addEventListener("click", function(){
+        var shown = out.style.display !== "none";
+        out.style.display = shown ? "none" : "flex";
+        btn.textContent = shown ? ("Test it with " + t.sub) : "Hide";
+      });
+      card.appendChild(btn);
+      card.appendChild(out);
+      trapHost.appendChild(card);
+    });
+  }
+
+  /* ---------------- rule chooser ---------------- */
+  var workEl = $("#solverWork");
+  if(workEl && L.problems){
+    var pi = 0, history = [];
+    var SV = L.solver || {};
+    var CONN = (SV.connector == null) ? "=" : SV.connector;
+    var ASK  = SV.ask  || "Which rule can you legally use on this line?";
+    var DONE = SV.done || "Fully simplified — every base appears once, nothing sits in a bracket, and no exponent is negative.";
+    var OKM  = SV.ok   || "Yes — that one is legal here.";
+    var LAST = SV.last || "That is the answer.";
+    var fbEl = $("#solverFb"), rulesEl = $("#solverRules");
+    var whichEl = $("#solverWhich"), tabsEl = $("#solverTabs");
+    var finishEl = $("#solverFinish"), doneEl = $("#solverDone"), nextEl = $("#solverNext");
+    var promptEl = $("#solverPrompt");
+
+    L.rules.forEach(function(r){
+      var b = el("button", "rulebtn",
+        "<span class='nm'>" + r.nm + "</span><span class='frm'>" + r.frm + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){ pick(r.id); });
+      rulesEl.appendChild(b);
+    });
+
+    L.problems.forEach(function(p, i){
+      var t = el("button", "tab", String(i + 1));
+      t.type = "button";
+      t.addEventListener("click", function(){ load(i); });
+      tabsEl.appendChild(t);
+    });
+
+    function render(){
+      var p = L.problems[pi];
+      workEl.innerHTML = "";
+      var first = el("div", history.length ? "line past" : "line now");
+      first.innerHTML = "<span class='eq'></span><span class='m'>" + p.start + "</span>";
+      workEl.appendChild(first);
+
+      history.forEach(function(h, i){
+        var isLast = (i === history.length - 1) && (history.length === p.steps.length);
+        var ln = el("div", "line " + (isLast ? "done" : "past"));
+        ln.innerHTML = "<span class='eq'>" + CONN + "</span><span class='m'>" + h.result + "</span>" +
+                       "<span class='usedtag'>" + h.nm + "</span>";
+        workEl.appendChild(ln);
+        if(h.note){
+          var nt = el("div", "line");
+          nt.innerHTML = "<span class='eq'></span><span class='note'>" + h.note + "</span>";
+          workEl.appendChild(nt);
+        }
+      });
+
+      $$(".tab", tabsEl).forEach(function(t, i){
+        t.className = "tab" + (i === pi ? " on" : "");
+      });
+      whichEl.textContent = "Problem " + (pi + 1) + " of " + L.problems.length;
+
+      var finished = history.length === p.steps.length;
+      $$(".rulebtn", rulesEl).forEach(function(b){ b.disabled = finished; });
+      finishEl.style.display = finished ? "flex" : "none";
+      promptEl.innerHTML = finished ? DONE : ASK;
+      if(finished){
+        doneEl.textContent = p.steps.length + " steps, " + p.steps.length + " decisions";
+        nextEl.textContent = (pi === L.problems.length - 1) ? "Back to problem 1" : "Next problem";
+      }
+    }
+
+    function pick(id){
+      var p = L.problems[pi];
+      if(history.length >= p.steps.length) return;
+      var step = p.steps[history.length];
+      if(id === step.rule){
+        var r = L.rules.filter(function(x){ return x.id === id; })[0];
+        history.push({result: step.result, note: step.note, nm: r.nm});
+        fbEl.className = "solver-fb ok";
+        fbEl.innerHTML = (history.length === p.steps.length) ? LAST : OKM;
+        render();
+      }else{
+        fbEl.className = "solver-fb no";
+        fbEl.innerHTML = (step.wrong && step.wrong[id]) ? step.wrong[id] : L.generic[id];
+      }
+    }
+
+    function load(i){
+      pi = i; history = [];
+      fbEl.className = "solver-fb"; fbEl.innerHTML = "";
+      render();
+    }
+
+    nextEl.addEventListener("click", function(){
+      load((pi + 1) % L.problems.length);
+      $(".solver").scrollIntoView({behavior: "smooth", block: "start"});
+    });
+
+    load(0);
+  }
+
+  paintMeter();
+  paintScore();
+}
+
+/* ---------------- numbers ----------------
+   A value as it should read on the page: true minus sign, halves written as
+   fractions, no floating-point dust. plain=true keeps decimals (slider read-outs). */
+var HALF = {"0.5":"&frac12;", "1.5":"3/2", "2.5":"5/2", "3.5":"7/2", "4.5":"9/2",
+            "5.5":"11/2", "6.5":"13/2", "7.5":"15/2"};
+function num(v, plain){
+  var r = Math.round(v * 100) / 100;
+  var s = String(Math.abs(r));
+  if(!plain && HALF[s]) s = HALF[s];
+  return (r < 0 ? "−" : "") + s;
+}
+
+/* ---------------- sets of numbers ----------------
+   A SET is a list of pieces [left, right, openLeft, openRight] — the same
+   shape nline draws. null on a side = runs off to infinity. [] = empty.
+
+   SET.fromTest(test, crit) builds the exact set where test(x) is true, given
+   every point where the truth could change (the critical values). Between
+   two neighbouring critical values the truth cannot change, so testing one
+   number per gap and each critical value itself decides everything.       */
+var SET = (function(){
+  function fromTest(test, crit){
+    var c = crit.slice().sort(function(a, b){ return a - b; })
+                .filter(function(v, i, a){ return i === 0 || v !== a[i - 1]; });
+    if(!c.length) return test(0) ? [[null, null, false, false]] : [];
+    var regions = [{lo:null, hi:c[0], x:c[0] - 1}];
+    c.forEach(function(v, i){
+      var nx = c[i + 1];
+      regions.push({pt:true, lo:v, hi:v, x:v});
+      regions.push({lo:v, hi:(nx == null ? null : nx), x:(nx == null ? v + 1 : (v + nx) / 2)});
+    });
+    var out = [], cur = null;
+    regions.forEach(function(r){
+      if(test(r.x)){
+        if(!cur) cur = [r.lo, r.hi, !r.pt, !r.pt];
+        else { cur[1] = r.hi; cur[3] = !r.pt; }
+      }else if(cur){ out.push(cur); cur = null; }
+    });
+    if(cur) out.push(cur);
+    return out;
+  }
+
+  var SYM = {lt:"&lt;", le:"&le;", gt:"&gt;", ge:"&ge;"};
+  function rel(r, v){
+    return {lt:function(x){ return x < v; }, le:function(x){ return x <= v; },
+            gt:function(x){ return x > v; }, ge:function(x){ return x >= v; }}[r];
+  }
+
+  function fmt(P){
+    if(!P.length) return "no solution";
+    return P.map(function(p){
+      if(p[0] == null && p[1] == null) return "(&minus;&infin;, &infin;)";
+      if(p[0] != null && p[0] === p[1]) return "{" + num(p[0]) + "}";
+      var L = (p[0] == null) ? "(&minus;&infin;" : (p[2] ? "(" : "[") + num(p[0]);
+      var R = (p[1] == null) ? "&infin;)" : num(p[1]) + (p[3] ? ")" : "]");
+      return L + ", " + R;
+    }).join(" &cup; ");
+  }
+
+  /* "one piece" / "two pieces" / "no solution" / "all real numbers" */
+  function shape(P){
+    if(!P.length) return "no solution";
+    if(P.length === 1 && P[0][0] == null && P[0][1] == null) return "all real numbers";
+    if(P.length === 1 && P[0][0] != null && P[0][0] === P[0][1]) return "a single number";
+    return P.length === 1 ? "one piece" : "two pieces";
+  }
+
+  function has(P, x){
+    return P.some(function(p){
+      var okL = (p[0] == null) || (p[2] ? x > p[0] : x >= p[0]);
+      var okR = (p[1] == null) || (p[3] ? x < p[1] : x <= p[1]);
+      return okL && okR;
+    });
+  }
+
+  return {fromTest:fromTest, rel:rel, SYM:SYM, fmt:fmt, shape:shape, has:has};
+})();
+
+/* ---------------- number lines ----------------
+   One axis, with zero or more shaded pieces on it.
+
+     nline({ticks:[-1,4], pieces:[[-1,null,true,false]]})
+
+   A PIECE is [left, right, openLeft, openRight] in axis coordinates; null on a
+   side means the shading runs off that end. No pieces at all = the empty set.
+   A fifth entry of true draws the shading without its endpoint dots.
+   Returns an SVG string, so it drops straight into innerHTML.
+
+     ticks : key values, labelled bold. An entry may be [value, "label"].
+     grid  : small tick + light label at every integer (default on when the
+             axis spans 24 or fewer units), so a student can count along it
+     ghost : a value to mark with a dashed ring (an endpoint not yet decided)
+     pin   : {v, ok, label}  a marker above the axis for a tested number
+     arc   : {a, b, label}   a bracket above the axis, for a distance
+     cls   : "dim" for an input row, "ok" for a result worth colouring      */
+var NL = {W:560, PAD:26};
+function nlGeom(cfg){
+  var lo = (cfg.lo == null) ? -6 : cfg.lo;
+  var hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var span = NL.W - 2 * NL.PAD;
+  return {lo:lo, hi:hi, x:function(v){ return NL.PAD + (v - lo) / (hi - lo) * span; }};
+}
+/* the axis value under a click, from its horizontal fraction across the svg */
+function nlValueAt(cfg, frac){
+  var g = nlGeom(cfg);
+  return g.lo + (frac * NL.W - NL.PAD) / (NL.W - 2 * NL.PAD) * (g.hi - g.lo);
+}
+function nline(cfg){
+  var g = nlGeom(cfg), lo = g.lo, hi = g.hi, x = g.x, W = NL.W, PAD = NL.PAD;
+  var top = (cfg.pin || cfg.arc) ? 40 : 6;
+  var Y = top + 12, H = Y + 34, R = 7;
+  var s = '<svg class="nl' + (cfg.cls ? " " + cfg.cls : "") +
+          '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">';
+  s += '<line class="ax" x1="' + PAD + '" y1="' + Y + '" x2="' + (W - PAD) + '" y2="' + Y + '"/>';
+  s += '<polygon class="head" points="' + (PAD - 15) + ',' + Y + ' ' +
+       (PAD - 3) + ',' + (Y - 5.5) + ' ' + (PAD - 3) + ',' + (Y + 5.5) + '"/>';
+  s += '<polygon class="head" points="' + (W - PAD + 15) + ',' + Y + ' ' +
+       (W - PAD + 3) + ',' + (Y - 5.5) + ' ' + (W - PAD + 3) + ',' + (Y + 5.5) + '"/>';
+
+  var keys = (cfg.ticks || []).map(function(t){
+    return (t instanceof Array) ? {v:t[0], t:t[1]} : {v:t, t:num(t)};
+  });
+  var grid = (cfg.grid == null) ? (hi - lo <= 24) : cfg.grid;
+  if(grid){
+    for(var k = Math.ceil(lo); k <= Math.floor(hi); k++){
+      var near = keys.some(function(kk){ return Math.abs(kk.v - k) < 0.6; });
+      s += '<line class="tk minor" x1="' + x(k) + '" y1="' + (Y - 4) + '" x2="' + x(k) + '" y2="' + (Y + 4) + '"/>';
+      if(!near) s += '<text class="minor" x="' + x(k) + '" y="' + (Y + 24) + '">' + num(k) + '</text>';
+    }
+  }
+
+  /* ticks go under the shading, so an open circle stays visibly open */
+  keys.forEach(function(t){
+    s += '<line class="tk" x1="' + x(t.v) + '" y1="' + (Y - 6) + '" x2="' + x(t.v) +
+         '" y2="' + (Y + 6) + '"/>';
+  });
+
+  (cfg.pieces || []).forEach(function(p){
+    var a = (p[0] == null) ? PAD - 13 : x(p[0]);
+    var b = (p[1] == null) ? W - PAD + 13 : x(p[1]);
+    s += '<line class="seg" x1="' + a + '" y1="' + Y + '" x2="' + b + '" y2="' + Y + '"/>';
+  });
+  (cfg.pieces || []).forEach(function(p){
+    if(p[4]) return;                       /* [.., true] = shading only, no dots */
+    if(p[0] != null){
+      s += '<circle class="pt ' + (p[2] ? "open" : "closed") + '" cx="' + x(p[0]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+    if(p[1] != null && p[1] !== p[0]){
+      s += '<circle class="pt ' + (p[3] ? "open" : "closed") + '" cx="' + x(p[1]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+  });
+  if(cfg.ghost != null){
+    s += '<circle class="pt ghost" cx="' + x(cfg.ghost) + '" cy="' + Y + '" r="' + R + '"/>';
+  }
+
+  keys.forEach(function(t){
+    s += '<text class="key" x="' + x(t.v) + '" y="' + (Y + 25) + '">' + t.t + '</text>';
+  });
+
+  if(cfg.arc){
+    var xa = x(cfg.arc.a), xb = x(cfg.arc.b), ay = Y - 20;
+    s += '<path class="arc" d="M' + xa + ',' + (Y - 9) + ' V' + ay + ' H' + xb + ' V' + (Y - 9) + '"/>';
+    if(cfg.arc.label){
+      s += '<text class="arclbl" x="' + ((xa + xb) / 2) + '" y="' + (ay - 7) + '">' + cfg.arc.label + '</text>';
+    }
+  }
+  if(cfg.pin){
+    var px = x(Math.max(lo, Math.min(hi, cfg.pin.v)));
+    s += '<g class="pin ' + (cfg.pin.ok ? "yes" : "no") + '">' +
+         '<line x1="' + px + '" y1="' + (Y - 26) + '" x2="' + px + '" y2="' + (Y - 10) + '"/>' +
+         '<polygon points="' + (px - 6) + ',' + (Y - 12) + ' ' + (px + 6) + ',' + (Y - 12) + ' ' + px + ',' + (Y - 3) + '"/>' +
+         '<circle cx="' + px + '" cy="' + Y + '" r="4.5"/>';
+    if(cfg.pin.label) s += '<text x="' + px + '" y="' + (Y - 31) + '">' + cfg.pin.label + '</text>';
+    s += '</g>';
+  }
+  return s + '</svg>';
+}
+
+/* A labelled stack: input rows, a rule, then the result row.
+   rows = [[label, nlineCfg], ...]; the LAST row is the result.          */
+function nstack(host, rows){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var last = rows.length - 1;
+  host.innerHTML = rows.map(function(r, i){
+    var cfg = r[1] || {};
+    if(i < last && cfg.cls == null) cfg.cls = "dim";
+    var none = (i === last) && !(cfg.pieces && cfg.pieces.length);
+    return '<div class="nlrow' + (i === last ? " res" : "") + '">' +
+           '<span class="lbl' + (none ? " none" : "") + '">' + r[0] + '</span>' +
+           nline(cfg) + '</div>';
+  }).join("");
+}
+
+/* ---------------- worked examples, one line at a time ----------------
+   <div class="walk">
+     <div class="walk-q"><span class="m">2x + 3 &gt; 7</span></div>
+     <ol class="walk-steps">
+       <li><span class="m">2x &gt; 4</span><span class="why">Subtract 3.</span></li>
+     </ol>
+   </div>
+   Lines stay hidden until asked for, so a student can try each one on paper
+   first.                                                                 */
+function walks(){
+  $$(".walk").forEach(function(w){
+    var steps = $$(".walk-steps > li", w);
+    if(!steps.length) return;
+    var shown = 0;
+    var bar = el("div", "walk-ctrls");
+    var nextB = el("button", "btn on", ""); nextB.type = "button";
+    var allB = el("button", "btn", "Show all"); allB.type = "button";
+    var hint = el("span", "walk-hint", "");
+    bar.appendChild(nextB); bar.appendChild(allB); bar.appendChild(hint);
+    w.appendChild(bar);
+    function paint(){
+      steps.forEach(function(li, i){ li.style.display = (i < shown) ? "" : "none"; });
+      var done = shown >= steps.length;
+      nextB.textContent = done ? "Start over" : (shown ? "Next step" : "Show first step");
+      allB.style.display = done ? "none" : "";
+      hint.textContent = done ? "Could you do it again without looking?"
+                              : shown + " of " + steps.length + " steps shown. Try the next one on paper first.";
+    }
+    nextB.addEventListener("click", function(){
+      shown = (shown >= steps.length) ? 0 : shown + 1; paint();
+    });
+    allB.addEventListener("click", function(){ shown = steps.length; paint(); });
+    paint();
+  });
+}
+
+/* ---------------- quick-fire drill ----------------
+   drill("#host", {
+     items   : [{m, a, why}]          a = the key of the right choice
+     choices : [{k, t}]               the buttons
+     end     : "closing line"
+   })                                                                   */
+function drill(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.classList.add("drill");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='drill-q m'></div><div class='drill-btns'></div><div class='drill-fb'></div>";
+  var q = $(".drill-q", host), fb = $(".drill-fb", host), cnt = $(".count", host);
+  var pips = $(".pips", host), btns = $(".drill-btns", host);
+  var i = 0, marks = [], label = {};
+  var choiceBtns = cfg.choices.map(function(c){
+    label[c.k] = c.t;
+    var b = el("button", "btn", c.t); b.type = "button";
+    b.addEventListener("click", function(){ answer(c.k); });
+    btns.appendChild(b);
+    return b;
+  });
+  var nextB = el("button", "btn on", "Next"); nextB.type = "button";
+  btns.appendChild(nextB);
+  nextB.addEventListener("click", function(){
+    if(i === cfg.items.length - 1){ i = 0; marks = []; } else { i++; }
+    draw();
+  });
+
+  function drawPips(){
+    pips.innerHTML = "";
+    cfg.items.forEach(function(_, k){
+      pips.appendChild(el("span", "pip" +
+        (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") + (k === i ? " now" : "")));
+    });
+  }
+  function draw(){
+    q.innerHTML = cfg.items[i].m;
+    cnt.textContent = (i + 1) + " of " + cfg.items.length;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    choiceBtns.forEach(function(b){ b.disabled = false; b.classList.remove("right", "wrongpick"); });
+    nextB.style.display = "none";
+    drawPips();
+  }
+  function answer(k){
+    var it = cfg.items[i], right = (k === it.a);
+    if(marks[i] === undefined) marks[i] = right;
+    choiceBtns.forEach(function(b, j){
+      b.disabled = true;
+      var ck = cfg.choices[j].k;
+      if(ck === it.a) b.classList.add("right");
+      else if(ck === k) b.classList.add("wrongpick");
+    });
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not this one &mdash; it's <strong>" + label[it.a] + "</strong>. ") + it.why;
+    var lastOne = (i === cfg.items.length - 1);
+    nextB.textContent = lastOne ? "Start again" : "Next";
+    nextB.style.display = "";
+    if(lastOne){
+      var n = marks.filter(function(v){ return v; }).length;
+      fb.innerHTML += "<div class='drill-end'>" + n + " of " + cfg.items.length +
+        " right first time. " + (cfg.end || "") + "</div>";
+    }
+    drawPips();
+  }
+  draw();
+}
+
+/* ---------------- test-a-number ----------------
+   tester("#host", {
+     problems : [{label, set, ticks, test(x) -> {html, ok}}]
+     lo, hi, step, start
+     hidden   : true = the shading starts hidden, so the student predicts it
+   })
+   A slider (or a click on the line) moves a pin; the page substitutes that
+   number and says whether it lands in the set.                          */
+function tester(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var pi = 0, xv = (cfg.start == null) ? 0 : cfg.start, show = !cfg.hidden;
+  var lo = (cfg.lo == null) ? -6 : cfg.lo, hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var step = cfg.step || 0.5;
+  host.classList.add("tester");
+  host.innerHTML =
+    (cfg.problems.length > 1 ? "<div class='ctrls tp-probs'></div>" : "") +
+    "<div class='tp-line'></div>" +
+    "<div class='tp-slide'><span class='ctrl-label'>Move the point</span>" +
+      "<input type='range' min='" + lo + "' max='" + hi + "' step='" + step + "' value='" + xv +
+      "' aria-label='the number to test'></div>" +
+    "<div class='tp-out'></div>" +
+    "<div class='ctrls'><button type='button' class='btn tp-show'></button></div>";
+  var probs = $(".tp-probs", host), lineEl = $(".tp-line", host);
+  var range = $("input", host), out = $(".tp-out", host), showB = $(".tp-show", host);
+
+  if(probs){
+    probs.appendChild(el("span", "ctrl-label", "Inequality"));
+    cfg.problems.forEach(function(p, i){
+      var b = el("button", "btn" + (i === 0 ? " on" : ""), "<span class='m'>" + p.label + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){
+        $$(".btn", probs).forEach(function(o){ o.classList.remove("on"); });
+        b.classList.add("on"); pi = i; show = !cfg.hidden; draw();
+      });
+      probs.appendChild(b);
+    });
+  }
+  function lineCfg(){
+    var p = cfg.problems[pi];
+    return {lo:lo, hi:hi, ticks:p.ticks || [], pieces:show ? p.set : [], cls:"ok",
+            pin:{v:xv, ok:p.test(xv).ok, label:"x = " + num(xv, true)}};
+  }
+  function draw(){
+    var p = cfg.problems[pi], r = p.test(xv), n = num(xv, true);
+    lineEl.innerHTML = nline(lineCfg());
+    out.className = "tp-out " + (r.ok ? "yes" : "no");
+    out.innerHTML = "<span class='m'>" + r.html + "</span>" +
+      "<span class='tp-verdict'>" + (r.ok ? "true, so " + n + " is in the set"
+                                          : "false, so " + n + " is not in the set") + "</span>";
+    showB.textContent = show ? "Hide the shading" : "Show every number that works";
+  }
+  range.addEventListener("input", function(){ xv = parseFloat(range.value); draw(); });
+  lineEl.addEventListener("click", function(e){
+    var svg = $("svg", lineEl); if(!svg) return;
+    var r = svg.getBoundingClientRect();
+    var v = Math.round(nlValueAt(lineCfg(), (e.clientX - r.left) / r.width) / step) * step;
+    xv = Math.max(lo, Math.min(hi, v)); range.value = xv; draw();
+  });
+  showB.addEventListener("click", function(){ show = !show; draw(); });
+  draw();
+}
+
+return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
+        root: root, num: num, SET: SET, nline: nline, nlValueAt: nlValueAt,
+        nstack: nstack, walks: walks, drill: drill, tester: tester, init: init};
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var $ = EXP.$, $$ = EXP.$$, num = EXP.num;
+
+var X = "<i>x</i>";
+function p(n){ return X + "<sup>" + n + "</sup>"; }
+
+/* ---- drawing: graphs-02's graph(), trimmed to curves only ---- */
+var GID = 0;
+function graph(c){
+  var x0 = c.x[0], x1 = c.x[1], y0 = c.y[0], y1 = c.y[1];
+  var W = c.w || 300, P = 14, u = (W - 2 * P) / (x1 - x0), H = Math.round(2 * P + u * (y1 - y0));
+  function px(x){ return +(P + (x - x0) * u).toFixed(2); }
+  function py(y){ return +(P + (y1 - y) * u).toFixed(2); }
+  var id = "gclip" + (++GID), s = "", i;
+  s += "<defs><clipPath id='" + id + "'><rect x='" + P + "' y='" + P + "' width='" + (W - 2 * P) +
+       "' height='" + (H - 2 * P) + "'/></clipPath></defs>";
+  for(i = Math.ceil(x0); i <= x1; i++)
+    s += "<line class='gp-g' x1='" + px(i) + "' y1='" + py(y0) + "' x2='" + px(i) + "' y2='" + py(y1) + "'/>";
+  for(i = Math.ceil(y0); i <= y1; i++)
+    s += "<line class='gp-g' x1='" + px(x0) + "' y1='" + py(i) + "' x2='" + px(x1) + "' y2='" + py(i) + "'/>";
+  if(y0 <= 0 && y1 >= 0) s += "<line class='gp-a' x1='" + px(x0) + "' y1='" + py(0) + "' x2='" + px(x1) + "' y2='" + py(0) + "'/>";
+  if(x0 <= 0 && x1 >= 0) s += "<line class='gp-a' x1='" + px(0) + "' y1='" + py(y0) + "' x2='" + px(0) + "' y2='" + py(y1) + "'/>";
+  (c.curves || []).forEach(function(cv){
+    var d = "", n = 240, k, x, y;
+    for(k = 0; k <= n; k++){
+      x = x0 + (x1 - x0) * k / n; y = cv.f(x);
+      d += (k ? "L" : "M") + px(x) + "," + py(Math.max(y0 - 2, Math.min(y1 + 2, y)));
+    }
+    s += "<path class='gp-new' clip-path='url(#" + id + ")' d='" + d + "'/>";
+  });
+  return "<svg class='gp' viewBox='0 0 " + W + " " + H + "' role='img' aria-label='" + (c.alt || "graph") + "'>" + s + "</svg>";
+}
+function small(f, alt){ return graph({x:[-3, 3], y:[-3, 3], w:200, curves:[{f:f}], alt:alt}); }
+function card(f, eq, d, alt){
+  return "<div class='pcard'>" + small(f, alt) + "<span class='pc-eq m'>" + eq + "</span><span class='pc-d'>" + d + "</span></div>";
+}
+
+var FIGS = {
+  four:
+    card(function(x){ return x * x; }, "<i>y</i> = " + p(2), "Even, positive: rises left, rises right.", "y = x squared, both ends up") +
+    card(function(x){ return -x * x; }, "<i>y</i> = −" + p(2), "Even, negative: falls left, falls right.", "y = minus x squared, both ends down") +
+    card(function(x){ return x * x * x; }, "<i>y</i> = " + p(3), "Odd, positive: falls left, rises right.", "y = x cubed, down on the left, up on the right") +
+    card(function(x){ return -x * x * x; }, "<i>y</i> = −" + p(3), "Odd, negative: rises left, falls right.", "y = minus x cubed, up on the left, down on the right"),
+  /* −x³ + 3x: rises left, falls right, with two bumps in the middle */
+  c4fig: graph({x:[-3, 3], y:[-4, 4], w:240, curves:[{f:function(x){ return -x * x * x + 3 * x; }}],
+                alt:"a polynomial graph that comes down from the upper left, bends twice, and falls on the right"}),
+  /* x³ − 4x: falls left, rises right */
+  q5fig: graph({x:[-3, 3], y:[-5, 5], w:220, curves:[{f:function(x){ return x * x * x - 4 * x; }}],
+                alt:"a polynomial graph that comes up from the lower left, bends twice, and rises on the right"})
+};
+$$("[data-g]").forEach(function(h){ h.innerHTML = FIGS[h.getAttribute("data-g")]; });
+
+var RR = "rises left, rises right", FF = "falls left, falls right",
+    FR = "falls left, rises right", RF = "rises left, falls right";
+
+EXP.init({
+  storeKey: "m1200-ends-01",
+  inline: ["c1","c2","c3","c4"],
+  quiz:   ["q1","q2","q3","q4","q5","q6"],
+
+  checks: {
+    c1: { opts:[
+      {t:"−" + p(3), ok:true, fb:"Right. The powers are 0, 1 and 3. The highest is 3, and its sign is minus."},
+      {t:"7", fb:"7 is written first, but it has no <i>x</i>. Look for the highest power."},
+      {t:"2" + X, fb:"2" + X + " has power 1. " + p(3) + " is higher."},
+      {t:p(3), fb:"Right term, but the minus belongs to it: −" + p(3) + "."}
+    ]},
+    c2: { opts:[
+      {t:"−4" + p(3), ok:true, fb:"Right. 4 · " + p(2) + " · (−" + X + ") = −4" + p(3) + "."},
+      {t:"4" + p(3), fb:"The leading term of (3 − " + X + ") is −" + X + ". Its minus carries through."},
+      {t:"−4" + p(2), fb:"(" + X + " + 1)<sup>2</sup> leads with " + p(2) + ", not " + X + ". Then 4 · " + p(2) + " · (−" + X + ")."},
+      {t:"12" + p(2), fb:"That uses the 3 from (3 − " + X + "). The leading term is the " + X + " term: −" + X + "."}
+    ]},
+    c3: { opts:[
+      {t:RF, ok:true, fb:"Right. Leading term −2" + p(5) + ": negative, so it falls on the right. Odd, so the left end is the opposite."},
+      {t:FR, fb:"That's for a positive leading coefficient. −2 is negative, so it falls on the right."},
+      {t:FF, fb:"Both ends the same needs an even degree. 5 is odd."},
+      {t:RR, fb:"Both ends the same needs an even degree, and negative falls on the right."}
+    ]},
+    c4: { opts:[
+      {t:"odd degree, negative coefficient", ok:true, fb:"Right. The ends go opposite ways, so odd. It falls on the right, so negative. It's <i>y</i> = −" + p(3) + " + 3" + X + "."},
+      {t:"odd degree, positive coefficient", fb:"Positive rises on the right. This one falls on the right."},
+      {t:"even degree, negative coefficient", fb:"Even degree sends both ends the same way. Here the left end is up and the right end is down."},
+      {t:"even degree, positive coefficient", fb:"Even would send both ends the same way, and positive rises on the right. This falls on the right."}
+    ]},
+
+    q1: { ask:"The leading term of", m:"6" + p(2) + " − " + p(5) + " + 4", opts:[
+      {t:"−" + p(5), ok:true, fb:"Power 5 is the highest, and it has a minus."},
+      {t:"6" + p(2), fb:"6" + p(2) + " is first, but " + p(5) + " has the higher power. See section 1."},
+      {t:p(5), fb:"Right term, but keep its minus: −" + p(5) + ". See section 1."},
+      {t:"4", fb:"4 has no " + X + ". See section 1."}
+    ]},
+    q2: { ask:"The leading term of", m:"−3" + X + "(" + X + " − 2)<sup>2</sup>", opts:[
+      {t:"−3" + p(3), ok:true, fb:"−3" + X + " · " + p(2) + " = −3" + p(3) + "."},
+      {t:"−3" + p(2), fb:"The bracket is squared, so it leads with " + p(2) + ". −3" + X + " · " + p(2) + " = −3" + p(3) + ". See section 2."},
+      {t:"3" + p(3), fb:"The −3 keeps its sign. See section 2."},
+      {t:"−12" + X, fb:"That uses the −2 from the bracket. The leading term of (" + X + " − 2)<sup>2</sup> is " + p(2) + ". See section 2."}
+    ]},
+    q3: { ask:"End behavior of", m:"<i>f</i>(" + X + ") = 4" + p(3) + " − " + p(6), opts:[
+      {t:FF, ok:true, fb:"Leading term −" + p(6) + ": even, negative. Both ends fall."},
+      {t:FR, fb:"That reads 4" + p(3) + ", the first term. The highest power is 6. See section 1."},
+      {t:RR, fb:"Even degree, but the leading coefficient is −1. Negative falls on the right. See section 4."},
+      {t:RF, fb:"Opposite ends needs an odd degree. 6 is even. See section 4."}
+    ]},
+    q4: { ask:"End behavior of", m:"<i>f</i>(" + X + ") = −(" + X + " − 1)(" + X + " + 3)(" + X + " + 5)", opts:[
+      {t:RF, ok:true, fb:"Leading term −" + X + " · " + X + " · " + X + " = −" + p(3) + ": odd, negative."},
+      {t:FR, fb:"The minus in front makes the leading term −" + p(3) + ". Negative falls on the right. See section 2."},
+      {t:FF, fb:"Three " + X + "'s multiply to " + p(3) + ", which is odd, so the ends go opposite ways. See section 4."},
+      {t:RR, fb:"The degree is 3, odd, and the coefficient is negative. See section 4."}
+    ]},
+    q5: { ask:"Which could be the equation of this graph?", m:"<span data-g2='q5fig'></span>", opts:[
+      {t:"<i>y</i> = " + p(3) + " − 4" + X, ok:true, fb:"Falls left and rises right: odd degree, positive. Only " + p(3) + " − 4" + X + " fits."},
+      {t:"<i>y</i> = −" + p(3) + " + 4" + X, fb:"Negative leading coefficient falls on the right. This graph rises on the right. See section 4."},
+      {t:"<i>y</i> = " + p(4) + " − 4" + p(2), fb:"Even degree sends both ends the same way. Here they go opposite ways. See section 4."},
+      {t:"<i>y</i> = −" + p(4) + " + 4" + p(2), fb:"Even and negative: both ends fall. This graph rises on the right. See section 4."}
+    ]},
+    q6: { ask:"The degree is even and the leading coefficient is negative. The graph", m:"", opts:[
+      {t:FF, ok:true, fb:"Negative falls on the right. Even, so the left end matches."},
+      {t:RR, fb:"Negative falls on the right, not rises. See section 4."},
+      {t:RF, fb:"Even degree makes both ends match. See section 4."},
+      {t:FR, fb:"Even degree makes both ends match, and negative falls on the right. See section 4."}
+    ]}
+  },
+
+  verdicts: {
+    all:"All six. Next, Zeros and Multiplicity fills in the middle of the graph.",
+    most:"Close. Redo the misses on paper, using the section each one names.",
+    few:"Go back to section 5. Find the leading term first, every time."
+  },
+
+  traps: [
+    {bad:"2 − 5" + p(3) + " + " + X + " rises on the right, because 2 is positive", badge:"Wrong",
+     why:"2 is written first, but the leading term is −5" + p(3) + ". Negative falls on the right.",
+     sub:"x = 10", verdict:"it falls",
+     left:{lbl:"the claim", val:"rises"}, right:{lbl:"f(10) = 2 − 5000 + 10", val:"−4988"}},
+    {bad:"−" + p(4) + " + 3" + X + " rises on both ends, because 4 is even", badge:"Wrong",
+     why:"Even means both ends match. The sign decides which way: negative, so both fall.",
+     sub:"x = 10", verdict:"it falls",
+     left:{lbl:"the claim", val:"rises"}, right:{lbl:"f(10) = −10000 + 30", val:"−9970"}},
+    {bad:"The leading term of " + X + "(2" + X + " − 1)<sup>2</sup> is 2" + p(2), badge:"Wrong",
+     why:"The square applies to the 2 as well: (2" + X + ")<sup>2</sup> = 4" + p(2) + ". So " + X + " · 4" + p(2) + " = 4" + p(3) + ", and 4 · 10<sup>3</sup> = 4000 is close to 3610.",
+     sub:"x = 10", verdict:"not close",
+     left:{lbl:"10 · 19²", val:"3610"}, right:{lbl:"2 · 10²", val:"200"}},
+    {bad:"The leading term of (" + X + " + 1)(2 − " + X + ") is " + p(2), badge:"Wrong",
+     why:"The leading term of (2 − " + X + ") is −" + X + ". So it's " + X + " · (−" + X + ") = −" + p(2) + ".",
+     sub:"x = 10", verdict:"wrong sign",
+     left:{lbl:"(10 + 1)(2 − 10)", val:"−88"}, right:{lbl:"10²", val:"100"}}
+  ]
+});
+
+/* the quiz graph is drawn after the quiz exists */
+$$("[data-g2]").forEach(function(h){ h.innerHTML = FIGS[h.getAttribute("data-g2")]; });
+
+EXP.walks();
+
+/* ---- stepped practice: vertex-01's ladder() ------------------------------
+   items: [{goal, m, done, parts:[{ask, opts:[right first, ...], why}]}]   */
+function ladder(sel, items, cfg){
+  var host = $(sel); if(!host) return;
+  cfg = cfg || {};
+  host.className = "drill";
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='ld-goal'></div><div class='ld-q m'></div><div class='ld-done'></div><div class='ld-ask'></div>" +
+    "<div class='ld-opts'></div><div class='drill-fb'></div><div class='ld-final'></div>" +
+    "<div class='drill-btns'><button type='button' class='btn on ld-next'></button></div>";
+  var goalEl = $(".ld-goal", host), finEl = $(".ld-final", host), qEl = $(".ld-q", host), doneEl = $(".ld-done", host), askEl = $(".ld-ask", host),
+      optsEl = $(".ld-opts", host), fb = $(".drill-fb", host), cnt = $(".count", host),
+      pips = $(".pips", host), next = $(".ld-next", host);
+  var i = 0, p = 0, clean = true, marks = [];
+
+  function shuffled(n){
+    var a = [], j, t, k;
+    for(k = 0; k < n; k++) a.push(k);
+    for(k = n - 1; k > 0; k--){ j = Math.floor(Math.random() * (k + 1)); t = a[k]; a[k] = a[j]; a[j] = t; }
+    return a;
+  }
+  function drawPips(){
+    pips.innerHTML = "";
+    items.forEach(function(_, k){
+      pips.appendChild(EXP.el("span", "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
+                                     (k === i ? " now" : "")));
+    });
+  }
+  function drawItem(){
+    p = 0; clean = true;
+    goalEl.innerHTML = items[i].goal || cfg.goal || "";
+    qEl.innerHTML = items[i].m;
+    doneEl.innerHTML = "";
+    finEl.innerHTML = "";
+    cnt.textContent = "Problem " + (i + 1) + " of " + items.length;
+    drawPips();
+    drawPart();
+  }
+  function drawPart(){
+    var it = items[i], part = it.parts[p], n = it.parts.length;
+    askEl.innerHTML = (n > 1 ? "<span class='ld-step'>Step " + (p + 1) + " of " + n + "</span>" : "") + part.ask;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    next.style.display = "none";
+    optsEl.innerHTML = "";
+    shuffled(part.opts.length).forEach(function(k){
+      var b = EXP.el("button", "ldbtn", part.opts[k]);
+      b.type = "button"; b._k = k;
+      b.addEventListener("click", function(){ answer(k, b); });
+      optsEl.appendChild(b);
+    });
+  }
+  function answer(k, b){
+    var it = items[i], part = it.parts[p], right = (k === 0), last = (p === it.parts.length - 1);
+    if(!right) clean = false;
+    $$(".ldbtn", optsEl).forEach(function(c){ c.disabled = true; if(c._k === 0) c.classList.add("right"); });
+    if(!right) b.classList.add("wrongpick");
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not quite. ") + part.why;
+    if(last){
+      if(it.done) finEl.innerHTML = "<span class='lbl'>" + (it.doneLbl || cfg.doneLbl || "Finished") +
+        "</span><span class='m'>" + it.done + "</span>";
+      if(marks[i] === undefined) marks[i] = clean;
+      drawPips();
+      if(i === items.length - 1){
+        var got = marks.filter(function(v){ return v; }).length;
+        fb.innerHTML += "<div class='drill-end'>" + got + " of " + items.length + " right first time. " + (cfg.end || "") + "</div>";
+      }
+    }
+    next.textContent = !last ? "Next step" : (i < items.length - 1 ? "Next problem" : "Start again");
+    next.style.display = "";
+  }
+  next.addEventListener("click", function(){
+    var it = items[i];
+    if(p < it.parts.length - 1){
+      doneEl.insertAdjacentHTML("beforeend", "<div class='ld-line'><span>" + it.parts[p].ask +
+        "</span><span class='m'>" + it.parts[p].opts[0] + "</span></div>");
+      p++; drawPart();
+    }else{
+      if(i < items.length - 1) i++; else { i = 0; marks = []; }
+      drawItem();
+    }
+  });
+  drawItem();
+}
+
+/* leading term of a product, one factor at a time */
+var F = "<i>f</i>(" + X + ") = ";
+ladder("#ldLead", [
+  /* 2x(x − 3)²: 2x · x² = 2x³ */
+  {m:F + "2" + X + "(" + X + " − 3)<sup>2</sup>", done:"2" + p(3), parts:[
+    {ask:"Leading term of (" + X + " − 3)<sup>2</sup>:", opts:[p(2), X, "9", "−3" + p(2)],
+     why:"Square the " + X + " term: " + X + " · " + X + " = " + p(2) + ". The −3 only makes smaller powers."},
+    {ask:"Times 2" + X + ":", opts:["2" + p(3), "2" + p(2), "18" + X, "−6" + p(2)],
+     why:"2" + X + " · " + p(2) + " = 2" + p(3) + ". Add the powers: 1 + 2 = 3."}
+  ]},
+  /* −(2x − 1)³: −(2x)³ = −8x³ */
+  {m:F + "−(2" + X + " − 1)<sup>3</sup>", done:"−8" + p(3), parts:[
+    {ask:"Leading term of (2" + X + " − 1)<sup>3</sup>:", opts:["8" + p(3), "2" + p(3), "6" + p(3), "−1"],
+     why:"Cube the 2 as well: (2" + X + ")<sup>3</sup> = 2 · 2 · 2 · " + p(3) + " = 8" + p(3) + "."},
+    {ask:"With the minus in front:", opts:["−8" + p(3), "8" + p(3), "−2" + p(3), "1"],
+     why:"The minus in front multiplies it: −1 · 8" + p(3) + " = −8" + p(3) + "."}
+  ]},
+  /* 5(3 − x)(x + 4): 5 · (−x) · x = −5x² */
+  {m:F + "5(3 − " + X + ")(" + X + " + 4)", done:"−5" + p(2), parts:[
+    {ask:"Leading term of (3 − " + X + "):", opts:["−" + X, "3", X, "−3"],
+     why:"The " + X + " term leads, minus sign and all."},
+    {ask:"5 · (−" + X + ") · " + X + " =", opts:["−5" + p(2), "5" + p(2), "60", "−5" + X],
+     why:"5 · (−" + X + ") · " + X + " = −5" + p(2) + ". 60 is 5 · 3 · 4, the constants: they only give the constant term."}
+  ]},
+  /* x²(1 − 2x)²: x² · 4x² = 4x⁴ */
+  {m:F + p(2) + "(1 − 2" + X + ")<sup>2</sup>", done:"4" + p(4), parts:[
+    {ask:"Leading term of (1 − 2" + X + ")<sup>2</sup>:", opts:["4" + p(2), "−2" + p(2), "2" + p(2), "1"],
+     why:"(−2" + X + ")<sup>2</sup> = (−2)(−2)" + p(2) + " = 4" + p(2) + ". Squaring makes the minus positive."},
+    {ask:"Times " + p(2) + ":", opts:["4" + p(4), "4" + p(3), "−4" + p(4), "2" + p(4)],
+     why:p(2) + " · 4" + p(2) + " = 4" + p(4) + ". Add the powers: 2 + 2 = 4."}
+  ]},
+  /* −3(x + 2)(x − 1)(x + 5): −3 · x³ */
+  {m:F + "−3(" + X + " + 2)(" + X + " − 1)(" + X + " + 5)", done:"−3" + p(3), parts:[
+    {ask:"The three brackets lead with " + X + ", " + X + ", " + X + ". Together:", opts:[p(3), "3" + X, p(2), "−10"],
+     why:X + " · " + X + " · " + X + " = " + p(3) + ". Multiply, don't add."},
+    {ask:"With −3 in front:", opts:["−3" + p(3), "3" + p(3), p(3), "30"],
+     why:"−3 · " + p(3) + " = −3" + p(3) + ". The −3 keeps its sign."}
+  ]},
+  /* (4 − x)²(2x + 1): x² · 2x = 2x³ */
+  {m:F + "(4 − " + X + ")<sup>2</sup>(2" + X + " + 1)", done:"2" + p(3), parts:[
+    {ask:"Leading term of (4 − " + X + ")<sup>2</sup>:", opts:[p(2), "−" + p(2), "16", "−8" + X],
+     why:"(−" + X + ")<sup>2</sup> = " + p(2) + ". The square makes the minus positive."},
+    {ask:"Times the leading term of (2" + X + " + 1):", opts:["2" + p(3), "−2" + p(3), "2" + p(2), "16"],
+     why:p(2) + " · 2" + X + " = 2" + p(3) + "."}
+  ]},
+  /* 2x³(5 − x): 2x³ · (−x) = −2x⁴ */
+  {m:F + "2" + p(3) + "(5 − " + X + ")", done:"−2" + p(4), parts:[
+    {ask:"Leading term:", opts:["−2" + p(4), "10" + p(3), "2" + p(4), "−2" + p(3)],
+     why:"(5 − " + X + ") leads with −" + X + ". So 2" + p(3) + " · (−" + X + ") = −2" + p(4) + ". 10" + p(3) + " uses the 5 instead."}
+  ]},
+  /* (x − 1)²(3 − 2x)³: x² · (−2x)³ = x² · (−8x³) = −8x⁵ */
+  {m:F + "(" + X + " − 1)<sup>2</sup>(3 − 2" + X + ")<sup>3</sup>", done:"−8" + p(5), parts:[
+    {ask:"(" + X + " − 1)<sup>2</sup> leads with " + p(2) + ". Leading term of (3 − 2" + X + ")<sup>3</sup>:", opts:["−8" + p(3), "8" + p(3), "−2" + p(3), "27"],
+     why:"(−2" + X + ")<sup>3</sup> = (−2)(−2)(−2)" + p(3) + " = −8" + p(3) + ". An odd power keeps the minus."},
+    {ask:p(2) + " · (−8" + p(3) + ") =", opts:["−8" + p(5), "8" + p(5), "−8" + p(6), "−6" + p(5)],
+     why:"Add the powers, don't multiply them: 2 + 3 = 5. So −8" + p(5) + "."}
+  ]}
+], {doneLbl:"Leading term", end:"Missed some? The slip is usually a dropped minus or a number that didn't get the power."});
+
+EXP.drill("#drEnds", {
+  choices: [{k:"RR", t:RR}, {k:"FF", t:FF}, {k:"FR", t:FR}, {k:"RF", t:RF}],
+  items: [
+    {m:"<i>f</i>(" + X + ") = " + p(4) + " − 3" + X + " + 1", a:"RR", why:"Leading term " + p(4) + ": even, positive."},
+    {m:"<i>f</i>(" + X + ") = −" + p(3) + " + 2" + p(2), a:"RF", why:"Leading term −" + p(3) + ": odd, negative."},
+    {m:"<i>f</i>(" + X + ") = 2" + p(5) + " − " + X, a:"FR", why:"Leading term 2" + p(5) + ": odd, positive."},
+    {m:"<i>f</i>(" + X + ") = 5 + " + X + " − " + p(2), a:"FF", why:"Leading term −" + p(2) + ": even, negative. It's written last."},
+    {m:"<i>f</i>(" + X + ") = (" + X + " − 1)(" + X + " + 2)(" + X + " − 3)", a:"FR", why:X + " · " + X + " · " + X + " = " + p(3) + ": odd, positive."},
+    {m:"<i>f</i>(" + X + ") = −2" + X + "(" + X + " + 1)<sup>2</sup>", a:"RF", why:"−2" + X + " · " + p(2) + " = −2" + p(3) + ": odd, negative."},
+    {m:"<i>f</i>(" + X + ") = " + p(2) + "(3 − " + X + ")<sup>2</sup>", a:"RR", why:"(3 − " + X + ")<sup>2</sup> leads with (−" + X + ")<sup>2</sup> = " + p(2) + ". So " + p(2) + " · " + p(2) + " = " + p(4) + ": even, positive."},
+    {m:"<i>f</i>(" + X + ") = 3" + X + "(1 − " + X + ")(" + X + " + 2)", a:"RF", why:"3" + X + " · (−" + X + ") · " + X + " = −3" + p(3) + ": odd, negative."}
+  ],
+  end:"Missed some? The leading term is where it went wrong. Go back to section 2."
+});
+
+})();
+</script>
+</body>
+</html>

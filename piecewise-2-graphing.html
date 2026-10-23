@@ -1,0 +1,1818 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Graphing Piecewise Functions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
+<style>
+/* Math 1200 · exponent crash course · shared theme
+   Neutral professional palette: graphite accent, warm-neutral paper.
+   Correctness colour is SEMANTIC (--ok / --wrong) and deliberately separate
+   from the accent, so "right" never reads as "emphasised". */
+
+:root{
+  --paper:#F6F6F4; --surface:#FFFFFF; --surface-2:#EDEDEA;
+  --ink:#1B1C1B; --ink-2:#4F524F; --ink-3:#858885;
+  --rule:#E0E0DB; --rule-strong:#C6C7C1;
+  --accent:#33403F; --accent-2:#1F2827; --accent-wash:#E9EBEA;
+  --on-accent:#FFFFFF;
+  --ok:#3D6B55; --ok-wash:#E8EEEB;
+  --wrong:#96453A; --wrong-wash:#F4E9E7;
+  --chip:#EEEEEB;
+  --shadow:0 1px 2px rgba(27,28,27,.05), 0 8px 24px -14px rgba(27,28,27,.20);
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"Karla", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+    --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+    --rule:#2D302E; --rule-strong:#3F423F;
+    --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+    --on-accent:#141514;
+    --ok:#7CBB9C; --ok-wash:#1B2721;
+    --wrong:#DA9184; --wrong-wash:#2B1D1A;
+    --chip:#212422;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+  --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+  --rule:#2D302E; --rule-strong:#3F423F;
+  --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+  --on-accent:#141514;
+  --ok:#7CBB9C; --ok-wash:#1B2721;
+  --wrong:#DA9184; --wrong-wash:#2B1D1A;
+  --chip:#212422;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--paper);
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.topbar-in{
+  max-width:820px; margin:0 auto; padding:10px 24px;
+  display:flex; align-items:center; gap:16px; justify-content:space-between;
+}
+.brandmark{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.brandmark b{color:var(--ink-2); font-weight:500}
+.brandmark a{color:var(--ink-2); text-decoration:none}
+.brandmark a:hover{color:var(--ink); text-decoration:underline}
+.brandmark a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.meter{display:flex; align-items:center; gap:10px}
+.meter-track{width:120px; height:5px; border-radius:99px; background:var(--rule); overflow:hidden}
+.meter-fill{height:100%; width:0%; background:var(--accent); transition:width .35s ease}
+.meter-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+/* phones: the bar keeps one line; the title truncates and the track goes */
+@media (max-width:560px){
+  .topbar-in{padding:9px 16px; gap:10px}
+  .brandmark{overflow:hidden; text-overflow:ellipsis; min-width:0}
+  .meter-track{display:none}
+  main{padding:0 16px 80px}
+}
+
+/* ---------- page frame ---------- */
+main{max-width:820px; margin:0 auto; padding:0 24px 96px}
+section{padding:44px 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(34px,6vw,52px);
+  line-height:1.08; margin:0 0 16px; letter-spacing:-.015em; text-wrap:balance;
+}
+h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(25px,3.6vw,32px);
+  line-height:1.2; margin:0 0 14px; letter-spacing:-.01em; text-wrap:balance;
+}
+h3{font-family:var(--sans); font-weight:700; font-size:15px; margin:0 0 8px}
+p{margin:0 0 16px; max-width:62ch; color:var(--ink-2)}
+p.lead{font-size:19px; color:var(--ink)}
+strong{color:var(--ink); font-weight:700}
+ul.plain{margin:0 0 16px; padding-left:20px; max-width:62ch; color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+
+/* ---------- math ---------- */
+.m{font-family:var(--serif); font-size:1.18em; line-height:1.35; white-space:nowrap}
+.m i{font-style:italic}
+.m sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.m .op{padding:0 .18em; color:var(--ink-2)}
+/* An inline-grid takes its baseline from the numerator, so anything written
+   after a fraction lands level with the top half. Centring the box on the
+   parent's x-height puts the bar where a reader expects it. */
+.fr{display:inline-grid; vertical-align:middle; text-align:center; margin:0 .14em}
+.fr > span{padding:0 .4em}
+.fr > span + span{border-top:1.6px solid currentColor; padding-top:.1em; margin-top:.1em}
+.rad{border-top:1.5px solid currentColor; padding:.06em .18em 0 .1em; margin-left:-.06em}
+.idx{font-size:.58em; vertical-align:.75em; margin-right:-.32em; line-height:0}
+.big{font-size:1.5em}
+
+/* ---------- factor chips ---------- */
+.expand{
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  padding:20px; margin:0 0 20px; box-shadow:var(--shadow);
+}
+.expand-row{display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px}
+.chiprow{display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:34px}
+.chip{
+  font-family:var(--mono); font-size:14px;
+  min-width:30px; height:32px; padding:0 8px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--chip); border:1px solid var(--rule-strong); border-radius:6px;
+  color:var(--ink);
+}
+.chip.a{background:var(--accent-wash); border-color:var(--accent); color:var(--accent-2)}
+.chip.b{background:var(--ok-wash); border-color:var(--ok); color:var(--ok)}
+.chip.gone{opacity:.3; text-decoration:line-through; text-decoration-color:var(--wrong)}
+.dot{font-family:var(--mono); color:var(--ink-3); font-size:13px}
+.count{
+  font-family:var(--mono); font-size:12px; color:var(--ink-2);
+  background:var(--surface-2); border-radius:6px; padding:3px 9px;
+}
+.stack{display:flex; flex-direction:column; gap:10px}
+.overline{border-top:1.6px solid var(--rule-strong); padding-top:10px}
+
+/* ---------- controls ---------- */
+button{font-family:inherit; font-size:inherit; cursor:pointer}
+.btn{
+  font-family:var(--sans); font-weight:500; font-size:14px;
+  padding:8px 15px; border-radius:8px; border:1px solid var(--rule-strong);
+  background:var(--surface); color:var(--ink); transition:background .15s, border-color .15s;
+}
+.btn:hover{background:var(--surface-2); border-color:var(--accent)}
+.btn.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn:focus-visible, .opt:focus-visible, .rulebtn:focus-visible, .tab:focus-visible{
+  outline:2.5px solid var(--accent); outline-offset:2px;
+}
+.ctrls{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px}
+.ctrl-label{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-right:4px}
+
+/* ---------- rule statement ---------- */
+.rulebox{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px;
+  background:var(--accent-wash); border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0; padding:18px 22px; margin:0 0 20px;
+}
+.rulebox .tag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-2);
+}
+.rulebox .m{font-size:1.5em; color:var(--ink)}
+/* a condition on a rule, e.g. (a ≠ 0): lower case matters, so never a .tag */
+.rulebox .cond{font-family:var(--serif); font-size:16px; color:var(--ink-2)}
+.rulebox .cond i{font-style:italic}
+@media (max-width:560px){ .rulebox .m{white-space:normal} }
+
+/* ---------- side-by-side compare ---------- */
+.compare{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; background:var(--surface)}
+.compare > div{padding:18px 20px}
+.compare > div + div{border-left:1px solid var(--rule)}
+.compare .hd{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* only the stacked statements are blocks — an inline .m inside a caption stays inline */
+.compare > div > .m{display:block; margin-bottom:8px}
+.compare small{color:var(--ink-2); font-size:13.5px; line-height:1.45; display:block}
+@media (max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .compare > div + div{border-left:0; border-top:1px solid var(--rule)}
+}
+
+/* ---------- traps ---------- */
+.trap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; margin:0 0 14px}
+.trap-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:6px}
+.never{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--wrong); background:var(--wrong-wash); border-radius:5px; padding:3px 8px; white-space:nowrap;
+}
+.trap p{margin:8px 0 12px; font-size:15px}
+.subst{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:12px; padding-top:14px; border-top:1px dashed var(--rule-strong)}
+.subst .side{display:flex; flex-direction:column; gap:4px}
+.subst .side .lbl{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.verdict{font-family:var(--mono); font-size:13px; color:var(--wrong); align-self:center}
+
+/* ---------- multiple choice ---------- */
+.check{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; margin:22px 0 0; box-shadow:var(--shadow)}
+.check-q{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin-bottom:14px}
+.check-q .ask{font-weight:700; color:var(--ink); font-size:15px}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px}
+.opt{
+  font-family:var(--sans); text-align:left; padding:11px 14px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  transition:border-color .15s, background .15s;
+}
+/* Options are mostly math (nowrap is right) but some are prose — "no solution",
+   "it cannot be simplified" — which must wrap rather than clip. */
+.opt .m{white-space:normal; display:inline-block}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok); background:var(--ok-wash)}
+.opt.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.fb{margin-top:12px; font-size:14.5px; line-height:1.5; display:none}
+.fb.show{display:block}
+.fb.ok{color:var(--ok)}
+.fb.no{color:var(--wrong)}
+
+/* ---------- two-button drill (factor-or-term, splits-or-not) ---------- */
+.drill{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:22px 20px; box-shadow:var(--shadow)}
+.drill-top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+.drill-q{font-family:var(--serif); font-size:clamp(22px,3.4vw,30px); line-height:1.35; padding:6px 0 14px}
+.drill-q i{font-style:italic}
+.drill-q.m{white-space:normal}
+.drill-q sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.drill-btns{display:flex; flex-wrap:wrap; gap:8px}
+.drill-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:3em}
+.drill-fb.ok{color:var(--ok)}
+.drill-fb.no{color:var(--wrong)}
+.pips{display:flex; flex-wrap:wrap; gap:5px}
+.pip{width:9px; height:9px; border-radius:99px; background:var(--rule); border:1px solid var(--rule-strong)}
+.pip.ok{background:var(--ok); border-color:var(--ok)}
+.pip.no{background:var(--wrong); border-color:var(--wrong)}
+.pip.now{box-shadow:0 0 0 3px var(--accent-wash); border-color:var(--accent)}
+
+/* ---------- rule chooser ---------- */
+.solver{background:var(--surface); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+.solver-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--rule); background:var(--surface-2)}
+.solver-head .which{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.tabs{display:flex; flex-wrap:wrap; gap:6px}
+.tab{font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:6px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink-2)}
+.tab.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.work{padding:22px 20px; display:flex; flex-direction:column; gap:2px; overflow-x:auto}
+.line{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:7px 0}
+.line .eq{font-family:var(--serif); font-size:1.18em; color:var(--ink-3); width:14px; flex:none}
+.line.now .m{color:var(--ink)}
+.line.past .m{color:var(--ink-2)}
+.line .note{color:var(--ink-3); font-size:13px; line-height:1.45}
+.usedtag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); background:var(--accent-wash); border-radius:5px; padding:2px 8px}
+.line.done .m{color:var(--ok); font-weight:600}
+.picker{padding:16px 20px 20px; border-top:1px solid var(--rule)}
+.picker .prompt{font-size:14px; font-weight:700; color:var(--ink); margin-bottom:12px}
+.rulegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px}
+.rulebtn{
+  font-family:var(--sans); text-align:left; padding:10px 13px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; gap:3px; transition:border-color .15s, background .15s;
+}
+.rulebtn:hover:not(:disabled){border-color:var(--accent); background:var(--surface-2)}
+.rulebtn:disabled{opacity:.5; cursor:default}
+.rulebtn .nm{font-weight:700; font-size:14px}
+.rulebtn .frm{font-family:var(--serif); font-size:14.5px; color:var(--ink-3)}
+.rulebtn .frm i{font-style:italic}
+.rulebtn .frm sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.solver-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:1.5em}
+.solver-fb.no{color:var(--wrong)}
+.solver-fb.ok{color:var(--ok)}
+.finish{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:16px}
+
+/* ---------- scoreboard ---------- */
+.score{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  border:1px solid var(--rule); border-radius:10px; padding:18px 22px; background:var(--surface); margin-top:26px;
+}
+.score .n{font-family:var(--serif); font-size:36px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1}
+.score .say{font-size:14.5px; color:var(--ink-2); max-width:44ch}
+
+/* ---------- factor tree (lesson 3) ---------- */
+.treewrap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
+.treewrap svg{display:block; max-width:100%; height:auto}
+.tree-line{stroke:var(--rule-strong); stroke-width:1.5}
+.tree-node{font-family:var(--mono); font-size:14px; fill:var(--ink)}
+.tree-leaf-ring{fill:none; stroke:var(--rule-strong); stroke-width:1.5}
+.tree-leaf-ring.p1{stroke:var(--accent); stroke-width:2.2}
+.tree-leaf-ring.p2{stroke:var(--ok); stroke-width:2.2}
+.tree-legend{display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--rule)}
+.swatch{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--ink-2)}
+.swatch i{width:13px; height:13px; border-radius:99px; border:2.2px solid var(--rule-strong); display:inline-block}
+.swatch.p1 i{border-color:var(--accent)}
+.swatch.p2 i{border-color:var(--ok)}
+
+/* ---------- closing ---------- */
+.next{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-top:20px}
+.nextcard{border:1px solid var(--rule); border-radius:10px; padding:16px 18px; background:var(--surface)}
+.nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
+.nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
+.nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
+.colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
+
+/* ---------- number lines (inequalities crash course) ---------- */
+.nlbox{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.nlrow{display:grid; grid-template-columns:minmax(96px,auto) 1fr; gap:6px 14px; align-items:center}
+.nlrow + .nlrow{margin-top:8px}
+.nlrow .lbl{font-family:var(--serif); font-size:17px; text-align:right; color:var(--ink); white-space:nowrap}
+.nlrow .lbl i{font-style:italic}
+.nlrow.res{border-top:1px solid var(--rule-strong); padding-top:12px; margin-top:12px}
+.nlrow.res .lbl{font-weight:600}
+.nlrow.res .lbl.none{color:var(--wrong)}
+svg.nl{display:block; width:100%; height:auto; overflow:visible}
+svg.nl .ax{stroke:var(--ink-3); stroke-width:1.6; fill:none}
+svg.nl .head{fill:var(--ink-3); stroke:none}
+svg.nl .tk{stroke:var(--ink-2); stroke-width:1.8}
+svg.nl .tk.minor{stroke:var(--ink-3); stroke-width:1.2}
+svg.nl text{font-family:var(--mono); text-anchor:middle}
+svg.nl text.key{font-size:17px; font-weight:500; fill:var(--ink)}
+svg.nl text.minor{font-size:13px; fill:var(--ink-3)}
+svg.nl .seg{stroke:var(--accent); stroke-width:7; stroke-linecap:butt; fill:none}
+svg.nl .pt{stroke:var(--accent); stroke-width:2.6}
+svg.nl .pt.open{fill:var(--surface)}
+svg.nl .pt.closed{fill:var(--accent)}
+svg.nl .pt.ghost{fill:none; stroke:var(--ink-3); stroke-dasharray:3 3}
+svg.nl.dim .seg{stroke:var(--ink-3)}
+svg.nl.dim .pt{stroke:var(--ink-3)}
+svg.nl.dim .pt.closed{fill:var(--ink-3)}
+svg.nl.ok .seg{stroke:var(--ok)}
+svg.nl.ok .pt{stroke:var(--ok)}
+svg.nl.ok .pt.closed{fill:var(--ok)}
+svg.nl .arc{fill:none; stroke:var(--accent); stroke-width:1.8}
+svg.nl .arclbl{font-size:15px; fill:var(--accent-2); font-weight:500}
+svg.nl .pin line{stroke-width:2}
+svg.nl .pin text{font-size:14px; font-weight:500}
+svg.nl .pin.yes line{stroke:var(--ok)}   svg.nl .pin.yes polygon, svg.nl .pin.yes circle{fill:var(--ok)}   svg.nl .pin.yes text{fill:var(--ok)}
+svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no circle{fill:var(--wrong)} svg.nl .pin.no text{fill:var(--wrong)}
+.nlnote{font-size:14.5px; color:var(--ink-2); margin-top:14px; padding-top:12px; border-top:1px solid var(--rule); line-height:1.5}
+.nlgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:26px}
+.nlgrid > div + div{padding-top:20px; border-top:1px solid var(--rule)}
+@media (min-width:1000px){ .nlgrid > div + div{padding-top:0; border-top:none} }
+@media (max-width:520px){ .nlgrid{grid-template-columns:1fr} .nlrow{grid-template-columns:minmax(72px,auto) 1fr} }
+.nlgrid .hd{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* a math statement heading a box: never uppercased, since x and X differ */
+.boxhd{font-family:var(--serif); font-size:21px; color:var(--ink); padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid var(--rule)}
+.boxhd i{font-style:italic}
+.hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
+
+/* ---------- page map ---------- */
+/* A contents list, not tiles: numbered rows on hairlines, reading down two
+   columns on wide screens and one on phones. */
+.pagemap{list-style:none; counter-reset:pm; margin:26px 0 0; padding:0; columns:2 250px; column-gap:44px}
+.pagemap::before{content:"On this page"; display:block; column-span:all; margin:0 0 6px; padding-bottom:8px;
+  border-bottom:1px solid var(--rule-strong); font-family:var(--mono); font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3)}
+.pagemap li{counter-increment:pm; break-inside:avoid}
+.pagemap a{display:block; position:relative; padding:8px 2px 8px 36px; border-bottom:1px solid var(--rule);
+  color:var(--ink); text-decoration:none; font-size:15.5px; line-height:1.35}
+.pagemap a::before{content:counter(pm, decimal-leading-zero); position:absolute; left:2px; top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{color:var(--accent-2); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.pagemap a:hover::before{color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:3px}
+
+/* ---------- key idea / watch out ---------- */
+.keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
+.keybox .tag, .warn .tag{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin-bottom:6px}
+.keybox p, .warn p{margin:0; color:var(--ink); max-width:none}
+.keybox p + p, .warn p + p{margin-top:8px}
+.keybox ul{margin:4px 0 0; padding-left:20px; color:var(--ink)}
+.keybox li{margin-bottom:4px}
+.warn{background:var(--wrong-wash); border-left:3px solid var(--wrong); border-radius:0 10px 10px 0; padding:14px 20px; margin:0 0 20px}
+.warn .tag{color:var(--wrong)}
+
+/* ---------- symbol table ---------- */
+.symtab{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; font-size:15.5px}
+.symtab th{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:500; text-align:left; padding:10px 14px; background:var(--surface-2); border-bottom:1px solid var(--rule)}
+.symtab td{padding:10px 14px; border-bottom:1px solid var(--rule); color:var(--ink); vertical-align:middle}
+.symtab tr:last-child td{border-bottom:0}
+.symtab td.m, .symtab td .m{font-size:1.15em}
+.dotic{display:inline-block; width:14px; height:14px; border-radius:99px; border:2.4px solid var(--ok); vertical-align:-2px; margin-right:6px}
+.dotic.closed{background:var(--ok)}
+@media (max-width:560px){ .symtab{font-size:14px} .symtab th, .symtab td{padding:8px 9px} }
+
+/* ---------- worked example, one step at a time ---------- */
+.walk{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; box-shadow:var(--shadow); margin:0 0 20px}
+.walk-q{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; padding-bottom:12px; border-bottom:1px solid var(--rule)}
+.walk-q .ask{font-weight:700; font-size:15px}
+.walk-q .m{font-size:1.4em}
+.walk-steps{list-style:none; margin:0; padding:6px 0 0}
+.walk-steps li{display:grid; grid-template-columns:minmax(150px,auto) 1fr; gap:4px 20px; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--rule)}
+.walk-steps li:last-child{border-bottom:0}
+.walk-steps li .m{font-size:1.3em}
+.walk-steps li.ans .m{color:var(--ok); font-weight:600}
+.walk-steps .why{font-size:14.5px; color:var(--ink-2); line-height:1.45}
+.walk-steps .why b{color:var(--wrong)}
+@media (max-width:560px){ .walk-steps li{grid-template-columns:1fr} }
+.walk-ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:12px}
+.walk-hint{font-size:13.5px; color:var(--ink-3)}
+.walk + .walk{margin-top:-4px}
+
+/* ---------- test-a-number ---------- */
+.tester{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.tester .tp-probs{margin-bottom:10px}
+.tester .tp-line{cursor:crosshair}
+.tp-slide{display:flex; align-items:center; gap:12px; margin:10px 0 4px}
+.tp-slide input{flex:1; accent-color:var(--accent); min-width:0; height:28px}
+.tp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; margin:8px 0 12px; font-size:15px}
+.tp-out.yes{background:var(--ok-wash)}
+.tp-out.no{background:var(--wrong-wash)}
+.tp-verdict{font-weight:700}
+.tp-out.yes .tp-verdict{color:var(--ok)}
+.tp-out.no .tp-verdict{color:var(--wrong)}
+
+/* ---------- explorers (and/or, flip, distance) ---------- */
+.xp{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.xp-row{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px}
+.xp-row .ctrl-label{min-width:74px}
+.stepper{display:inline-flex; align-items:center; border:1px solid var(--rule-strong); border-radius:8px; overflow:hidden}
+.stepper button{border:0; background:var(--surface-2); color:var(--ink); width:34px; height:34px; font-size:17px}
+.stepper button:hover{background:var(--accent-wash)}
+.stepper button:focus-visible{outline:2.5px solid var(--accent); outline-offset:-2px}
+.stepper span{min-width:44px; text-align:center; font-family:var(--serif); font-size:18px}
+.xp-stmt{font-family:var(--serif); font-size:clamp(20px,3vw,26px); padding:10px 0 4px; border-top:1px solid var(--rule); margin-top:6px}
+.xp-stmt i{font-style:italic}
+.xp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; background:var(--ok-wash); margin-top:12px; font-size:15px}
+.xp-out .m{font-size:1.3em}
+.xp-out .shape{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); font-weight:500}
+.xp-out.empty{background:var(--wrong-wash)} .xp-out.empty .shape{color:var(--wrong)}
+.xp-say{font-size:14.5px; color:var(--ink-2); margin-top:10px}
+
+/* ---------- build-the-graph drill ---------- */
+.gb .drill-q{padding-bottom:6px}
+.gb .xp-row{margin:6px 0}
+.btn.right{border-color:var(--ok); background:var(--ok-wash)}
+.btn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.btn:disabled{cursor:default}
+.drill-end{margin-top:10px; padding-top:10px; border-top:1px solid var(--rule); color:var(--ink-2)}
+
+/* ---------- numbered method (steps-list) ---------- */
+.steps-list{list-style:none; counter-reset:rc; margin:0 0 20px; padding:0}
+.steps-list > li{counter-increment:rc; position:relative; padding:12px 16px 12px 52px; border:1px solid var(--rule); border-radius:10px; background:var(--surface); margin-bottom:8px; color:var(--ink)}
+.steps-list > li::before{content:counter(rc); position:absolute; left:14px; top:11px; width:26px; height:26px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-family:var(--mono); font-size:13px; display:flex; align-items:center; justify-content:center}
+.steps-list > li small{display:block; color:var(--ink-2); font-size:14px; margin-top:2px}
+
+/* ---------- cheat sheet ---------- */
+.cheat{border:1.5px solid var(--accent); border-radius:12px; padding:20px 22px; background:var(--surface)}
+.cheat h3{font-family:var(--serif); font-size:21px; font-weight:600; margin:0 0 12px}
+.cheat ul{margin:0; padding-left:20px; color:var(--ink)}
+.cheat li{margin-bottom:6px}
+.cheat .symtab{margin:10px 0 14px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important; scroll-behavior:auto !important}
+}
+</style>
+<style>
+/* piecewise lessons. Graph and stepped-practice styles as in the graphs lessons. */
+.gp{display:block; width:100%; height:auto}
+.gp-g{stroke:var(--rule); stroke-width:1}
+.gp-a{stroke:var(--ink-3); stroke-width:1.4}
+.gp-t{font-family:var(--mono); font-size:10.5px; fill:var(--ink-3); text-anchor:middle}
+.gp-par{fill:none; stroke:var(--ink-3); stroke-width:2; stroke-dasharray:6 5}
+.gp-new{fill:none; stroke:var(--accent-2); stroke-width:2.8; stroke-linejoin:round; stroke-linecap:round}
+.gp-mv{stroke:var(--ink-3); stroke-width:1.2; stroke-dasharray:2 3}
+.gp-pn{fill:var(--accent-2)}
+.gp-pp{fill:var(--surface); stroke:var(--ink-3); stroke-width:1.6}
+.gp-lb{font-family:var(--mono); font-size:11.5px; fill:var(--ink-2); font-weight:500}
+.gfig{margin:6px 0 20px; max-width:340px}
+.gfig.sm{max-width:300px}
+.gcap{font-size:13.5px; color:var(--ink-2); margin-top:6px; line-height:1.45}
+.gcap .m{font-size:1.08em}
+.gpair{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:18px; margin:0 0 20px}
+.gpair .gfig{margin:0; max-width:none}
+.pgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin:0 0 24px}
+.pcard{border:1px solid var(--rule); border-radius:10px; background:var(--surface); padding:12px 14px}
+.pcard .gp{max-width:200px; margin:0 auto 8px}
+.pc-eq{display:block; font-size:1.3em; margin-bottom:2px}
+.pc-d{font-size:14px; color:var(--ink-2); line-height:1.45}
+.pc-pts{font-family:var(--serif); font-size:15px; color:var(--ink); margin-top:4px; white-space:normal}
+.drill-q svg.gp, .ld-q svg.gp{max-width:280px}
+.check-q svg.gp{max-width:260px; margin-top:6px}
+.walk-steps li .gfig{margin:10px 0 2px}
+#tx .xp-row .btn{font-size:14px}
+.txgrid{display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; margin-top:10px}
+.txgrid .gfig{flex:0 1 340px; margin:0}
+.txside{flex:1 1 240px; min-width:0}
+.txmoves{list-style:none; margin:0 0 12px; padding:0}
+.txmoves li{padding:6px 0; border-bottom:1px dashed var(--rule); font-size:15px}
+.txmoves li:last-child{border-bottom:0}
+.txmoves .k{display:inline-block; min-width:76px; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.txside .symtab{margin:0}
+.txside .symtab td{white-space:nowrap}
+.ld-goal{font-weight:700; font-size:15.5px; color:var(--ink); margin:8px 0 0}
+.ld-goal:empty{display:none}
+.ld-q{font-size:clamp(22px,3.4vw,28px); margin:4px 0 12px; white-space:normal}
+.ld-final{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; margin:12px 0 0; padding:12px 14px; border-radius:8px; background:var(--ok-wash)}
+.ld-final:empty{display:none}
+.ld-final .lbl{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ok)}
+.ld-final .m{font-size:1.3em; color:var(--ok); font-weight:600}
+.ld-done{display:flex; flex-direction:column; gap:4px; margin:0 0 10px}
+.ld-done:empty{display:none}
+.ld-line{display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline; font-size:15px; color:var(--ink-2)}
+.ld-line .m{color:var(--ok); font-weight:600; font-size:1.12em}
+.ld-ask{font-weight:700; font-size:15.5px; margin:0 0 10px; color:var(--ink)}
+.ld-step{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-right:10px}
+.ld-opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:0 0 6px}
+.drill.wide .ld-opts{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ldbtn{font-family:var(--serif); font-size:18px; padding:11px 14px; border-radius:8px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink); cursor:pointer; text-align:center}
+.ldbtn i, .ld-q i, .ld-line i, .ld-ask i{font-style:italic}
+.ldbtn sup, .ld-q sup, .ld-line sup, .ld-ask sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ldbtn:hover:not(:disabled){border-color:var(--accent)}
+.ldbtn:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+.ldbtn:disabled{cursor:default}
+.ldbtn.right{border-color:var(--ok); background:var(--ok-wash)}
+.ldbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+@media (max-width:480px){ .drill.wide .ld-opts{grid-template-columns:1fr} }
+.gp-open{fill:var(--surface); stroke:var(--accent-2); stroke-width:2.2}
+.gp-hit{fill:var(--accent); stroke:var(--surface); stroke-width:2}
+/* the strips a piecewise function's conditions cut the plane into */
+.gp-band{fill:var(--ink); opacity:.05}
+.gp-band.alt{opacity:.12}
+.gp-bnd{stroke:var(--ink-2); stroke-width:1.5; stroke-dasharray:6 4}
+.gp-blb{font-family:var(--mono); font-size:11px; fill:var(--ink-2); text-anchor:middle}
+.gp-ghost{fill:none; stroke:var(--ink-3); stroke-width:1.6; stroke-dasharray:3 5}
+/* a piecewise definition: a brace, then rule / condition rows */
+.pw{display:inline-flex; align-items:center; gap:4px; vertical-align:middle; white-space:nowrap}
+.pw .br{font-size:calc(var(--n, 2) * 1.05em); line-height:1; font-weight:300; transform:scaleX(.62); margin:0 -2px}
+.pw-rows{display:grid; grid-template-columns:auto auto; column-gap:16px; row-gap:1px; text-align:left}
+.pw-if{color:var(--ink-2)}
+.pwbox{margin:4px 0 18px; font-size:clamp(18px,2.6vw,22px)}
+.ldbtn .pw, .opt .pw{font-size:.92em}
+#sl .tp-slide .m{min-width:44px; font-size:20px}
+#sl .txmoves .k{min-width:96px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Piecewise Functions, Part 2 of 2</b></div>
+    <div class="meter">
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-num" id="meterNum">0 / 9 correct</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<section id="top">
+  <div class="eyebrow">Piecewise functions · Part 2 of 2</div>
+  <h1>Cut the plane into strips, and draw one rule in each</h1>
+  <p class="lead">The conditions in a piecewise function only talk about <span class="m"><i>x</i></span>. So each condition is a vertical strip of the plane. <strong>In each strip, draw that strip's rule, and nothing else.</strong></p>
+  <p>Do Part 1 first: you need to read the conditions. You also need to graph a line from its equation, like <span class="m"><i>y</i> = −<i>x</i></span> or <span class="m"><i>y</i> = <i>x</i> − 3</span>. No calculator needed.</p>
+  <p style="font-size:14.5px">ALEKS topic: <em>Graphing a piecewise-defined function: Problem type 1</em> (§2.7).</p>
+  <ol class="pagemap">
+    <li><a href="#s1">The conditions are strips</a></li>
+    <li><a href="#s2">Slide the boundary</a></li>
+    <li><a href="#s3">Open or closed dot</a></li>
+    <li><a href="#s4">Flat pieces, and three strips</a></li>
+    <li><a href="#s5">Practice one step at a time</a></li>
+    <li><a href="#s6">Common mistakes</a></li>
+    <li><a href="#s7">Check yourself</a></li>
+    <li><a href="#s8">Cheat sheet</a></li>
+  </ol>
+</section>
+
+<section id="s1">
+  <div class="eyebrow">1 · The big idea</div>
+  <h2>The conditions cut the plane into strips</h2>
+  <p>Look at the condition <span class="m"><i>x</i> &lt; 2</span>. It says nothing about <span class="m"><i>y</i></span>. The points <span class="m">(0, 5)</span>, <span class="m">(0, −3)</span> and <span class="m">(1.5, 100)</span> all pass it, because only their <span class="m"><i>x</i></span> matters. So <span class="m"><i>x</i> &lt; 2</span> is <strong>everything to the left of the vertical line <span class="m"><i>x</i> = 2</span></strong>, at any height. And <span class="m"><i>x</i> &ge; 2</span> is everything on that line or to its right.</p>
+  <p>The conditions split the plane into vertical strips, one for each rule. Graphing is then the same job in every strip: <strong>draw that strip's rule, and only inside that strip.</strong> Here it is, one stage at a time:</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Graph</span><span class="m" data-pw="w"></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">mark the boundary, <i>x</i> = 2</span><span class="why">That's where the conditions switch. Draw it as a dashed vertical line. The left strip is <span class="m"><i>x</i> &lt; 2</span>. The right strip is <span class="m"><i>x</i> &ge; 2</span>.</span><div class="gfig sm" data-g="w1"></div></li>
+      <li><span class="m">sketch both rules lightly, across the whole plane</span><span class="why"><span class="m"><i>y</i> = −<i>x</i></span> and <span class="m"><i>y</i> = <i>x</i> − 3</span> are ordinary lines. Draw each faintly, as if it were the whole function. Two points each is enough.</span><div class="gfig sm" data-g="w2"></div></li>
+      <li><span class="m">keep each line only inside its own strip</span><span class="why">Left of <span class="m"><i>x</i> = 2</span> the function is <span class="m">−<i>x</i></span>, so darken that part of <span class="m"><i>y</i> = −<i>x</i></span>. Right of it, darken <span class="m"><i>y</i> = <i>x</i> − 3</span>. The faint parts outside their strips are not on the graph.</span><div class="gfig sm" data-g="w3"></div></li>
+      <li class="ans"><span class="m">finish the two ends at <i>x</i> = 2</span><span class="why">Each piece stops where its strip stops. One end is an open dot and one is closed. Section 3 shows how to tell which.</span><div class="gfig sm" data-g="w4"></div></li>
+    </ol>
+  </div>
+
+  <div class="keybox">
+    <span class="tag">Why the boundaries are vertical</span>
+    <p>A condition only picks out <span class="m"><i>x</i></span>-values. Points straight above and below each other have the same <span class="m"><i>x</i></span>, so they're always in the same strip. That's why a boundary is a vertical line like <span class="m"><i>x</i> = 2</span>, never a horizontal one.</p>
+  </div>
+
+  <div class="check" data-q="c6">
+    <div class="check-q"><span class="ask">In</span><span class="m" data-pw="g"></span><span class="ask">which part of the plane does the piece <span class="m"><i>x</i><sup>2</sup></span> live in?</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="eyebrow">2 · Try it</div>
+  <h2>Slide the boundary</h2>
+  <p>Here the two rules stay the same, and you move the boundary <span class="m"><i>c</i></span>. The faint lines are the two rules drawn everywhere. The dark pieces are the graph. Watch three things as you slide:</p>
+  <ul>
+    <li>the strips change width, but each one still shows only its own rule</li>
+    <li>each piece's end at <span class="m"><i>x</i> = <i>c</i></span> slides along its own faint line</li>
+    <li>the gap between the two ends, the <strong>jump</strong>, grows, shrinks, and can close up</li>
+  </ul>
+  <div class="xp" id="sl"></div>
+
+  <p><strong>Things to try:</strong></p>
+  <ul>
+    <li>With <span class="m"><i>x</i> + 2</span> and <span class="m">−<i>x</i> + 1</span>, slide <span class="m"><i>c</i></span> to <span class="m">−&frac12;</span>. That's where the faint lines cross, so the two ends meet.</li>
+    <li>Switch the condition to <span class="m"><i>x</i> &le; <i>c</i></span>. The closed dot moves to the other piece.</li>
+    <li>With <span class="m">2</span> and <span class="m"><i>x</i> − 1</span>, find the <span class="m"><i>c</i></span> where the jump disappears.</li>
+  </ul>
+
+  <div class="keybox">
+    <span class="tag">When the pieces meet</span>
+    <p>If both rules give the same height at the boundary, the open dot and the closed dot land on the same spot. The closed dot fills the hole, and <strong>the graph has no jump</strong>. It's still a piecewise function. It just doesn't look like one.</p>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="eyebrow">3 · At the boundary</div>
+  <h2>Open dot or closed dot</h2>
+  <p>Each piece stops at the boundary, so each piece has an end there. Two questions finish it off:</p>
+  <ol class="steps-list">
+    <li><strong>How high is the end?</strong> Plug the boundary into that piece's rule. Do it <strong>even if the condition leaves the boundary out</strong>. The piece still runs right up to it.</li>
+    <li><strong>Is the end on the graph?</strong> <span class="m">&lt;</span> or <span class="m">&gt;</span> leave the boundary out: <strong>open dot</strong>. The piece gets as close as you like, but never touches. <span class="m">&le;</span> or <span class="m">&ge;</span> let it in: <strong>closed dot</strong>.</li>
+  </ol>
+  <p>In the example from section 1, <span class="m">−<i>x</i></span> at <span class="m"><i>x</i> = 2</span> is <span class="m">−2</span>. Its condition is <span class="m"><i>x</i> &lt; 2</span>, so <span class="m">(2, −2)</span> is open. <span class="m"><i>x</i> − 3</span> at 2 is <span class="m">−1</span>, and <span class="m"><i>x</i> &ge; 2</span> lets 2 in, so <span class="m">(2, −1)</span> is closed.</p>
+
+  <div class="keybox">
+    <span class="tag">One x, one y</span>
+    <p>A function gives each <span class="m"><i>x</i></span> exactly one output. So at a boundary, <strong>only one piece owns the point, and only its dot is closed.</strong> Two closed dots above one <span class="m"><i>x</i></span> would give it two outputs.</p>
+  </div>
+
+  <div class="check" data-q="c3">
+    <div class="check-q"><span class="ask">At <span class="m"><i>x</i> = 2</span>, the graph of</span><span class="m" data-pw="c3"></span><span class="ask">has</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="eyebrow">4 · Two things that look odd</div>
+  <h2>Flat pieces, and three strips</h2>
+  <p>A rule with no <span class="m"><i>x</i></span> in it, like <span class="m">3</span>, gives the same height for every <span class="m"><i>x</i></span> in its strip. Its graph is <span class="m"><i>y</i> = 3</span>: <strong>a flat, horizontal line</strong> across that strip. Not a vertical line. That would be <span class="m"><i>x</i> = 3</span>.</p>
+  <p>Three rules mean two boundaries, so three strips. The middle strip has a boundary on each side, so <strong>its piece has two ends</strong>, and each end gets its own open-or-closed check.</p>
+  <div class="pwbox m" data-pw="h"></div>
+  <div class="gfig sm" data-g="flat"></div>
+  <p>Read the middle piece: <span class="m">−1 &le; <i>x</i></span> lets −1 in, so <span class="m">(−1, −1)</span> is closed. <span class="m"><i>x</i> &lt; 2</span> leaves 2 out, so <span class="m">(2, 2)</span> is open. The outside pieces are flat: <span class="m">−2</span> on the left and <span class="m">3</span> on the right.</p>
+
+  <div class="check" data-q="c4">
+    <div class="check-q"><span class="ask">The piece <span class="m">−3 if <i>x</i> &le; 0</span> is drawn as</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="eyebrow">5 · Putting it together</div>
+  <h2>Practice one step at a time</h2>
+  <p>Sketch it on paper as you go: the boundary first, then one end of each piece, then one more point. The finished graph appears at the end, strips and all.</p>
+  <div id="ldGraph"></div>
+</section>
+
+<section id="s6">
+  <div class="eyebrow">6 · Common mistakes</div>
+  <h2>Three wrong moves</h2>
+  <p>Each card shows a wrong idea. Click its button to test it.</p>
+  <div id="trapHost"></div>
+</section>
+
+<section id="s7">
+  <div class="eyebrow">7 · Check yourself</div>
+  <h2>Six on your own</h2>
+  <p>If you miss one, the feedback names the section to go back to.</p>
+  <div id="quizHost"></div>
+  <div class="score">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span class="n" id="scoreN">0</span><span class="count">of 6</span>
+    </div>
+    <div class="say" id="scoreSay">Answer all six to see where you stand.</div>
+  </div>
+</section>
+
+<section id="s8">
+  <div class="eyebrow">8 · Keep this</div>
+  <h2>Cheat sheet</h2>
+  <div class="cheat">
+    <h3>Graphing a piecewise function</h3>
+    <ol class="steps-list">
+      <li>Draw each boundary as a dashed vertical line.<small>The strips between them are the conditions.</small></li>
+      <li>In each strip, graph that strip's rule, and only inside the strip.<small>Sketch it lightly across the plane first if that helps. A number on its own is a flat line.</small></li>
+      <li>At each boundary, plug it into each piece that touches it.<small>Even when the boundary isn't allowed in that piece.</small></li>
+      <li><span class="m">&lt;</span> or <span class="m">&gt;</span>: open dot. <span class="m">&le;</span> or <span class="m">&ge;</span>: closed dot.<small>Only one closed dot per boundary, unless the ends meet.</small></li>
+    </ol>
+  </div>
+
+  <div class="next">
+    <div class="nextcard">
+      <div class="n">Done</div><div class="t">Part 1</div>
+      <p>Reading and evaluating.</p>
+    </div>
+    <div class="nextcard">
+      <div class="n">Done · Module 13</div><div class="t">Part 2</div>
+      <p>Graphing, strip by strip.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Also · Module 13</div><div class="t">Composition</div>
+      <p>The output of one function as the input of another.</p>
+    </div>
+  </div>
+  <div class="colophon">
+    Math 1200 · College Algebra · supplement to ALEKS §2.7<br>
+    Practice only. Nothing here is graded or submitted.<br>
+    Your progress is saved on this device only.
+  </div>
+</section>
+
+</main>
+<script>
+/* Math 1200 · exponent crash course · shared engine
+   A lesson supplies a LESSON config object; this builds the interactive parts.
+
+   LESSON = {
+     storeKey : localStorage key, unique per lesson
+     checks   : { key: {ask?, m?, opts:[{t, ok?, fb}]} }   all MC items
+     inline   : [keys]   rendered into existing .check[data-q="key"] hosts
+     quiz     : [keys]   rendered into #quizHost, scored together
+     traps    : [{bad, why, sub, left:{lbl,val}, right:{lbl,val}}]
+     rules    : [{id, nm, frm}]
+     generic  : { RULEID: "why that rule does not apply, generically" }
+     problems : [{start, steps:[{rule, result, note, wrong:{RULEID:msg}}]}]
+     verdicts : {all, most, few}   score copy
+     solver   : {connector, ask, ok, last, done}   optional solver wording;
+                connector "" suits inequalities, where "=" between lines is false
+   }                                                                        */
+
+var EXP = (function(){
+"use strict";
+
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+function el(tag, cls, html){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+
+function rep(sym, n, cls){
+  var a = [];
+  for(var i = 0; i < n; i++) a.push({t: sym, cls: cls});
+  return a;
+}
+
+function chipRow(host, items){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.innerHTML = "";
+  items.forEach(function(it, i){
+    if(i) host.appendChild(el("span", "dot", "·"));
+    host.appendChild(el("span", "chip" + (it.cls ? " " + it.cls : ""), it.t));
+  });
+}
+
+/* a fraction, as math HTML */
+function frac(n, d){
+  return "<span class='fr'><span>" + n + "</span><span>" + d + "</span></span>";
+}
+
+/* a radical: sqrt(inner), or nth root when idx is given */
+function root(inner, idx){
+  return (idx ? "<span class='idx'>" + idx + "</span>" : "") +
+         "√<span class='rad'>" + inner + "</span>";
+}
+
+function init(L){
+  var correct = {};
+  try{
+    var saved = window.localStorage.getItem(L.storeKey);
+    if(saved) correct = JSON.parse(saved) || {};
+  }catch(e){ correct = {}; }
+
+  function persist(){
+    try{ window.localStorage.setItem(L.storeKey, JSON.stringify(correct)); }catch(e){}
+  }
+
+  var TOTAL = L.inline.length + L.quiz.length;
+
+  /* Count only this page's questions. A saved store can hold keys from an
+     older version of the lesson (a split moves questions out), and counting
+     those would push the meter past TOTAL. */
+  function paintMeter(){
+    var n = 0;
+    L.inline.concat(L.quiz).forEach(function(k){ if(correct[k]) n++; });
+    var fill = $("#meterFill"), num = $("#meterNum");
+    if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
+    if(num) num.textContent = n + " / " + TOTAL + " correct";
+  }
+
+  /* ---------------- multiple choice ---------------- */
+  /* Options are authored correct-first for reviewability, then shuffled here,
+     so the right answer is never in a predictable slot. */
+  function shuffled(arr){
+    var a = arr.slice(), i, j, t;
+    for(i = a.length - 1; i > 0; i--){
+      j = Math.floor(Math.random() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildCheck(host, key, cfg){
+    var optsHost = $(".opts", host), fb = $(".fb", host);
+    var order = shuffled(cfg.opts);
+    order.forEach(function(o){
+      var b = el("button", "opt", "<span class='m'>" + o.t + "</span>");
+      b.type = "button";
+      b._ok = !!o.ok;
+      b.addEventListener("click", function(){
+        $$(".opt", optsHost).forEach(function(c){ c.disabled = true; });
+        if(o.ok){
+          b.classList.add("right");
+          fb.className = "fb show ok";
+          correct[key] = true; persist(); paintMeter();
+        }else{
+          b.classList.add("wrongpick");
+          $$(".opt", optsHost).forEach(function(c){
+            if(c._ok) c.classList.add("right");
+          });
+          fb.className = "fb show no";
+        }
+        fb.innerHTML = o.fb;
+        if(L.quiz.indexOf(key) !== -1) paintScore();
+      });
+      optsHost.appendChild(b);
+    });
+  }
+
+  L.inline.forEach(function(key){
+    var host = $(".check[data-q='" + key + "']");
+    if(host) buildCheck(host, key, L.checks[key]);
+  });
+
+  var quizHost = $("#quizHost");
+  if(quizHost){
+    L.quiz.forEach(function(key, i){
+      var cfg = L.checks[key];
+      var card = el("div", "check");
+      card.innerHTML =
+        "<div class='check-q'><span class='ask'>" + (i + 1) + ". " + cfg.ask + "</span>" +
+        "<span class='m'>" + cfg.m + "</span></div>" +
+        "<div class='opts'></div><div class='fb'></div>";
+      quizHost.appendChild(card);
+      buildCheck(card, key, cfg);
+    });
+  }
+
+  function paintScore(){
+    var n = 0;
+    L.quiz.forEach(function(k){ if(correct[k]) n++; });
+    var nEl = $("#scoreN"), sEl = $("#scoreSay");
+    if(!nEl || !sEl) return;
+    nEl.textContent = n;
+    var answered = $$("#quizHost .fb.show").length;
+    var total = L.quiz.length;
+    if(answered < total){
+      sEl.textContent = answered + " of " + total + " answered. Keep going.";
+    }else if(n === total){
+      sEl.textContent = L.verdicts.all;
+    }else if(n >= total - 2){
+      sEl.textContent = L.verdicts.most;
+    }else{
+      sEl.textContent = L.verdicts.few;
+    }
+  }
+
+  /* ---------------- traps ---------------- */
+  var trapHost = $("#trapHost");
+  if(trapHost && L.traps){
+    L.traps.forEach(function(t){
+      var card = el("div", "trap");
+      card.innerHTML =
+        "<div class='trap-head'><span class='never'>" + (t.badge || "Never") + "</span>" +
+        "<span class='m'>" + t.bad + "</span></div><p>" + t.why + "</p>";
+      var btn = el("button", "btn", "Test it with " + t.sub);
+      btn.type = "button";
+      var out = el("div", "subst");
+      out.style.display = "none";
+      out.innerHTML =
+        "<div class='side'><span class='lbl'>" + t.left.lbl + "</span><span class='m'>" + t.left.val + "</span></div>" +
+        "<div class='side'><span class='lbl'>" + t.right.lbl + "</span><span class='m'>" + t.right.val + "</span></div>" +
+        "<span class='verdict'>" + (t.verdict || "not equal") + "</span>";
+      btn.addEventListener("click", function(){
+        var shown = out.style.display !== "none";
+        out.style.display = shown ? "none" : "flex";
+        btn.textContent = shown ? ("Test it with " + t.sub) : "Hide";
+      });
+      card.appendChild(btn);
+      card.appendChild(out);
+      trapHost.appendChild(card);
+    });
+  }
+
+  /* ---------------- rule chooser ---------------- */
+  var workEl = $("#solverWork");
+  if(workEl && L.problems){
+    var pi = 0, history = [];
+    var SV = L.solver || {};
+    var CONN = (SV.connector == null) ? "=" : SV.connector;
+    var ASK  = SV.ask  || "Which rule can you legally use on this line?";
+    var DONE = SV.done || "Fully simplified — every base appears once, nothing sits in a bracket, and no exponent is negative.";
+    var OKM  = SV.ok   || "Yes — that one is legal here.";
+    var LAST = SV.last || "That is the answer.";
+    var fbEl = $("#solverFb"), rulesEl = $("#solverRules");
+    var whichEl = $("#solverWhich"), tabsEl = $("#solverTabs");
+    var finishEl = $("#solverFinish"), doneEl = $("#solverDone"), nextEl = $("#solverNext");
+    var promptEl = $("#solverPrompt");
+
+    L.rules.forEach(function(r){
+      var b = el("button", "rulebtn",
+        "<span class='nm'>" + r.nm + "</span><span class='frm'>" + r.frm + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){ pick(r.id); });
+      rulesEl.appendChild(b);
+    });
+
+    L.problems.forEach(function(p, i){
+      var t = el("button", "tab", String(i + 1));
+      t.type = "button";
+      t.addEventListener("click", function(){ load(i); });
+      tabsEl.appendChild(t);
+    });
+
+    function render(){
+      var p = L.problems[pi];
+      workEl.innerHTML = "";
+      var first = el("div", history.length ? "line past" : "line now");
+      first.innerHTML = "<span class='eq'></span><span class='m'>" + p.start + "</span>";
+      workEl.appendChild(first);
+
+      history.forEach(function(h, i){
+        var isLast = (i === history.length - 1) && (history.length === p.steps.length);
+        var ln = el("div", "line " + (isLast ? "done" : "past"));
+        ln.innerHTML = "<span class='eq'>" + CONN + "</span><span class='m'>" + h.result + "</span>" +
+                       "<span class='usedtag'>" + h.nm + "</span>";
+        workEl.appendChild(ln);
+        if(h.note){
+          var nt = el("div", "line");
+          nt.innerHTML = "<span class='eq'></span><span class='note'>" + h.note + "</span>";
+          workEl.appendChild(nt);
+        }
+      });
+
+      $$(".tab", tabsEl).forEach(function(t, i){
+        t.className = "tab" + (i === pi ? " on" : "");
+      });
+      whichEl.textContent = "Problem " + (pi + 1) + " of " + L.problems.length;
+
+      var finished = history.length === p.steps.length;
+      $$(".rulebtn", rulesEl).forEach(function(b){ b.disabled = finished; });
+      finishEl.style.display = finished ? "flex" : "none";
+      promptEl.innerHTML = finished ? DONE : ASK;
+      if(finished){
+        doneEl.textContent = p.steps.length + " steps, " + p.steps.length + " decisions";
+        nextEl.textContent = (pi === L.problems.length - 1) ? "Back to problem 1" : "Next problem";
+      }
+    }
+
+    function pick(id){
+      var p = L.problems[pi];
+      if(history.length >= p.steps.length) return;
+      var step = p.steps[history.length];
+      if(id === step.rule){
+        var r = L.rules.filter(function(x){ return x.id === id; })[0];
+        history.push({result: step.result, note: step.note, nm: r.nm});
+        fbEl.className = "solver-fb ok";
+        fbEl.innerHTML = (history.length === p.steps.length) ? LAST : OKM;
+        render();
+      }else{
+        fbEl.className = "solver-fb no";
+        fbEl.innerHTML = (step.wrong && step.wrong[id]) ? step.wrong[id] : L.generic[id];
+      }
+    }
+
+    function load(i){
+      pi = i; history = [];
+      fbEl.className = "solver-fb"; fbEl.innerHTML = "";
+      render();
+    }
+
+    nextEl.addEventListener("click", function(){
+      load((pi + 1) % L.problems.length);
+      $(".solver").scrollIntoView({behavior: "smooth", block: "start"});
+    });
+
+    load(0);
+  }
+
+  paintMeter();
+  paintScore();
+}
+
+/* ---------------- numbers ----------------
+   A value as it should read on the page: true minus sign, halves written as
+   fractions, no floating-point dust. plain=true keeps decimals (slider read-outs). */
+var HALF = {"0.5":"&frac12;", "1.5":"3/2", "2.5":"5/2", "3.5":"7/2", "4.5":"9/2",
+            "5.5":"11/2", "6.5":"13/2", "7.5":"15/2"};
+function num(v, plain){
+  var r = Math.round(v * 100) / 100;
+  var s = String(Math.abs(r));
+  if(!plain && HALF[s]) s = HALF[s];
+  return (r < 0 ? "−" : "") + s;
+}
+
+/* ---------------- sets of numbers ----------------
+   A SET is a list of pieces [left, right, openLeft, openRight] — the same
+   shape nline draws. null on a side = runs off to infinity. [] = empty.
+
+   SET.fromTest(test, crit) builds the exact set where test(x) is true, given
+   every point where the truth could change (the critical values). Between
+   two neighbouring critical values the truth cannot change, so testing one
+   number per gap and each critical value itself decides everything.       */
+var SET = (function(){
+  function fromTest(test, crit){
+    var c = crit.slice().sort(function(a, b){ return a - b; })
+                .filter(function(v, i, a){ return i === 0 || v !== a[i - 1]; });
+    if(!c.length) return test(0) ? [[null, null, false, false]] : [];
+    var regions = [{lo:null, hi:c[0], x:c[0] - 1}];
+    c.forEach(function(v, i){
+      var nx = c[i + 1];
+      regions.push({pt:true, lo:v, hi:v, x:v});
+      regions.push({lo:v, hi:(nx == null ? null : nx), x:(nx == null ? v + 1 : (v + nx) / 2)});
+    });
+    var out = [], cur = null;
+    regions.forEach(function(r){
+      if(test(r.x)){
+        if(!cur) cur = [r.lo, r.hi, !r.pt, !r.pt];
+        else { cur[1] = r.hi; cur[3] = !r.pt; }
+      }else if(cur){ out.push(cur); cur = null; }
+    });
+    if(cur) out.push(cur);
+    return out;
+  }
+
+  var SYM = {lt:"&lt;", le:"&le;", gt:"&gt;", ge:"&ge;"};
+  function rel(r, v){
+    return {lt:function(x){ return x < v; }, le:function(x){ return x <= v; },
+            gt:function(x){ return x > v; }, ge:function(x){ return x >= v; }}[r];
+  }
+
+  function fmt(P){
+    if(!P.length) return "no solution";
+    return P.map(function(p){
+      if(p[0] == null && p[1] == null) return "(&minus;&infin;, &infin;)";
+      if(p[0] != null && p[0] === p[1]) return "{" + num(p[0]) + "}";
+      var L = (p[0] == null) ? "(&minus;&infin;" : (p[2] ? "(" : "[") + num(p[0]);
+      var R = (p[1] == null) ? "&infin;)" : num(p[1]) + (p[3] ? ")" : "]");
+      return L + ", " + R;
+    }).join(" &cup; ");
+  }
+
+  /* "one piece" / "two pieces" / "no solution" / "all real numbers" */
+  function shape(P){
+    if(!P.length) return "no solution";
+    if(P.length === 1 && P[0][0] == null && P[0][1] == null) return "all real numbers";
+    if(P.length === 1 && P[0][0] != null && P[0][0] === P[0][1]) return "a single number";
+    return P.length === 1 ? "one piece" : "two pieces";
+  }
+
+  function has(P, x){
+    return P.some(function(p){
+      var okL = (p[0] == null) || (p[2] ? x > p[0] : x >= p[0]);
+      var okR = (p[1] == null) || (p[3] ? x < p[1] : x <= p[1]);
+      return okL && okR;
+    });
+  }
+
+  return {fromTest:fromTest, rel:rel, SYM:SYM, fmt:fmt, shape:shape, has:has};
+})();
+
+/* ---------------- number lines ----------------
+   One axis, with zero or more shaded pieces on it.
+
+     nline({ticks:[-1,4], pieces:[[-1,null,true,false]]})
+
+   A PIECE is [left, right, openLeft, openRight] in axis coordinates; null on a
+   side means the shading runs off that end. No pieces at all = the empty set.
+   A fifth entry of true draws the shading without its endpoint dots.
+   Returns an SVG string, so it drops straight into innerHTML.
+
+     ticks : key values, labelled bold. An entry may be [value, "label"].
+     grid  : small tick + light label at every integer (default on when the
+             axis spans 24 or fewer units), so a student can count along it
+     ghost : a value to mark with a dashed ring (an endpoint not yet decided)
+     pin   : {v, ok, label}  a marker above the axis for a tested number
+     arc   : {a, b, label}   a bracket above the axis, for a distance
+     cls   : "dim" for an input row, "ok" for a result worth colouring      */
+var NL = {W:560, PAD:26};
+function nlGeom(cfg){
+  var lo = (cfg.lo == null) ? -6 : cfg.lo;
+  var hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var span = NL.W - 2 * NL.PAD;
+  return {lo:lo, hi:hi, x:function(v){ return NL.PAD + (v - lo) / (hi - lo) * span; }};
+}
+/* the axis value under a click, from its horizontal fraction across the svg */
+function nlValueAt(cfg, frac){
+  var g = nlGeom(cfg);
+  return g.lo + (frac * NL.W - NL.PAD) / (NL.W - 2 * NL.PAD) * (g.hi - g.lo);
+}
+function nline(cfg){
+  var g = nlGeom(cfg), lo = g.lo, hi = g.hi, x = g.x, W = NL.W, PAD = NL.PAD;
+  var top = (cfg.pin || cfg.arc) ? 40 : 6;
+  var Y = top + 12, H = Y + 34, R = 7;
+  var s = '<svg class="nl' + (cfg.cls ? " " + cfg.cls : "") +
+          '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">';
+  s += '<line class="ax" x1="' + PAD + '" y1="' + Y + '" x2="' + (W - PAD) + '" y2="' + Y + '"/>';
+  s += '<polygon class="head" points="' + (PAD - 15) + ',' + Y + ' ' +
+       (PAD - 3) + ',' + (Y - 5.5) + ' ' + (PAD - 3) + ',' + (Y + 5.5) + '"/>';
+  s += '<polygon class="head" points="' + (W - PAD + 15) + ',' + Y + ' ' +
+       (W - PAD + 3) + ',' + (Y - 5.5) + ' ' + (W - PAD + 3) + ',' + (Y + 5.5) + '"/>';
+
+  var keys = (cfg.ticks || []).map(function(t){
+    return (t instanceof Array) ? {v:t[0], t:t[1]} : {v:t, t:num(t)};
+  });
+  var grid = (cfg.grid == null) ? (hi - lo <= 24) : cfg.grid;
+  if(grid){
+    for(var k = Math.ceil(lo); k <= Math.floor(hi); k++){
+      var near = keys.some(function(kk){ return Math.abs(kk.v - k) < 0.6; });
+      s += '<line class="tk minor" x1="' + x(k) + '" y1="' + (Y - 4) + '" x2="' + x(k) + '" y2="' + (Y + 4) + '"/>';
+      if(!near) s += '<text class="minor" x="' + x(k) + '" y="' + (Y + 24) + '">' + num(k) + '</text>';
+    }
+  }
+
+  /* ticks go under the shading, so an open circle stays visibly open */
+  keys.forEach(function(t){
+    s += '<line class="tk" x1="' + x(t.v) + '" y1="' + (Y - 6) + '" x2="' + x(t.v) +
+         '" y2="' + (Y + 6) + '"/>';
+  });
+
+  (cfg.pieces || []).forEach(function(p){
+    var a = (p[0] == null) ? PAD - 13 : x(p[0]);
+    var b = (p[1] == null) ? W - PAD + 13 : x(p[1]);
+    s += '<line class="seg" x1="' + a + '" y1="' + Y + '" x2="' + b + '" y2="' + Y + '"/>';
+  });
+  (cfg.pieces || []).forEach(function(p){
+    if(p[4]) return;                       /* [.., true] = shading only, no dots */
+    if(p[0] != null){
+      s += '<circle class="pt ' + (p[2] ? "open" : "closed") + '" cx="' + x(p[0]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+    if(p[1] != null && p[1] !== p[0]){
+      s += '<circle class="pt ' + (p[3] ? "open" : "closed") + '" cx="' + x(p[1]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+  });
+  if(cfg.ghost != null){
+    s += '<circle class="pt ghost" cx="' + x(cfg.ghost) + '" cy="' + Y + '" r="' + R + '"/>';
+  }
+
+  keys.forEach(function(t){
+    s += '<text class="key" x="' + x(t.v) + '" y="' + (Y + 25) + '">' + t.t + '</text>';
+  });
+
+  if(cfg.arc){
+    var xa = x(cfg.arc.a), xb = x(cfg.arc.b), ay = Y - 20;
+    s += '<path class="arc" d="M' + xa + ',' + (Y - 9) + ' V' + ay + ' H' + xb + ' V' + (Y - 9) + '"/>';
+    if(cfg.arc.label){
+      s += '<text class="arclbl" x="' + ((xa + xb) / 2) + '" y="' + (ay - 7) + '">' + cfg.arc.label + '</text>';
+    }
+  }
+  if(cfg.pin){
+    var px = x(Math.max(lo, Math.min(hi, cfg.pin.v)));
+    s += '<g class="pin ' + (cfg.pin.ok ? "yes" : "no") + '">' +
+         '<line x1="' + px + '" y1="' + (Y - 26) + '" x2="' + px + '" y2="' + (Y - 10) + '"/>' +
+         '<polygon points="' + (px - 6) + ',' + (Y - 12) + ' ' + (px + 6) + ',' + (Y - 12) + ' ' + px + ',' + (Y - 3) + '"/>' +
+         '<circle cx="' + px + '" cy="' + Y + '" r="4.5"/>';
+    if(cfg.pin.label) s += '<text x="' + px + '" y="' + (Y - 31) + '">' + cfg.pin.label + '</text>';
+    s += '</g>';
+  }
+  return s + '</svg>';
+}
+
+/* A labelled stack: input rows, a rule, then the result row.
+   rows = [[label, nlineCfg], ...]; the LAST row is the result.          */
+function nstack(host, rows){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var last = rows.length - 1;
+  host.innerHTML = rows.map(function(r, i){
+    var cfg = r[1] || {};
+    if(i < last && cfg.cls == null) cfg.cls = "dim";
+    var none = (i === last) && !(cfg.pieces && cfg.pieces.length);
+    return '<div class="nlrow' + (i === last ? " res" : "") + '">' +
+           '<span class="lbl' + (none ? " none" : "") + '">' + r[0] + '</span>' +
+           nline(cfg) + '</div>';
+  }).join("");
+}
+
+/* ---------------- worked examples, one line at a time ----------------
+   <div class="walk">
+     <div class="walk-q"><span class="m">2x + 3 &gt; 7</span></div>
+     <ol class="walk-steps">
+       <li><span class="m">2x &gt; 4</span><span class="why">Subtract 3.</span></li>
+     </ol>
+   </div>
+   Lines stay hidden until asked for, so a student can try each one on paper
+   first.                                                                 */
+function walks(){
+  $$(".walk").forEach(function(w){
+    var steps = $$(".walk-steps > li", w);
+    if(!steps.length) return;
+    var shown = 0;
+    var bar = el("div", "walk-ctrls");
+    var nextB = el("button", "btn on", ""); nextB.type = "button";
+    var allB = el("button", "btn", "Show all"); allB.type = "button";
+    var hint = el("span", "walk-hint", "");
+    bar.appendChild(nextB); bar.appendChild(allB); bar.appendChild(hint);
+    w.appendChild(bar);
+    function paint(){
+      steps.forEach(function(li, i){ li.style.display = (i < shown) ? "" : "none"; });
+      var done = shown >= steps.length;
+      nextB.textContent = done ? "Start over" : (shown ? "Next step" : "Show first step");
+      allB.style.display = done ? "none" : "";
+      hint.textContent = done ? "Could you do it again without looking?"
+                              : shown + " of " + steps.length + " steps shown. Try the next one on paper first.";
+    }
+    nextB.addEventListener("click", function(){
+      shown = (shown >= steps.length) ? 0 : shown + 1; paint();
+    });
+    allB.addEventListener("click", function(){ shown = steps.length; paint(); });
+    paint();
+  });
+}
+
+/* ---------------- quick-fire drill ----------------
+   drill("#host", {
+     items   : [{m, a, why}]          a = the key of the right choice
+     choices : [{k, t}]               the buttons
+     end     : "closing line"
+   })                                                                   */
+function drill(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.classList.add("drill");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='drill-q m'></div><div class='drill-btns'></div><div class='drill-fb'></div>";
+  var q = $(".drill-q", host), fb = $(".drill-fb", host), cnt = $(".count", host);
+  var pips = $(".pips", host), btns = $(".drill-btns", host);
+  var i = 0, marks = [], label = {};
+  var choiceBtns = cfg.choices.map(function(c){
+    label[c.k] = c.t;
+    var b = el("button", "btn", c.t); b.type = "button";
+    b.addEventListener("click", function(){ answer(c.k); });
+    btns.appendChild(b);
+    return b;
+  });
+  var nextB = el("button", "btn on", "Next"); nextB.type = "button";
+  btns.appendChild(nextB);
+  nextB.addEventListener("click", function(){
+    if(i === cfg.items.length - 1){ i = 0; marks = []; } else { i++; }
+    draw();
+  });
+
+  function drawPips(){
+    pips.innerHTML = "";
+    cfg.items.forEach(function(_, k){
+      pips.appendChild(el("span", "pip" +
+        (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") + (k === i ? " now" : "")));
+    });
+  }
+  function draw(){
+    q.innerHTML = cfg.items[i].m;
+    cnt.textContent = (i + 1) + " of " + cfg.items.length;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    choiceBtns.forEach(function(b){ b.disabled = false; b.classList.remove("right", "wrongpick"); });
+    nextB.style.display = "none";
+    drawPips();
+  }
+  function answer(k){
+    var it = cfg.items[i], right = (k === it.a);
+    if(marks[i] === undefined) marks[i] = right;
+    choiceBtns.forEach(function(b, j){
+      b.disabled = true;
+      var ck = cfg.choices[j].k;
+      if(ck === it.a) b.classList.add("right");
+      else if(ck === k) b.classList.add("wrongpick");
+    });
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not this one &mdash; it's <strong>" + label[it.a] + "</strong>. ") + it.why;
+    var lastOne = (i === cfg.items.length - 1);
+    nextB.textContent = lastOne ? "Start again" : "Next";
+    nextB.style.display = "";
+    if(lastOne){
+      var n = marks.filter(function(v){ return v; }).length;
+      fb.innerHTML += "<div class='drill-end'>" + n + " of " + cfg.items.length +
+        " right first time. " + (cfg.end || "") + "</div>";
+    }
+    drawPips();
+  }
+  draw();
+}
+
+/* ---------------- test-a-number ----------------
+   tester("#host", {
+     problems : [{label, set, ticks, test(x) -> {html, ok}}]
+     lo, hi, step, start
+     hidden   : true = the shading starts hidden, so the student predicts it
+   })
+   A slider (or a click on the line) moves a pin; the page substitutes that
+   number and says whether it lands in the set.                          */
+function tester(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var pi = 0, xv = (cfg.start == null) ? 0 : cfg.start, show = !cfg.hidden;
+  var lo = (cfg.lo == null) ? -6 : cfg.lo, hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var step = cfg.step || 0.5;
+  host.classList.add("tester");
+  host.innerHTML =
+    (cfg.problems.length > 1 ? "<div class='ctrls tp-probs'></div>" : "") +
+    "<div class='tp-line'></div>" +
+    "<div class='tp-slide'><span class='ctrl-label'>Move the point</span>" +
+      "<input type='range' min='" + lo + "' max='" + hi + "' step='" + step + "' value='" + xv +
+      "' aria-label='the number to test'></div>" +
+    "<div class='tp-out'></div>" +
+    "<div class='ctrls'><button type='button' class='btn tp-show'></button></div>";
+  var probs = $(".tp-probs", host), lineEl = $(".tp-line", host);
+  var range = $("input", host), out = $(".tp-out", host), showB = $(".tp-show", host);
+
+  if(probs){
+    probs.appendChild(el("span", "ctrl-label", "Inequality"));
+    cfg.problems.forEach(function(p, i){
+      var b = el("button", "btn" + (i === 0 ? " on" : ""), "<span class='m'>" + p.label + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){
+        $$(".btn", probs).forEach(function(o){ o.classList.remove("on"); });
+        b.classList.add("on"); pi = i; show = !cfg.hidden; draw();
+      });
+      probs.appendChild(b);
+    });
+  }
+  function lineCfg(){
+    var p = cfg.problems[pi];
+    return {lo:lo, hi:hi, ticks:p.ticks || [], pieces:show ? p.set : [], cls:"ok",
+            pin:{v:xv, ok:p.test(xv).ok, label:"x = " + num(xv, true)}};
+  }
+  function draw(){
+    var p = cfg.problems[pi], r = p.test(xv), n = num(xv, true);
+    lineEl.innerHTML = nline(lineCfg());
+    out.className = "tp-out " + (r.ok ? "yes" : "no");
+    out.innerHTML = "<span class='m'>" + r.html + "</span>" +
+      "<span class='tp-verdict'>" + (r.ok ? "true, so " + n + " is in the set"
+                                          : "false, so " + n + " is not in the set") + "</span>";
+    showB.textContent = show ? "Hide the shading" : "Show every number that works";
+  }
+  range.addEventListener("input", function(){ xv = parseFloat(range.value); draw(); });
+  lineEl.addEventListener("click", function(e){
+    var svg = $("svg", lineEl); if(!svg) return;
+    var r = svg.getBoundingClientRect();
+    var v = Math.round(nlValueAt(lineCfg(), (e.clientX - r.left) / r.width) / step) * step;
+    xv = Math.max(lo, Math.min(hi, v)); range.value = xv; draw();
+  });
+  showB.addEventListener("click", function(){ show = !show; draw(); });
+  draw();
+}
+
+return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
+        root: root, num: num, SET: SET, nline: nline, nlValueAt: nlValueAt,
+        nstack: nstack, walks: walks, drill: drill, tester: tester, init: init};
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var $ = EXP.$, $$ = EXP.$$, num = EXP.num;
+var X = "<i>x</i>";
+function sup(n){ return "<sup>" + n + "</sup>"; }
+
+/* ---- drawing ----------------------------------------------------------
+   graph({x:[lo,hi], y:[lo,hi], w, lab, curves:[{f, dom, cls} | {poly:[[x,y]..], cls}],
+          pts:[{x, y, cls, lb, dx, dy}], moves:[[x1,y1,x2,y2]], alt})
+   Units are equal on both axes, so shapes are true. Curves are clipped to
+   the window; a curve breaks wherever f has no value.                    */
+var GID = 0;
+function graph(c){
+  var x0 = c.x[0], x1 = c.x[1], y0 = c.y[0], y1 = c.y[1];
+  var W = c.w || 320, P = 14, u = (W - 2 * P) / (x1 - x0), H = Math.round(2 * P + u * (y1 - y0));
+  function px(x){ return +(P + (x - x0) * u).toFixed(2); }
+  function py(y){ return +(P + (y1 - y) * u).toFixed(2); }
+  var id = "gclip" + (++GID), s = "", i;
+  s += "<defs><clipPath id='" + id + "'><rect x='" + P + "' y='" + P + "' width='" + (W - 2 * P) +
+       "' height='" + (H - 2 * P) + "'/></clipPath></defs>";
+  for(i = Math.ceil(x0); i <= x1; i++)
+    s += "<line class='gp-g' x1='" + px(i) + "' y1='" + py(y0) + "' x2='" + px(i) + "' y2='" + py(y1) + "'/>";
+  for(i = Math.ceil(y0); i <= y1; i++)
+    s += "<line class='gp-g' x1='" + px(x0) + "' y1='" + py(i) + "' x2='" + px(x1) + "' y2='" + py(i) + "'/>";
+  if(y0 <= 0 && y1 >= 0) s += "<line class='gp-a' x1='" + px(x0) + "' y1='" + py(0) + "' x2='" + px(x1) + "' y2='" + py(0) + "'/>";
+  if(x0 <= 0 && x1 >= 0) s += "<line class='gp-a' x1='" + px(0) + "' y1='" + py(y0) + "' x2='" + px(0) + "' y2='" + py(y1) + "'/>";
+  var lab = (c.lab == null) ? 2 : c.lab;
+  if(lab){
+    for(i = Math.ceil(x0); i <= x1; i++){
+      if(!i || i % lab || i === x0 || i === x1) continue;
+      s += "<text class='gp-t' x='" + px(i) + "' y='" + (py(0) + 13) + "'>" + num(i) + "</text>";
+    }
+    for(i = Math.ceil(y0); i <= y1; i++){
+      if(!i || i % lab || i === y0 || i === y1) continue;
+      s += "<text class='gp-t' x='" + (px(0) - 10) + "' y='" + (py(i) + 4) + "'>" + num(i) + "</text>";
+    }
+  }
+  (c.curves || []).forEach(function(cv){
+    var d = "";
+    if(cv.poly){
+      d = cv.poly.map(function(q, j){ return (j ? "L" : "M") + px(q[0]) + "," + py(q[1]); }).join("");
+    }else{
+      var a = Math.max(x0 - 1, cv.dom ? cv.dom[0] : -Infinity), b = Math.min(x1 + 1, cv.dom ? cv.dom[1] : Infinity);
+      var n = 360, pen = false, k, x, y;
+      for(k = 0; k <= n; k++){
+        x = a + (b - a) * k / n; y = cv.f(x);
+        if(isFinite(y) && Math.abs(y) < 1e4){
+          d += (pen ? "L" : "M") + px(x) + "," + py(y); pen = true;
+        }else pen = false;
+      }
+    }
+    s += "<path class='" + (cv.cls || "gp-new") + "' clip-path='url(#" + id + ")' d='" + d + "'/>";
+  });
+  (c.moves || []).forEach(function(m){
+    s += "<line class='gp-mv' clip-path='url(#" + id + ")' x1='" + px(m[0]) + "' y1='" + py(m[1]) +
+         "' x2='" + px(m[2]) + "' y2='" + py(m[3]) + "'/>";
+  });
+  (c.pts || []).forEach(function(q){
+    if(q.x < x0 || q.x > x1 || q.y < y0 || q.y > y1) return;
+    s += "<circle class='" + (q.cls || "gp-pn") + "' cx='" + px(q.x) + "' cy='" + py(q.y) + "' r='" + (q.cls === "gp-pp" ? 3.6 : 4.2) + "'/>";
+    if(q.lb) s += "<text class='gp-lb' x='" + (px(q.x) + (q.dx == null ? 7 : q.dx)) + "' y='" + (py(q.y) + (q.dy == null ? -7 : q.dy)) +
+                  "' text-anchor='" + (q.anchor || "start") + "'>" + q.lb + "</text>";
+  });
+  return "<svg class='gp' viewBox='0 0 " + W + " " + H + "' role='img' aria-label='" + (c.alt || "graph") + "'>" + s + "</svg>";
+}
+
+/* ---- piecewise helpers ---------------------------------------------------
+   pw(name, rows): the definition as HTML. rows = [[rule, condition], ...]
+
+   pwGraph(pieces, win, extra, opt)
+     pieces : [{f, a, b, ao, bo, lbl}]  a/b null = runs off the edge,
+              ao/bo = that end is open, lbl = the strip's label ("x < 2")
+     extra  : more points, drawn on top
+     opt    : strips  shade each piece's strip of the plane, with its label
+              ghost   draw each rule faintly across the whole plane
+              solid   false = leave the pieces out (strips and ghosts only)
+              dots    false = leave the endpoint dots out
+   Open dots are drawn last, so the line never shows through them.          */
+function pw(name, rows){
+  return "<span class='pw'>" + (name ? "<span>" + name + " =&nbsp;</span>" : "") +
+    "<span class='br' style='--n:" + rows.length + "'>{</span><span class='pw-rows'>" +
+    rows.map(function(r){ return "<span>" + r[0] + "</span><span class='pw-if'>if " + r[1] + "</span>"; }).join("") +
+    "</span></span>";
+}
+function pwGraph(pieces, win, extra, opt){
+  opt = opt || {};
+  var curves = [], pts = [];
+  if(opt.ghost) pieces.forEach(function(p){ curves.push({f:p.f, cls:"gp-ghost"}); });
+  pieces.forEach(function(p){
+    if(opt.solid !== false)
+      curves.push({f:p.f, dom:[p.a == null ? -Infinity : p.a, p.b == null ? Infinity : p.b]});
+    if(opt.dots === false || opt.solid === false) return;
+    if(p.a != null) pts.push({x:p.a, y:p.f(p.a), cls:p.ao ? "gp-open" : "gp-pn"});
+    if(p.b != null) pts.push({x:p.b, y:p.f(p.b), cls:p.bo ? "gp-open" : "gp-pn"});
+  });
+  /* where the pieces meet, the closed dot fills the open one: drop the open dot */
+  pts = pts.filter(function(q){
+    return q.cls !== "gp-open" || !pts.some(function(r){
+      return r.cls === "gp-pn" && Math.abs(r.x - q.x) < 1e-9 && Math.abs(r.y - q.y) < 1e-9;
+    });
+  });
+  (extra || []).forEach(function(q){ pts.push(q); });
+  pts.sort(function(u, v){ return (u.cls === "gp-open") - (v.cls === "gp-open"); });
+  var svg = graph({x:win.x, y:win.y, w:win.w, lab:win.lab, curves:curves, pts:pts, alt:win.alt || "a piecewise graph"});
+  return opt.strips ? addStrips(svg, pieces, win) : svg;
+}
+/* Shade each piece's strip and draw the boundaries. The bands go in just after
+   <defs>, so the grid, the curves and the dots all draw over them. The scale
+   is graph()'s own: P = 14, u = (W − 2P) / (x1 − x0).                        */
+function addStrips(svg, pieces, win){
+  var x0 = win.x[0], x1 = win.x[1], y0 = win.y[0], y1 = win.y[1];
+  var W = win.w || 320, P = 14, u = (W - 2 * P) / (x1 - x0), H = Math.round(2 * P + u * (y1 - y0));
+  function px(v){ return +(P + (Math.max(x0, Math.min(x1, v)) - x0) * u).toFixed(2); }
+  var s = "";
+  pieces.forEach(function(p, i){
+    var a = px(p.a == null ? x0 : p.a), b = px(p.b == null ? x1 : p.b);
+    if(b - a < 0.5) return;
+    s += "<rect class='gp-band" + (i % 2 ? " alt" : "") + "' x='" + a + "' y='" + P + "' width='" + (b - a) +
+         "' height='" + (H - 2 * P) + "'/>";
+    if(p.lbl && b - a > 46)
+      s += "<text class='gp-blb' x='" + ((a + b) / 2) + "' y='" + (P + 13) + "'>" + p.lbl + "</text>";
+  });
+  pieces.forEach(function(p){
+    if(p.b != null && p.b > x0 && p.b < x1)
+      s += "<line class='gp-bnd' x1='" + px(p.b) + "' y1='" + P + "' x2='" + px(p.b) + "' y2='" + (H - P) + "'/>";
+  });
+  return svg.replace("</defs>", "</defs>" + s);
+}
+function K(c){ return function(){ return c; }; }
+
+var F = "<i>f</i>(" + X + ")", G = "<i>g</i>(" + X + ")", H = "<i>h</i>(" + X + ")";
+var PW = {
+  w:  pw(F, [["−" + X, X + " &lt; 2"], [X + " − 3", X + " &ge; 2"]]),
+  g:  pw(G, [["−4", X + " &lt; −1"], [X + sup(2), "−1 &le; " + X + " &lt; 3"], ["2" + X, X + " &ge; 3"]]),
+  h:  pw(H, [["−2", X + " &lt; −1"], [X, "−1 &le; " + X + " &lt; 2"], ["3", X + " &ge; 2"]]),
+  c3: pw(F, [[X, X + " &lt; 2"], ["4", X + " &ge; 2"]]),
+  tr: pw(F, [[X + " + 3", X + " &lt; 1"], [X + sup(2), X + " &ge; 1"]])
+};
+$$("[data-pw]").forEach(function(n){ n.innerHTML = PW[n.getAttribute("data-pw")]; });
+
+/* section 1's example, built up in four stages */
+var WP = [{f:function(x){ return -x; }, b:2, bo:true, lbl:"x < 2"}, {f:function(x){ return x - 3; }, a:2, lbl:"x ≥ 2"}];
+var WW = {x:[-4, 5], y:[-4, 4]};
+var FIGS = {
+  w1: pwGraph(WP, WW, [], {strips:true, solid:false}),
+  w2: pwGraph(WP, WW, [], {strips:true, ghost:true, solid:false}),
+  w3: pwGraph(WP, WW, [], {strips:true, ghost:true, dots:false}),
+  w4: pwGraph(WP, WW, [], {strips:true, ghost:true}),
+  flat: pwGraph([{f:K(-2), b:-1, bo:true, lbl:"x < −1"}, {f:function(x){ return x; }, a:-1, b:2, bo:true, lbl:"−1 ≤ x < 2"},
+                 {f:K(3), a:2, lbl:"x ≥ 2"}], {x:[-4, 4], y:[-3, 4]}, [], {strips:true})
+};
+$$("[data-g]").forEach(function(n){ n.innerHTML = FIGS[n.getAttribute("data-g")]; });
+
+/* ---- section 2: slide the boundary ---- */
+(function slider(){
+  var RULES = [
+    {A:{f:function(x){ return x + 2; }, s:X + " + 2"}, B:{f:function(x){ return -x + 1; }, s:"−" + X + " + 1"}},
+    {A:{f:K(2), s:"2"},                                B:{f:function(x){ return x - 1; }, s:X + " − 1"}},
+    {A:{f:function(x){ return x * x; }, s:X + sup(2)}, B:{f:function(x){ return x + 2; }, s:X + " + 2"}}
+  ];
+  var st = {r:0, c:1, lt:true}, host = $("#sl");
+  host.innerHTML =
+    "<div class='xp-row'><span class='ctrl-label'>Rules</span>" +
+      RULES.map(function(R, i){ return "<button type='button' class='btn' data-r='" + i + "'><span class='m'>" + R.A.s + " &nbsp;and&nbsp; " + R.B.s + "</span></button>"; }).join("") + "</div>" +
+    "<div class='xp-row'><span class='ctrl-label'>Condition</span>" +
+      "<button type='button' class='btn' data-lt='1'><span class='m'><i>x</i> &lt; <i>c</i>, &nbsp;<i>x</i> &ge; <i>c</i></span></button>" +
+      "<button type='button' class='btn' data-lt='0'><span class='m'><i>x</i> &le; <i>c</i>, &nbsp;<i>x</i> &gt; <i>c</i></span></button></div>" +
+    "<div class='tp-slide'><span class='ctrl-label'>Boundary <i>c</i></span>" +
+      "<input type='range' min='-3' max='3' step='0.5' value='1' aria-label='the boundary c'><span class='m' id='slC'></span></div>" +
+    "<div class='xp-stmt m' id='slQ'></div>" +
+    "<div class='txgrid'><div class='gfig' id='slPlot'></div><div class='txside'>" +
+      "<ul class='txmoves' id='slRows'></ul></div></div>" +
+    "<div class='xp-out' id='slOut'></div>";
+  var range = $("input", host);
+  function draw(){
+    var R = RULES[st.r], c = st.c, lt = st.lt, cs = num(c);
+    var L1 = lt ? "&lt;" : "&le;", L2 = lt ? "&ge;" : "&gt;", T1 = lt ? "<" : "≤", T2 = lt ? "≥" : ">";
+    var a = R.A.f(c), b = R.B.f(c), meet = Math.abs(a - b) < 1e-9;
+    $("#slC").innerHTML = cs;
+    $("#slQ").innerHTML = pw(F, [[R.A.s, X + " " + L1 + " " + cs], [R.B.s, X + " " + L2 + " " + cs]]);
+    $("#slPlot").innerHTML = pwGraph(
+      [{f:R.A.f, b:c, bo:lt, lbl:"x " + T1 + " " + cs}, {f:R.B.f, a:c, ao:!lt, lbl:"x " + T2 + " " + cs}],
+      {x:[-5, 5], y:[-5, 5], w:340, lab:2, alt:"the piecewise graph, with its two strips"}, [], {strips:true, ghost:true});
+    $("#slRows").innerHTML =
+      "<li><span class='k'>left strip</span><span class='m'><i>x</i> " + L1 + " " + cs + "</span>: &nbsp;draw <span class='m'><i>y</i> = " + R.A.s + "</span></li>" +
+      "<li><span class='k'>right strip</span><span class='m'><i>x</i> " + L2 + " " + cs + "</span>: &nbsp;draw <span class='m'><i>y</i> = " + R.B.s + "</span></li>" +
+      "<li><span class='k'>left end</span><span class='m'>" + R.A.s.replace(/<i>x<\/i>/g, "(" + cs + ")") + " = " + num(a) + "</span>: " +
+        (lt ? "open" : "closed") + " dot at <span class='m'>(" + cs + ", " + num(a) + ")</span></li>" +
+      "<li><span class='k'>right end</span><span class='m'>" + R.B.s.replace(/<i>x<\/i>/g, "(" + cs + ")") + " = " + num(b) + "</span>: " +
+        (lt ? "closed" : "open") + " dot at <span class='m'>(" + cs + ", " + num(b) + ")</span></li>";
+    $("#slOut").className = "xp-out" + (meet ? "" : " empty");
+    $("#slOut").innerHTML = meet
+      ? "<span class='shape'>no jump</span><span>Both ends are at <span class='m'>(" + cs + ", " + num(a) + ")</span>. The closed dot fills the hole.</span>"
+      : "<span class='shape'>a jump</span><span>At <span class='m'><i>x</i> = " + cs + "</span> the graph jumps from height <span class='m'>" + num(a) +
+        "</span> to <span class='m'>" + num(b) + "</span>. Only the " + (lt ? "right" : "left") + " end is on the graph.</span>";
+    $$("[data-r]", host).forEach(function(n){ n.classList.toggle("on", +n.getAttribute("data-r") === st.r); });
+    $$("[data-lt]", host).forEach(function(n){ n.classList.toggle("on", (n.getAttribute("data-lt") === "1") === lt); });
+  }
+  host.addEventListener("click", function(e){
+    var n = e.target.closest("button"); if(!n) return;
+    if(n.hasAttribute("data-r")) st.r = +n.getAttribute("data-r");
+    else if(n.hasAttribute("data-lt")) st.lt = n.getAttribute("data-lt") === "1";
+    else return;
+    draw();
+  });
+  range.addEventListener("input", function(){ st.c = parseFloat(range.value); draw(); });
+  draw();
+})();
+
+/* the quiz's graph: 2 if x < 1, x − 3 if x ≥ 1 */
+var Q5 = pwGraph([{f:K(2), b:1, bo:true}, {f:function(x){ return x - 3; }, a:1}],
+                 {x:[-4, 5], y:[-4, 4], w:260, alt:"a graph in two pieces"});
+
+EXP.init({
+  storeKey: "m1200-piecewise-02",
+  inline: ["c6","c3","c4"],
+  quiz:   ["q10","q11","q4","q12","q5","q6"],
+
+  checks: {
+    c6: { opts:[
+      {t:"the vertical strip between <i>x</i> = −1 and <i>x</i> = 3", ok:true, fb:"Right. Its condition, −1 &le; <i>x</i> &lt; 3, picks out the <i>x</i>-values from −1 up to 3, at any height."},
+      {t:"the horizontal strip between <i>y</i> = −1 and <i>y</i> = 3", fb:"The condition is about <i>x</i>, not <i>y</i>. So the strip is vertical: −1 to 3 across."},
+      {t:"everything to the right of <i>x</i> = −1", fb:"It stops at 3 too: <i>x</i> &lt; 3. Past that, the rule 2<i>x</i> takes over."},
+      {t:"everywhere: <i>x</i><sup>2</sup> is a whole parabola", fb:"In this function, <i>x</i><sup>2</sup> only applies when −1 &le; <i>x</i> &lt; 3. Outside that strip, the other rules take over."}
+    ]},
+    c3: { opts:[
+      {t:"an open dot at (2, 2) and a closed dot at (2, 4)", ok:true, fb:"Right. <span class='m'><i>x</i></span> at 2 is 2, but <span class='m'>2 &lt; 2</span> is false: open. The 4 piece has <span class='m'>&ge;</span>: closed."},
+      {t:"a closed dot at (2, 2) and an open dot at (2, 4)", fb:"Swapped. The closed dot goes with <span class='m'>&ge;</span>, and that's the 4 piece."},
+      {t:"closed dots at (2, 2) and (2, 4)", fb:"Then <span class='m'><i>x</i> = 2</span> would have two outputs. Only the piece with <span class='m'>&ge;</span> includes 2."},
+      {t:"a closed dot at (2, 4) only", fb:"The first piece still runs up to (2, 2). Draw that end as an open dot."}
+    ]},
+    c4: { opts:[
+      {t:"a horizontal line at height −3, ending in a closed dot at (0, −3)", ok:true, fb:"Right. The height is −3 for every <span class='m'><i>x</i></span> up to 0, and <span class='m'>&le;</span> includes 0."},
+      {t:"a vertical line through <i>x</i> = −3", fb:"−3 is the height, not an <span class='m'><i>x</i></span>-value. Every point has <span class='m'><i>y</i> = −3</span>: flat."},
+      {t:"a horizontal line at height −3, ending in an open dot at (0, −3)", fb:"<span class='m'>&le;</span> lets 0 in, so the dot is closed."},
+      {t:"a single point at (0, −3)", fb:"It covers every <span class='m'><i>x</i> &le; 0</span>, the whole left strip. Draw the flat line all the way left."}
+    ]},
+
+    q10: { ask:"At <span class='m'><i>x</i> = 2</span>, the two pieces of", m:pw(F, [[X + " + 1", X + " &lt; 2"], ["5 − " + X, X + " &ge; 2"]]), opts:[
+      {t:"meet at (2, 3), so there's no jump", ok:true, fb:"2 + 1 = 3 and 5 − 2 = 3. Same height: the closed dot fills the open one."},
+      {t:"leave a hole at (2, 3)", fb:"The second piece includes 2 (&ge;), so its closed dot fills the hole. See section 2."},
+      {t:"jump from (2, 3) to (2, 5)", fb:"Plug 2 into the second rule: 5 − 2 = 3, not 5. See section 3."},
+      {t:"meet at (3, 2)", fb:"Swapped: <i>x</i> comes first. They meet at <i>x</i> = 2, height 3."}
+    ]},
+    q11: { ask:"In the strip <span class='m'><i>x</i> &ge; 0</span>, the graph of", m:pw(F, [["2" + X, X + " &lt; 0"], [X + " + 3", X + " &ge; 0"]]) + " &nbsp;is", opts:[
+      {t:"the line <i>y</i> = <i>x</i> + 3, from a closed dot at (0, 3)", ok:true, fb:"That strip's rule is <i>x</i> + 3. At 0 it's 3, and &ge; lets 0 in."},
+      {t:"the line <i>y</i> = 2<i>x</i>, from (0, 0)", fb:"2<i>x</i> lives in the other strip, <i>x</i> &lt; 0. See section 1."},
+      {t:"the line <i>y</i> = <i>x</i> + 3, from an open dot at (0, 3)", fb:"&ge; lets 0 in, so the dot is closed. See section 3."},
+      {t:"both lines", fb:"Each strip shows only its own rule. See section 1."}
+    ]},
+    q4: { ask:"At <span class='m'><i>x</i> = −1</span>, the graph of", m:pw(F, [[X + " + 3", X + " &lt; −1"], ["2" + X, X + " &ge; −1"]]) + " &nbsp;has", opts:[
+      {t:"an open dot at (−1, 2) and a closed dot at (−1, −2)", ok:true, fb:"−1 + 3 = 2, open because of &lt;. 2(−1) = −2, closed because of &ge;."},
+      {t:"a closed dot at (−1, 2) and an open dot at (−1, −2)", fb:"Swapped. The closed dot belongs to the &ge; piece. See section 3."},
+      {t:"closed dots at (−1, 2) and (−1, −2)", fb:"Only one piece includes −1. See section 3."},
+      {t:"an open dot at (−1, 2) and a closed dot at (−1, 2)", fb:"Plug −1 into each piece: 2(−1) = −2, not 2. See section 3."}
+    ]},
+    q12: { ask:"In", m:pw(F, [["−" + X + " + 2", X + " &le; 1"], ["3", X + " &gt; 1"]]) + " &nbsp;the flat piece is", opts:[
+      {t:"the line <i>y</i> = 3, right of <i>x</i> = 1, starting with an open dot at (1, 3)", ok:true, fb:"Height 3 in the strip <i>x</i> &gt; 1. &gt; leaves 1 out: open."},
+      {t:"the line <i>y</i> = 3, right of <i>x</i> = 1, starting with a closed dot at (1, 3)", fb:"&gt; leaves 1 out, so the dot is open. See section 3."},
+      {t:"the vertical line <i>x</i> = 3", fb:"3 is the height. A flat piece is horizontal. See section 4."},
+      {t:"the line <i>y</i> = 3, left of <i>x</i> = 1", fb:"The 3 goes with <i>x</i> &gt; 1, the right strip. See section 1."}
+    ]},
+    q5: { ask:"Which function has this graph?", m:Q5, opts:[
+      {t:pw("", [["2", X + " &lt; 1"], [X + " − 3", X + " &ge; 1"]]), ok:true, fb:"Flat at 2 up to an open dot at (1, 2). Then a line, closed at (1, −2)."},
+      {t:pw("", [["2", X + " &le; 1"], [X + " − 3", X + " &gt; 1"]]), fb:"The closed dot is on the line at (1, −2), so &ge; goes with <span class='m'><i>x</i> − 3</span>. See section 3."},
+      {t:pw("", [[X + " − 3", X + " &lt; 1"], ["2", X + " &ge; 1"]]), fb:"The flat piece is in the left strip, so it goes with <span class='m'><i>x</i> &lt; 1</span>. See section 1."},
+      {t:pw("", [["2" + X, X + " &lt; 1"], [X + " − 3", X + " &ge; 1"]]), fb:"The left piece is flat: 2, not 2<i>x</i>. See section 4."}
+    ]},
+    q6: { ask:"Which point is on the graph of", m:pw(F, [[X, X + " &lt; 3"], ["6", X + " &ge; 3"]]), opts:[
+      {t:"(3, 6)", ok:true, fb:"3 &ge; 3, so the point at <i>x</i> = 3 is on the flat piece, height 6."},
+      {t:"(3, 3)", fb:"That's the open end of the first piece: not on the graph. See section 3."},
+      {t:"(4, 4)", fb:"4 is in the strip <i>x</i> &ge; 3, where the height is 6. See section 1."},
+      {t:"(6, 3)", fb:"Swapped: <i>x</i> comes first. At <i>x</i> = 3 the height is 6."}
+    ]}
+  },
+
+  verdicts: {
+    all:"All six. Strips first, one rule in each, then the dots.",
+    most:"Close. Redo the misses on paper, using the section each one names.",
+    few:"Go back to section 1 and redraw its example stage by stage. Then play with section 2."
+  },
+
+  traps: [
+    {bad:"For " + PW.tr + ", &nbsp;draw <i>y</i> = <i>x</i> + 3 across the whole plane", badge:"Wrong",
+     why:"Each rule lives only in its own strip. Right of <i>x</i> = 1, the rule is <i>x</i><sup>2</sup>, so the line <i>y</i> = <i>x</i> + 3 isn't on the graph there.",
+     sub:"x = 4", verdict:"only (4, 16) is on the graph",
+     left:{lbl:"x + 3 at x = 4", val:"7: not on the graph"},
+     right:{lbl:"f(4) = 4²", val:"16"}},
+    {bad:"Both dots at a boundary are closed", badge:"Wrong",
+     why:"Then that <span class='m'><i>x</i></span> would have two outputs. Only the piece whose condition includes the boundary gets the closed dot.",
+     sub:"x = 2", verdict:"only (2, 4) is on the graph",
+     left:{lbl:"x < 2 at x = 2", val:"false: (2, 2) open"},
+     right:{lbl:"x ≥ 2 at x = 2", val:"true: (2, 4) closed"}},
+    {bad:"The piece −2 is a vertical line", badge:"Wrong",
+     why:"The output is −2 for every <span class='m'><i>x</i></span> in the strip. Same height everywhere: a horizontal line. A vertical line would be <span class='m'><i>x</i> = −2</span>.",
+     sub:"two x-values in h", verdict:"same height: horizontal",
+     left:{lbl:"h(−3)", val:"−2"},
+     right:{lbl:"h(−2)", val:"−2"}}
+  ]
+});
+
+EXP.walks();
+
+/* ---- stepped practice ----------------------------------------------------
+   ladder(host, items, {wide, end, goal})
+   items: [{m, parts:[{ask, opts:[right first, ...], why}]}]
+   Options are authored right-first and shuffled here.                       */
+function ladder(sel, items, cfg){
+  var host = $(sel); if(!host) return;
+  cfg = cfg || {};
+  host.className = "drill" + (cfg.wide ? " wide" : "");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='ld-goal'></div><div class='ld-q m'></div><div class='ld-done'></div><div class='ld-ask'></div>" +
+    "<div class='ld-opts'></div><div class='drill-fb'></div><div class='ld-final'></div>" +
+    "<div class='drill-btns'><button type='button' class='btn on ld-next'></button></div>";
+  var goalEl = $(".ld-goal", host), finEl = $(".ld-final", host), qEl = $(".ld-q", host), doneEl = $(".ld-done", host), askEl = $(".ld-ask", host),
+      optsEl = $(".ld-opts", host), fb = $(".drill-fb", host), cnt = $(".count", host),
+      pips = $(".pips", host), next = $(".ld-next", host);
+  var i = 0, p = 0, clean = true, marks = [];
+
+  function shuffled(n){
+    var a = [], j, t, k;
+    for(k = 0; k < n; k++) a.push(k);
+    for(k = n - 1; k > 0; k--){ j = Math.floor(Math.random() * (k + 1)); t = a[k]; a[k] = a[j]; a[j] = t; }
+    return a;
+  }
+  function drawPips(){
+    pips.innerHTML = "";
+    items.forEach(function(_, k){
+      pips.appendChild(EXP.el("span", "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
+                                     (k === i ? " now" : "")));
+    });
+  }
+  function drawItem(){
+    p = 0; clean = true;
+    goalEl.innerHTML = items[i].goal || cfg.goal || "";
+    qEl.innerHTML = items[i].m;
+    doneEl.innerHTML = "";
+    finEl.innerHTML = "";
+    cnt.textContent = "Problem " + (i + 1) + " of " + items.length;
+    drawPips();
+    drawPart();
+  }
+  function drawPart(){
+    var it = items[i], part = it.parts[p], n = it.parts.length;
+    askEl.innerHTML = (n > 1 ? "<span class='ld-step'>Step " + (p + 1) + " of " + n + "</span>" : "") + part.ask;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    next.style.display = "none";
+    optsEl.innerHTML = "";
+    shuffled(part.opts.length).forEach(function(k){
+      var b = EXP.el("button", "ldbtn", part.opts[k]);
+      b.type = "button"; b._k = k;
+      b.addEventListener("click", function(){ answer(k, b); });
+      optsEl.appendChild(b);
+    });
+  }
+  function answer(k, b){
+    var it = items[i], part = it.parts[p], right = (k === 0), last = (p === it.parts.length - 1);
+    if(!right) clean = false;
+    $$(".ldbtn", optsEl).forEach(function(c){ c.disabled = true; if(c._k === 0) c.classList.add("right"); });
+    if(!right) b.classList.add("wrongpick");
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not quite. ") + part.why;
+    if(last){
+      if(it.done) finEl.innerHTML = "<span class='lbl'>" + (it.doneLbl || cfg.doneLbl || "Finished") +
+        "</span><span class='m'>" + it.done + "</span>";
+      if(marks[i] === undefined) marks[i] = clean;
+      drawPips();
+      if(i === items.length - 1){
+        var got = marks.filter(function(v){ return v; }).length;
+        fb.innerHTML += "<div class='drill-end'>" + got + " of " + items.length + " right first time. " + (cfg.end || "") + "</div>";
+      }
+    }
+    next.textContent = !last ? "Next step" : (i < items.length - 1 ? "Next problem" : "Start again");
+    next.style.display = "";
+  }
+  next.addEventListener("click", function(){
+    var it = items[i];
+    if(p < it.parts.length - 1){
+      doneEl.insertAdjacentHTML("beforeend", "<div class='ld-line'><span>" + it.parts[p].ask +
+        "</span><span class='m'>" + it.parts[p].opts[0] + "</span></div>");
+      p++; drawPart();
+    }else{
+      if(i < items.length - 1) i++; else { i = 0; marks = []; }
+      drawItem();
+    }
+  });
+  drawItem();
+}
+function one(m, ask, opts, why){ return {m:m, parts:[{ask:ask, opts:opts, why:why}]}; }
+
+/* graph one piecewise function: the boundary, a dot per piece, one more point */
+function gItem(rows, bnd, pieces, win, parts){
+  return {m:pw(F, rows), done:pwGraph(pieces, win, [], {strips:true}), doneLbl:"The graph",
+          parts:[{ask:"The strips are split by", opts:["the vertical line <i>x</i> = " + bnd, "the horizontal line <i>y</i> = " + bnd,
+                    "the point (" + bnd + ", 0)", "the line <i>y</i> = <i>x</i>"],
+                  why:"The conditions switch at <i>x</i> = " + bnd + ". A condition on <i>x</i> is a vertical boundary."}].concat(parts)};
+}
+ladder("#ldGraph", [
+  gItem([["3", X + " &lt; 0"], [X + " − 2", X + " &ge; 0"]], "0",
+    [{f:K(3), b:0, bo:true, lbl:"x < 0"}, {f:function(x){ return x - 2; }, a:0, lbl:"x ≥ 0"}], {x:[-4, 4], y:[-3, 4], w:240}, [
+    {ask:"The piece 3 ends at <i>x</i> = 0 with", opts:["an open dot at (0, 3)", "a closed dot at (0, 3)", "an open dot at (0, −2)", "a closed dot at (3, 0)"],
+     why:"Its height is 3. 0 &lt; 0 is false, so the dot is open."},
+    {ask:"The piece <i>x</i> − 2 starts at <i>x</i> = 0 with", opts:["a closed dot at (0, −2)", "an open dot at (0, −2)", "a closed dot at (0, 3)", "a closed dot at (−2, 0)"],
+     why:"0 − 2 = −2, and 0 &ge; 0 is true: closed."},
+    {ask:"One more point on the piece <i>x</i> − 2", opts:["(2, 0)", "(−2, −4)", "(2, 3)", "(0, 2)"],
+     why:"It lives in the strip <i>x</i> &ge; 0: 2 − 2 = 0. (−2 is in the other strip.)"}
+  ]),
+  gItem([[X + " + 4", X + " &le; −2"], ["−" + X + " − 1", X + " &gt; −2"]], "−2",
+    [{f:function(x){ return x + 4; }, b:-2, lbl:"x ≤ −2"}, {f:function(x){ return -x - 1; }, a:-2, ao:true, lbl:"x > −2"}], {x:[-5, 3], y:[-4, 4], w:240}, [
+    {ask:"The piece <i>x</i> + 4 ends at <i>x</i> = −2 with", opts:["a closed dot at (−2, 2)", "an open dot at (−2, 2)", "a closed dot at (−2, 1)", "a closed dot at (2, −2)"],
+     why:"−2 + 4 = 2, and &le; includes −2: closed."},
+    {ask:"The piece −<i>x</i> − 1 starts at <i>x</i> = −2 with", opts:["an open dot at (−2, 1)", "a closed dot at (−2, 1)", "an open dot at (−2, −3)", "an open dot at (−2, 2)"],
+     why:"−(−2) − 1 = 2 − 1 = 1, and &gt; leaves −2 out: open."},
+    {ask:"One more point on the piece <i>x</i> + 4", opts:["(−4, 0)", "(0, 4)", "(−4, 3)", "(−3, −1)"],
+     why:"It lives in the strip <i>x</i> &le; −2: −4 + 4 = 0. (0 is in the other strip.)"}
+  ]),
+  gItem([["2" + X, X + " &lt; 1"], ["4 − " + X, X + " &ge; 1"]], "1",
+    [{f:function(x){ return 2 * x; }, b:1, bo:true, lbl:"x < 1"}, {f:function(x){ return 4 - x; }, a:1, lbl:"x ≥ 1"}], {x:[-3, 5], y:[-4, 4], w:240}, [
+    {ask:"The piece 2<i>x</i> ends at <i>x</i> = 1 with", opts:["an open dot at (1, 2)", "a closed dot at (1, 2)", "an open dot at (1, 3)", "an open dot at (2, 1)"],
+     why:"2(1) = 2, and &lt; leaves 1 out: open."},
+    {ask:"The piece 4 − <i>x</i> starts at <i>x</i> = 1 with", opts:["a closed dot at (1, 3)", "an open dot at (1, 3)", "a closed dot at (1, 2)", "a closed dot at (1, 5)"],
+     why:"4 − 1 = 3, and &ge; includes 1: closed."},
+    {ask:"One more point on the piece 2<i>x</i>", opts:["(−1, −2)", "(−1, 5)", "(3, 6)", "(−1, 2)"],
+     why:"It lives in the strip <i>x</i> &lt; 1: 2(−1) = −2. (3 is in the other strip.)"}
+  ])
+], {wide:true, goal:"Graph it, strip by strip.", end:"Boundary first. Then each piece in its own strip, with the right dot."});
+
+})();
+</script>
+</body>
+</html>

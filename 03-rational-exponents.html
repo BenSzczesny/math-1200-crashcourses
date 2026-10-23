@@ -362,12 +362,19 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 .hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
 
 /* ---------- page map ---------- */
-.pagemap{list-style:none; counter-reset:pm; margin:22px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px}
-.pagemap li{counter-increment:pm}
-.pagemap a{display:block; position:relative; padding:10px 14px 10px 38px; border:1px solid var(--rule); border-radius:8px; background:var(--surface); color:var(--ink); text-decoration:none; font-size:15px; line-height:1.35}
-.pagemap a::before{content:counter(pm); position:absolute; left:14px; top:12px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
-.pagemap a:hover{border-color:var(--accent)}
-.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+/* A contents list, not tiles: numbered rows on hairlines, reading down two
+   columns on wide screens and one on phones. */
+.pagemap{list-style:none; counter-reset:pm; margin:26px 0 0; padding:0; columns:2 250px; column-gap:44px}
+.pagemap::before{content:"On this page"; display:block; column-span:all; margin:0 0 6px; padding-bottom:8px;
+  border-bottom:1px solid var(--rule-strong); font-family:var(--mono); font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3)}
+.pagemap li{counter-increment:pm; break-inside:avoid}
+.pagemap a{display:block; position:relative; padding:8px 2px 8px 36px; border-bottom:1px solid var(--rule);
+  color:var(--ink); text-decoration:none; font-size:15.5px; line-height:1.35}
+.pagemap a::before{content:counter(pm, decimal-leading-zero); position:absolute; left:2px; top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{color:var(--accent-2); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.pagemap a:hover::before{color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:3px}
 
 /* ---------- key idea / watch out ---------- */
 .keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
@@ -499,7 +506,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
     <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Exponents, Lesson 3 of 3</b></div>
     <div class="meter">
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
-      <div class="meter-num" id="meterNum">0 / 13 correct</div>
+      <div class="meter-num" id="meterNum">0 / 12 correct</div>
     </div>
   </div>
 </div>
@@ -510,7 +517,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Exponents · Lesson 3 of 3</div>
   <h1>A root is an exponent that is a fraction</h1>
   <p class="lead"><span class="m"><i>a</i><sup>1/2</sup> = √<span class="rad"><i>a</i></span></span>. Every root can be written as a power with a fraction in the exponent. Then <strong>the rules from Lessons 1 and 2 do all the work</strong>.</p>
-  <p>This lesson also covers simplifying, adding and multiplying square roots. No calculator needed.</p>
+  <p>Also here: simplifying, adding and multiplying square roots. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS topics: <em>Finding nth roots of perfect nth powers with signs</em> · <em>Converting between radical form and exponent form</em> · the five <em>Rational exponents</em> topics · <em>Simplifying the square root of a whole number less than 100</em> · <em>Square root addition or subtraction</em> · <em>Square root multiplication: Basic</em> (§R.3).</p>
   <ol class="pagemap">
     <li><a href="#s1">Where roots come from</a></li>
@@ -759,10 +766,6 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
     </ol>
   </div>
 
-  <div class="check" data-q="c5">
-    <div class="check-q"><span class="ask">Evaluate</span><span class="m">16<sup>−1/2</sup></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
   <div class="check" data-q="c7">
     <div class="check-q"><span class="ask">Evaluate</span><span class="m">(<span class="fr"><span>9</span><span>16</span></span>)<sup>−1/2</sup></span></div>
     <div class="opts"></div><div class="fb"></div>
@@ -927,9 +930,12 @@ function init(L){
 
   var TOTAL = L.inline.length + L.quiz.length;
 
+  /* Count only this page's questions. A saved store can hold keys from an
+     older version of the lesson (a split moves questions out), and counting
+     those would push the meter past TOTAL. */
   function paintMeter(){
-    var n = 0, k;
-    for(k in correct){ if(correct[k]) n++; }
+    var n = 0;
+    L.inline.concat(L.quiz).forEach(function(k){ if(correct[k]) n++; });
     var fill = $("#meterFill"), num = $("#meterNum");
     if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
     if(num) num.textContent = n + " / " + TOTAL + " correct";
@@ -1514,7 +1520,7 @@ var F = EXP.frac;
 
 EXP.init({
   storeKey: "m1200-exp-l3",
-  inline: ["c1","c2","c3","c4","c6","c5","c7"],
+  inline: ["c1","c2","c3","c4","c6","c7"],
   quiz:   ["q1","q2","q3","q4","q5","q6"],
 
   checks: {
@@ -1541,12 +1547,6 @@ EXP.init({
       {t:"5√<span class='rad'>3</span>", fb:"Swapped. The pair is 3 &middot; 3, so a 3 comes out and the 5 stays in."},
       {t:"9√<span class='rad'>5</span>", fb:"A pair of 3s sends <em>one</em> 3 out, not 9."},
       {t:"it cannot be simplified", fb:"45 = 9 &middot; 5, and 9 is a perfect square. Try the factor tree."}
-    ]},
-    c5: { opts:[
-      {t:F("1","4"), ok:true, fb:"Right. The minus moves it under the bar, and the 1/2 takes the square root: 1/&radic;16 = 1/4."},
-      {t:"−4", fb:"The minus is on the exponent. It says which side of the bar, nothing else."},
-      {t:"4", fb:"That's 16<sup>1/2</sup>. You dropped the minus instead of acting on it."},
-      {t:"−" + F("1","4"), fb:"The 1/4 is right, but there's no minus sign in the answer."}
     ]},
     c6: { opts:[
       {t:"5√<span class='rad'>3</span>", ok:true, fb:"Right. &radic;12 = 2&radic;3 and &radic;27 = 3&radic;3. Then 2 + 3 = 5."},

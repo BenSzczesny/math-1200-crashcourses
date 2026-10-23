@@ -1,0 +1,1930 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Rule of Thumb, and Shifts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
+<style>
+/* Math 1200 · exponent crash course · shared theme
+   Neutral professional palette: graphite accent, warm-neutral paper.
+   Correctness colour is SEMANTIC (--ok / --wrong) and deliberately separate
+   from the accent, so "right" never reads as "emphasised". */
+
+:root{
+  --paper:#F6F6F4; --surface:#FFFFFF; --surface-2:#EDEDEA;
+  --ink:#1B1C1B; --ink-2:#4F524F; --ink-3:#858885;
+  --rule:#E0E0DB; --rule-strong:#C6C7C1;
+  --accent:#33403F; --accent-2:#1F2827; --accent-wash:#E9EBEA;
+  --on-accent:#FFFFFF;
+  --ok:#3D6B55; --ok-wash:#E8EEEB;
+  --wrong:#96453A; --wrong-wash:#F4E9E7;
+  --chip:#EEEEEB;
+  --shadow:0 1px 2px rgba(27,28,27,.05), 0 8px 24px -14px rgba(27,28,27,.20);
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"Karla", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+    --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+    --rule:#2D302E; --rule-strong:#3F423F;
+    --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+    --on-accent:#141514;
+    --ok:#7CBB9C; --ok-wash:#1B2721;
+    --wrong:#DA9184; --wrong-wash:#2B1D1A;
+    --chip:#212422;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+  --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+  --rule:#2D302E; --rule-strong:#3F423F;
+  --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+  --on-accent:#141514;
+  --ok:#7CBB9C; --ok-wash:#1B2721;
+  --wrong:#DA9184; --wrong-wash:#2B1D1A;
+  --chip:#212422;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--paper);
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.topbar-in{
+  max-width:820px; margin:0 auto; padding:10px 24px;
+  display:flex; align-items:center; gap:16px; justify-content:space-between;
+}
+.brandmark{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.brandmark b{color:var(--ink-2); font-weight:500}
+.brandmark a{color:var(--ink-2); text-decoration:none}
+.brandmark a:hover{color:var(--ink); text-decoration:underline}
+.brandmark a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.meter{display:flex; align-items:center; gap:10px}
+.meter-track{width:120px; height:5px; border-radius:99px; background:var(--rule); overflow:hidden}
+.meter-fill{height:100%; width:0%; background:var(--accent); transition:width .35s ease}
+.meter-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+/* phones: the bar keeps one line; the title truncates and the track goes */
+@media (max-width:560px){
+  .topbar-in{padding:9px 16px; gap:10px}
+  .brandmark{overflow:hidden; text-overflow:ellipsis; min-width:0}
+  .meter-track{display:none}
+  main{padding:0 16px 80px}
+}
+
+/* ---------- page frame ---------- */
+main{max-width:820px; margin:0 auto; padding:0 24px 96px}
+section{padding:44px 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(34px,6vw,52px);
+  line-height:1.08; margin:0 0 16px; letter-spacing:-.015em; text-wrap:balance;
+}
+h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(25px,3.6vw,32px);
+  line-height:1.2; margin:0 0 14px; letter-spacing:-.01em; text-wrap:balance;
+}
+h3{font-family:var(--sans); font-weight:700; font-size:15px; margin:0 0 8px}
+p{margin:0 0 16px; max-width:62ch; color:var(--ink-2)}
+p.lead{font-size:19px; color:var(--ink)}
+strong{color:var(--ink); font-weight:700}
+ul.plain{margin:0 0 16px; padding-left:20px; max-width:62ch; color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+
+/* ---------- math ---------- */
+.m{font-family:var(--serif); font-size:1.18em; line-height:1.35; white-space:nowrap}
+.m i{font-style:italic}
+.m sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.m .op{padding:0 .18em; color:var(--ink-2)}
+/* An inline-grid takes its baseline from the numerator, so anything written
+   after a fraction lands level with the top half. Centring the box on the
+   parent's x-height puts the bar where a reader expects it. */
+.fr{display:inline-grid; vertical-align:middle; text-align:center; margin:0 .14em}
+.fr > span{padding:0 .4em}
+.fr > span + span{border-top:1.6px solid currentColor; padding-top:.1em; margin-top:.1em}
+.rad{border-top:1.5px solid currentColor; padding:.06em .18em 0 .1em; margin-left:-.06em}
+.idx{font-size:.58em; vertical-align:.75em; margin-right:-.32em; line-height:0}
+.big{font-size:1.5em}
+
+/* ---------- factor chips ---------- */
+.expand{
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  padding:20px; margin:0 0 20px; box-shadow:var(--shadow);
+}
+.expand-row{display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px}
+.chiprow{display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:34px}
+.chip{
+  font-family:var(--mono); font-size:14px;
+  min-width:30px; height:32px; padding:0 8px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--chip); border:1px solid var(--rule-strong); border-radius:6px;
+  color:var(--ink);
+}
+.chip.a{background:var(--accent-wash); border-color:var(--accent); color:var(--accent-2)}
+.chip.b{background:var(--ok-wash); border-color:var(--ok); color:var(--ok)}
+.chip.gone{opacity:.3; text-decoration:line-through; text-decoration-color:var(--wrong)}
+.dot{font-family:var(--mono); color:var(--ink-3); font-size:13px}
+.count{
+  font-family:var(--mono); font-size:12px; color:var(--ink-2);
+  background:var(--surface-2); border-radius:6px; padding:3px 9px;
+}
+.stack{display:flex; flex-direction:column; gap:10px}
+.overline{border-top:1.6px solid var(--rule-strong); padding-top:10px}
+
+/* ---------- controls ---------- */
+button{font-family:inherit; font-size:inherit; cursor:pointer}
+.btn{
+  font-family:var(--sans); font-weight:500; font-size:14px;
+  padding:8px 15px; border-radius:8px; border:1px solid var(--rule-strong);
+  background:var(--surface); color:var(--ink); transition:background .15s, border-color .15s;
+}
+.btn:hover{background:var(--surface-2); border-color:var(--accent)}
+.btn.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn:focus-visible, .opt:focus-visible, .rulebtn:focus-visible, .tab:focus-visible{
+  outline:2.5px solid var(--accent); outline-offset:2px;
+}
+.ctrls{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px}
+.ctrl-label{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-right:4px}
+
+/* ---------- rule statement ---------- */
+.rulebox{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px;
+  background:var(--accent-wash); border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0; padding:18px 22px; margin:0 0 20px;
+}
+.rulebox .tag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-2);
+}
+.rulebox .m{font-size:1.5em; color:var(--ink)}
+/* a condition on a rule, e.g. (a ≠ 0): lower case matters, so never a .tag */
+.rulebox .cond{font-family:var(--serif); font-size:16px; color:var(--ink-2)}
+.rulebox .cond i{font-style:italic}
+@media (max-width:560px){ .rulebox .m{white-space:normal} }
+
+/* ---------- side-by-side compare ---------- */
+.compare{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; background:var(--surface)}
+.compare > div{padding:18px 20px}
+.compare > div + div{border-left:1px solid var(--rule)}
+.compare .hd{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* only the stacked statements are blocks — an inline .m inside a caption stays inline */
+.compare > div > .m{display:block; margin-bottom:8px}
+.compare small{color:var(--ink-2); font-size:13.5px; line-height:1.45; display:block}
+@media (max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .compare > div + div{border-left:0; border-top:1px solid var(--rule)}
+}
+
+/* ---------- traps ---------- */
+.trap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; margin:0 0 14px}
+.trap-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:6px}
+.never{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--wrong); background:var(--wrong-wash); border-radius:5px; padding:3px 8px; white-space:nowrap;
+}
+.trap p{margin:8px 0 12px; font-size:15px}
+.subst{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:12px; padding-top:14px; border-top:1px dashed var(--rule-strong)}
+.subst .side{display:flex; flex-direction:column; gap:4px}
+.subst .side .lbl{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.verdict{font-family:var(--mono); font-size:13px; color:var(--wrong); align-self:center}
+
+/* ---------- multiple choice ---------- */
+.check{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; margin:22px 0 0; box-shadow:var(--shadow)}
+.check-q{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin-bottom:14px}
+.check-q .ask{font-weight:700; color:var(--ink); font-size:15px}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px}
+.opt{
+  font-family:var(--sans); text-align:left; padding:11px 14px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  transition:border-color .15s, background .15s;
+}
+/* Options are mostly math (nowrap is right) but some are prose — "no solution",
+   "it cannot be simplified" — which must wrap rather than clip. */
+.opt .m{white-space:normal; display:inline-block}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok); background:var(--ok-wash)}
+.opt.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.fb{margin-top:12px; font-size:14.5px; line-height:1.5; display:none}
+.fb.show{display:block}
+.fb.ok{color:var(--ok)}
+.fb.no{color:var(--wrong)}
+
+/* ---------- two-button drill (factor-or-term, splits-or-not) ---------- */
+.drill{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:22px 20px; box-shadow:var(--shadow)}
+.drill-top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+.drill-q{font-family:var(--serif); font-size:clamp(22px,3.4vw,30px); line-height:1.35; padding:6px 0 14px}
+.drill-q i{font-style:italic}
+.drill-q.m{white-space:normal}
+.drill-q sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.drill-btns{display:flex; flex-wrap:wrap; gap:8px}
+.drill-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:3em}
+.drill-fb.ok{color:var(--ok)}
+.drill-fb.no{color:var(--wrong)}
+.pips{display:flex; flex-wrap:wrap; gap:5px}
+.pip{width:9px; height:9px; border-radius:99px; background:var(--rule); border:1px solid var(--rule-strong)}
+.pip.ok{background:var(--ok); border-color:var(--ok)}
+.pip.no{background:var(--wrong); border-color:var(--wrong)}
+.pip.now{box-shadow:0 0 0 3px var(--accent-wash); border-color:var(--accent)}
+
+/* ---------- rule chooser ---------- */
+.solver{background:var(--surface); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+.solver-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--rule); background:var(--surface-2)}
+.solver-head .which{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.tabs{display:flex; flex-wrap:wrap; gap:6px}
+.tab{font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:6px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink-2)}
+.tab.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.work{padding:22px 20px; display:flex; flex-direction:column; gap:2px; overflow-x:auto}
+.line{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:7px 0}
+.line .eq{font-family:var(--serif); font-size:1.18em; color:var(--ink-3); width:14px; flex:none}
+.line.now .m{color:var(--ink)}
+.line.past .m{color:var(--ink-2)}
+.line .note{color:var(--ink-3); font-size:13px; line-height:1.45}
+.usedtag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); background:var(--accent-wash); border-radius:5px; padding:2px 8px}
+.line.done .m{color:var(--ok); font-weight:600}
+.picker{padding:16px 20px 20px; border-top:1px solid var(--rule)}
+.picker .prompt{font-size:14px; font-weight:700; color:var(--ink); margin-bottom:12px}
+.rulegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px}
+.rulebtn{
+  font-family:var(--sans); text-align:left; padding:10px 13px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; gap:3px; transition:border-color .15s, background .15s;
+}
+.rulebtn:hover:not(:disabled){border-color:var(--accent); background:var(--surface-2)}
+.rulebtn:disabled{opacity:.5; cursor:default}
+.rulebtn .nm{font-weight:700; font-size:14px}
+.rulebtn .frm{font-family:var(--serif); font-size:14.5px; color:var(--ink-3)}
+.rulebtn .frm i{font-style:italic}
+.rulebtn .frm sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.solver-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:1.5em}
+.solver-fb.no{color:var(--wrong)}
+.solver-fb.ok{color:var(--ok)}
+.finish{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:16px}
+
+/* ---------- scoreboard ---------- */
+.score{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  border:1px solid var(--rule); border-radius:10px; padding:18px 22px; background:var(--surface); margin-top:26px;
+}
+.score .n{font-family:var(--serif); font-size:36px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1}
+.score .say{font-size:14.5px; color:var(--ink-2); max-width:44ch}
+
+/* ---------- factor tree (lesson 3) ---------- */
+.treewrap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
+.treewrap svg{display:block; max-width:100%; height:auto}
+.tree-line{stroke:var(--rule-strong); stroke-width:1.5}
+.tree-node{font-family:var(--mono); font-size:14px; fill:var(--ink)}
+.tree-leaf-ring{fill:none; stroke:var(--rule-strong); stroke-width:1.5}
+.tree-leaf-ring.p1{stroke:var(--accent); stroke-width:2.2}
+.tree-leaf-ring.p2{stroke:var(--ok); stroke-width:2.2}
+.tree-legend{display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--rule)}
+.swatch{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--ink-2)}
+.swatch i{width:13px; height:13px; border-radius:99px; border:2.2px solid var(--rule-strong); display:inline-block}
+.swatch.p1 i{border-color:var(--accent)}
+.swatch.p2 i{border-color:var(--ok)}
+
+/* ---------- closing ---------- */
+.next{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-top:20px}
+.nextcard{border:1px solid var(--rule); border-radius:10px; padding:16px 18px; background:var(--surface)}
+.nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
+.nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
+.nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
+.colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
+
+/* ---------- number lines (inequalities crash course) ---------- */
+.nlbox{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.nlrow{display:grid; grid-template-columns:minmax(96px,auto) 1fr; gap:6px 14px; align-items:center}
+.nlrow + .nlrow{margin-top:8px}
+.nlrow .lbl{font-family:var(--serif); font-size:17px; text-align:right; color:var(--ink); white-space:nowrap}
+.nlrow .lbl i{font-style:italic}
+.nlrow.res{border-top:1px solid var(--rule-strong); padding-top:12px; margin-top:12px}
+.nlrow.res .lbl{font-weight:600}
+.nlrow.res .lbl.none{color:var(--wrong)}
+svg.nl{display:block; width:100%; height:auto; overflow:visible}
+svg.nl .ax{stroke:var(--ink-3); stroke-width:1.6; fill:none}
+svg.nl .head{fill:var(--ink-3); stroke:none}
+svg.nl .tk{stroke:var(--ink-2); stroke-width:1.8}
+svg.nl .tk.minor{stroke:var(--ink-3); stroke-width:1.2}
+svg.nl text{font-family:var(--mono); text-anchor:middle}
+svg.nl text.key{font-size:17px; font-weight:500; fill:var(--ink)}
+svg.nl text.minor{font-size:13px; fill:var(--ink-3)}
+svg.nl .seg{stroke:var(--accent); stroke-width:7; stroke-linecap:butt; fill:none}
+svg.nl .pt{stroke:var(--accent); stroke-width:2.6}
+svg.nl .pt.open{fill:var(--surface)}
+svg.nl .pt.closed{fill:var(--accent)}
+svg.nl .pt.ghost{fill:none; stroke:var(--ink-3); stroke-dasharray:3 3}
+svg.nl.dim .seg{stroke:var(--ink-3)}
+svg.nl.dim .pt{stroke:var(--ink-3)}
+svg.nl.dim .pt.closed{fill:var(--ink-3)}
+svg.nl.ok .seg{stroke:var(--ok)}
+svg.nl.ok .pt{stroke:var(--ok)}
+svg.nl.ok .pt.closed{fill:var(--ok)}
+svg.nl .arc{fill:none; stroke:var(--accent); stroke-width:1.8}
+svg.nl .arclbl{font-size:15px; fill:var(--accent-2); font-weight:500}
+svg.nl .pin line{stroke-width:2}
+svg.nl .pin text{font-size:14px; font-weight:500}
+svg.nl .pin.yes line{stroke:var(--ok)}   svg.nl .pin.yes polygon, svg.nl .pin.yes circle{fill:var(--ok)}   svg.nl .pin.yes text{fill:var(--ok)}
+svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no circle{fill:var(--wrong)} svg.nl .pin.no text{fill:var(--wrong)}
+.nlnote{font-size:14.5px; color:var(--ink-2); margin-top:14px; padding-top:12px; border-top:1px solid var(--rule); line-height:1.5}
+.nlgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:26px}
+.nlgrid > div + div{padding-top:20px; border-top:1px solid var(--rule)}
+@media (min-width:1000px){ .nlgrid > div + div{padding-top:0; border-top:none} }
+@media (max-width:520px){ .nlgrid{grid-template-columns:1fr} .nlrow{grid-template-columns:minmax(72px,auto) 1fr} }
+.nlgrid .hd{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* a math statement heading a box: never uppercased, since x and X differ */
+.boxhd{font-family:var(--serif); font-size:21px; color:var(--ink); padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid var(--rule)}
+.boxhd i{font-style:italic}
+.hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
+
+/* ---------- page map ---------- */
+/* A contents list, not tiles: numbered rows on hairlines, reading down two
+   columns on wide screens and one on phones. */
+.pagemap{list-style:none; counter-reset:pm; margin:26px 0 0; padding:0; columns:2 250px; column-gap:44px}
+.pagemap::before{content:"On this page"; display:block; column-span:all; margin:0 0 6px; padding-bottom:8px;
+  border-bottom:1px solid var(--rule-strong); font-family:var(--mono); font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3)}
+.pagemap li{counter-increment:pm; break-inside:avoid}
+.pagemap a{display:block; position:relative; padding:8px 2px 8px 36px; border-bottom:1px solid var(--rule);
+  color:var(--ink); text-decoration:none; font-size:15.5px; line-height:1.35}
+.pagemap a::before{content:counter(pm, decimal-leading-zero); position:absolute; left:2px; top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{color:var(--accent-2); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.pagemap a:hover::before{color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:3px}
+
+/* ---------- key idea / watch out ---------- */
+.keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
+.keybox .tag, .warn .tag{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin-bottom:6px}
+.keybox p, .warn p{margin:0; color:var(--ink); max-width:none}
+.keybox p + p, .warn p + p{margin-top:8px}
+.keybox ul{margin:4px 0 0; padding-left:20px; color:var(--ink)}
+.keybox li{margin-bottom:4px}
+.warn{background:var(--wrong-wash); border-left:3px solid var(--wrong); border-radius:0 10px 10px 0; padding:14px 20px; margin:0 0 20px}
+.warn .tag{color:var(--wrong)}
+
+/* ---------- symbol table ---------- */
+.symtab{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; font-size:15.5px}
+.symtab th{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:500; text-align:left; padding:10px 14px; background:var(--surface-2); border-bottom:1px solid var(--rule)}
+.symtab td{padding:10px 14px; border-bottom:1px solid var(--rule); color:var(--ink); vertical-align:middle}
+.symtab tr:last-child td{border-bottom:0}
+.symtab td.m, .symtab td .m{font-size:1.15em}
+.dotic{display:inline-block; width:14px; height:14px; border-radius:99px; border:2.4px solid var(--ok); vertical-align:-2px; margin-right:6px}
+.dotic.closed{background:var(--ok)}
+@media (max-width:560px){ .symtab{font-size:14px} .symtab th, .symtab td{padding:8px 9px} }
+
+/* ---------- worked example, one step at a time ---------- */
+.walk{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; box-shadow:var(--shadow); margin:0 0 20px}
+.walk-q{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; padding-bottom:12px; border-bottom:1px solid var(--rule)}
+.walk-q .ask{font-weight:700; font-size:15px}
+.walk-q .m{font-size:1.4em}
+.walk-steps{list-style:none; margin:0; padding:6px 0 0}
+.walk-steps li{display:grid; grid-template-columns:minmax(150px,auto) 1fr; gap:4px 20px; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--rule)}
+.walk-steps li:last-child{border-bottom:0}
+.walk-steps li .m{font-size:1.3em}
+.walk-steps li.ans .m{color:var(--ok); font-weight:600}
+.walk-steps .why{font-size:14.5px; color:var(--ink-2); line-height:1.45}
+.walk-steps .why b{color:var(--wrong)}
+@media (max-width:560px){ .walk-steps li{grid-template-columns:1fr} }
+.walk-ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:12px}
+.walk-hint{font-size:13.5px; color:var(--ink-3)}
+.walk + .walk{margin-top:-4px}
+
+/* ---------- test-a-number ---------- */
+.tester{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.tester .tp-probs{margin-bottom:10px}
+.tester .tp-line{cursor:crosshair}
+.tp-slide{display:flex; align-items:center; gap:12px; margin:10px 0 4px}
+.tp-slide input{flex:1; accent-color:var(--accent); min-width:0; height:28px}
+.tp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; margin:8px 0 12px; font-size:15px}
+.tp-out.yes{background:var(--ok-wash)}
+.tp-out.no{background:var(--wrong-wash)}
+.tp-verdict{font-weight:700}
+.tp-out.yes .tp-verdict{color:var(--ok)}
+.tp-out.no .tp-verdict{color:var(--wrong)}
+
+/* ---------- explorers (and/or, flip, distance) ---------- */
+.xp{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.xp-row{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px}
+.xp-row .ctrl-label{min-width:74px}
+.stepper{display:inline-flex; align-items:center; border:1px solid var(--rule-strong); border-radius:8px; overflow:hidden}
+.stepper button{border:0; background:var(--surface-2); color:var(--ink); width:34px; height:34px; font-size:17px}
+.stepper button:hover{background:var(--accent-wash)}
+.stepper button:focus-visible{outline:2.5px solid var(--accent); outline-offset:-2px}
+.stepper span{min-width:44px; text-align:center; font-family:var(--serif); font-size:18px}
+.xp-stmt{font-family:var(--serif); font-size:clamp(20px,3vw,26px); padding:10px 0 4px; border-top:1px solid var(--rule); margin-top:6px}
+.xp-stmt i{font-style:italic}
+.xp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; background:var(--ok-wash); margin-top:12px; font-size:15px}
+.xp-out .m{font-size:1.3em}
+.xp-out .shape{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); font-weight:500}
+.xp-out.empty{background:var(--wrong-wash)} .xp-out.empty .shape{color:var(--wrong)}
+.xp-say{font-size:14.5px; color:var(--ink-2); margin-top:10px}
+
+/* ---------- build-the-graph drill ---------- */
+.gb .drill-q{padding-bottom:6px}
+.gb .xp-row{margin:6px 0}
+.btn.right{border-color:var(--ok); background:var(--ok-wash)}
+.btn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.btn:disabled{cursor:default}
+.drill-end{margin-top:10px; padding-top:10px; border-top:1px solid var(--rule); color:var(--ink-2)}
+
+/* ---------- numbered method (steps-list) ---------- */
+.steps-list{list-style:none; counter-reset:rc; margin:0 0 20px; padding:0}
+.steps-list > li{counter-increment:rc; position:relative; padding:12px 16px 12px 52px; border:1px solid var(--rule); border-radius:10px; background:var(--surface); margin-bottom:8px; color:var(--ink)}
+.steps-list > li::before{content:counter(rc); position:absolute; left:14px; top:11px; width:26px; height:26px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-family:var(--mono); font-size:13px; display:flex; align-items:center; justify-content:center}
+.steps-list > li small{display:block; color:var(--ink-2); font-size:14px; margin-top:2px}
+
+/* ---------- cheat sheet ---------- */
+.cheat{border:1.5px solid var(--accent); border-radius:12px; padding:20px 22px; background:var(--surface)}
+.cheat h3{font-family:var(--serif); font-size:21px; font-weight:600; margin:0 0 12px}
+.cheat ul{margin:0; padding-left:20px; color:var(--ink)}
+.cheat li{margin-bottom:6px}
+.cheat .symtab{margin:10px 0 14px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important; scroll-behavior:auto !important}
+}
+</style>
+<style>
+/* graph-transformations lesson only */
+.gp{display:block; width:100%; height:auto}
+.gp-g{stroke:var(--rule); stroke-width:1}
+.gp-a{stroke:var(--ink-3); stroke-width:1.4}
+.gp-t{font-family:var(--mono); font-size:10.5px; fill:var(--ink-3); text-anchor:middle}
+.gp-par{fill:none; stroke:var(--ink-3); stroke-width:2; stroke-dasharray:6 5}
+.gp-new{fill:none; stroke:var(--accent-2); stroke-width:2.8; stroke-linejoin:round; stroke-linecap:round}
+.gp-mv{stroke:var(--ink-3); stroke-width:1.2; stroke-dasharray:2 3}
+.gp-pn{fill:var(--accent-2)}
+.gp-pp{fill:var(--surface); stroke:var(--ink-3); stroke-width:1.6}
+.gp-lb{font-family:var(--mono); font-size:11.5px; fill:var(--ink-2); font-weight:500}
+.gfig{margin:6px 0 20px; max-width:340px}
+.gfig.sm{max-width:300px}
+.gcap{font-size:13.5px; color:var(--ink-2); margin-top:6px; line-height:1.45}
+.gcap .m{font-size:1.08em}
+.gpair{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:18px; margin:0 0 20px}
+.gpair .gfig{margin:0; max-width:none}
+.pgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr)); gap:14px; margin:0 0 24px}
+.pcard{border:1px solid var(--rule); border-radius:10px; background:var(--surface); padding:14px 16px}
+.pcard .gp{margin:0 auto 10px}
+.pcard .gp-lb{font-size:12.5px; fill:var(--ink)}
+.check + h3{margin-top:32px}
+/* a table header that is math: never uppercased, since x and X differ */
+.symtab th.mh{text-transform:none; letter-spacing:0; font-family:var(--serif); font-size:16px; color:var(--ink-2)}
+.symtab th.mh i{font-style:italic}
+.pc-eq{display:block; font-size:1.3em; margin-bottom:2px}
+.pc-d{font-size:14px; color:var(--ink-2); line-height:1.45}
+.drill-q svg.gp, .ld-q svg.gp{max-width:280px}
+.check-q svg.gp{max-width:260px; margin-top:6px}
+.walk-steps li .gfig{margin:10px 0 2px}
+#tx .xp-row .btn{font-size:14px}
+.txgrid{display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start; margin-top:10px}
+.txgrid .gfig{flex:0 1 340px; margin:0}
+.txside{flex:1 1 240px; min-width:0}
+.txmoves{list-style:none; margin:0 0 12px; padding:0}
+.txmoves li{padding:6px 0; border-bottom:1px dashed var(--rule); font-size:15px}
+.txmoves li:last-child{border-bottom:0}
+.txmoves .k{display:inline-block; min-width:76px; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.txside .symtab{margin:0}
+.txside .symtab td{white-space:nowrap}
+.ld-goal{font-weight:700; font-size:15.5px; color:var(--ink); margin:8px 0 0}
+.ld-goal:empty{display:none}
+.ld-q{font-size:clamp(22px,3.4vw,28px); margin:4px 0 12px; white-space:normal}
+.ld-final{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; margin:12px 0 0; padding:12px 14px; border-radius:8px; background:var(--ok-wash)}
+.ld-final:empty{display:none}
+.ld-final .lbl{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ok)}
+.ld-final .m{font-size:1.3em; color:var(--ok); font-weight:600}
+.ld-done{display:flex; flex-direction:column; gap:4px; margin:0 0 10px}
+.ld-done:empty{display:none}
+.ld-line{display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline; font-size:15px; color:var(--ink-2)}
+.ld-line .m{color:var(--ok); font-weight:600; font-size:1.12em}
+.ld-ask{font-weight:700; font-size:15.5px; margin:0 0 10px; color:var(--ink)}
+.ld-step{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-right:10px}
+.ld-opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:0 0 6px}
+.drill.wide .ld-opts{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ldbtn{font-family:var(--serif); font-size:18px; padding:11px 14px; border-radius:8px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink); cursor:pointer; text-align:center}
+.ldbtn i, .ld-q i, .ld-line i, .ld-ask i{font-style:italic}
+.ldbtn sup, .ld-q sup, .ld-line sup, .ld-ask sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ldbtn:hover:not(:disabled){border-color:var(--accent)}
+.ldbtn:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+.ldbtn:disabled{cursor:default}
+.ldbtn.right{border-color:var(--ok); background:var(--ok-wash)}
+.ldbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+@media (max-width:480px){ .drill.wide .ld-opts{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Graphs, Part 1 of 3</b></div>
+    <div class="meter">
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-num" id="meterNum">0 / 11 correct</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<section id="top">
+  <div class="eyebrow">Graphs · Part 1 of 3</div>
+  <h1>Inside or outside: one rule for every move</h1>
+  <p class="lead">Most graphs in Module 12 are one of six <strong>parent graphs</strong>, moved. One rule says how any change in the equation moves the points. This page is that rule, then shifts: up, down, left and right.</p>
+  <p>Part 2 does flips and stretches. Part 3 puts several moves together. No calculator needed.</p>
+  <p style="font-size:14.5px">ALEKS (§2.6): <em>Translating the graph of a function: One step</em> and <em>Writing an equation for a function after a vertical translation</em>. The parent graphs come from Module 11: <em>Matching parent graphs with their equations</em>.</p>
+  <ol class="pagemap">
+    <li><a href="#s1">The six parent graphs</a></li>
+    <li><a href="#s2">Reading f(x)</a></li>
+    <li><a href="#s3">The rule of thumb</a></li>
+    <li><a href="#s4">Up and down</a></li>
+    <li><a href="#s5">Left and right</a></li>
+    <li><a href="#s6">Writing the equation</a></li>
+    <li><a href="#s7">Common mistakes</a></li>
+    <li><a href="#s8">Check yourself</a></li>
+    <li><a href="#s9">Cheat sheet</a></li>
+  </ol>
+</section>
+
+<section id="s1">
+  <div class="eyebrow">1 · Start here</div>
+  <h2>The six parent graphs</h2>
+  <p>Every problem starts from one of these. Know each shape and a few of its points.</p>
+  <div class="pgrid" id="parents"></div>
+
+  <h3>Name the graph</h3>
+  <p>Pick the equation for each one. The square root and the cube root are the pair people mix up.</p>
+  <div id="drParents"></div>
+</section>
+
+<section id="s2">
+  <div class="eyebrow">2 · The notation</div>
+  <h2>Reading <i>f</i>(<i>x</i>): put <i>x</i> in, get <i>y</i> out</h2>
+  <p>Instead of <span class="m"><i>y</i> = <i>x</i><sup>2</sup></span>, we can write <span class="m"><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup></span>. It's the same graph. <i>f</i> is the function's name, and <span class="m"><i>f</i>(<i>x</i>)</span> is another way to write <i>y</i>.</p>
+  <p>The brackets hold the <i>x</i> you put in. To find <span class="m"><i>f</i>(3)</span>, replace <i>x</i> with 3: <span class="m"><i>f</i>(3) = 3<sup>2</sup> = 9</span>. Put in 3, get out 9, so the point (3, 9) is on the graph.</p>
+
+  <div class="keybox">
+    <span class="tag">Three ways to say one thing</span>
+    <ul>
+      <li><i>f</i> passes through (3, 9).</li>
+      <li>The point (3, 9) is on the graph of <i>f</i>.</li>
+      <li><span class="m"><i>f</i>(3) = 9</span>: put in <span class="m"><i>x</i> = 3</span>, get out <span class="m"><i>y</i> = 9</span>.</li>
+    </ul>
+  </div>
+
+  <p>To test a point, put its <i>x</i> in. If you get its <i>y</i>, it's on the graph.</p>
+  <ul class="plain">
+    <li><span class="m"><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup></span> passes through (3, 9): <span class="m"><i>f</i>(3) = 3<sup>2</sup> = 9</span>.</li>
+    <li><span class="m"><i>f</i>(<i>x</i>) = |<i>x</i>|</span> passes through (−4, 4): <span class="m"><i>f</i>(−4) = |−4| = 4</span>.</li>
+    <li><span class="m"><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup></span> does <strong>not</strong> pass through (2, 5): <span class="m"><i>f</i>(2) = 2<sup>2</sup> = 4</span>, not 5.</li>
+  </ul>
+
+  <div class="check" data-q="n1">
+    <div class="check-q"><span class="ask">Let <span class="m"><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup></span>. Which point is on the graph of <i>f</i>?</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+
+  <h3>Changing what goes in</h3>
+  <p><span class="m"><i>f</i>(<i>x</i> − 3)</span> means: put <span class="m"><i>x</i> − 3</span> in where <i>x</i> was. That change is <strong>inside</strong>.</p>
+  <p><span class="m"><i>f</i>(<i>x</i>) + 3</span> means: work out <i>f</i>(<i>x</i>), then add 3. That change is <strong>outside</strong>.</p>
+  <table class="symtab">
+    <tr><th class="mh"><i>f</i>(<i>x</i>)</th><th class="mh"><i>f</i>(<i>x</i> − 3): inside</th><th class="mh"><i>f</i>(<i>x</i>) + 3: outside</th></tr>
+    <tr><td class="m"><i>x</i><sup>2</sup></td><td class="m">(<i>x</i> − 3)<sup>2</sup></td><td class="m"><i>x</i><sup>2</sup> + 3</td></tr>
+    <tr><td class="m">|<i>x</i>|</td><td class="m">|<i>x</i> − 3|</td><td class="m">|<i>x</i>| + 3</td></tr>
+    <tr><td class="m">√<span class="rad"><i>x</i></span></td><td class="m">√<span class="rad"><i>x</i> − 3</span></td><td class="m">√<span class="rad"><i>x</i></span> + 3</td></tr>
+  </table>
+  <p>Inside means inside the brackets, the bars or the root. Outside means after it. The next section says how each one moves the graph.</p>
+
+  <div class="check" data-q="n2">
+    <div class="check-q"><span class="ask">Let <span class="m"><i>f</i>(<i>x</i>) = |<i>x</i>|</span>. Which equation is</span><span class="m"><i>y</i> = <i>f</i>(<i>x</i> + 2)</span><span class="ask">?</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+
+  <h3>More practice</h3>
+  <p>Inside or outside? Copy what's in the brackets exactly.</p>
+  <div id="ldNotation"></div>
+</section>
+
+<section id="s3">
+  <div class="eyebrow">3 · The rule of thumb</div>
+  <h2>Inside changes <i>x</i>, the opposite way. Outside changes <i>y</i>, the same way.</h2>
+
+  <div class="rulebox">
+    <span class="tag">Every move</span>
+    <span><strong>Change the input</strong>, inside <span class="m"><i>f</i>( )</span>: the <i>x</i>-coordinates change, <strong>the opposite way</strong>.</span>
+    <span><strong>Change the whole function</strong>, outside <span class="m"><i>f</i>( )</span>: the <i>y</i>-coordinates change, <strong>the same way</strong>.</span>
+  </div>
+
+  <p>Outside is the easy one. <span class="m"><i>y</i> = <i>f</i>(<i>x</i>) + 3</span> takes every <i>y</i>-value of <i>f</i> and adds 3. It does what it says.</p>
+  <p>Inside goes the opposite way. Say <i>f</i> passes through (5, 2), so <span class="m"><i>f</i>(5) = 2</span>. For <span class="m"><i>y</i> = <i>f</i>(<i>x</i> − 3)</span> to give 2, the inside <span class="m"><i>x</i> − 3</span> has to be 5. So <span class="m"><i>x</i> = 8</span>. The point moved to (8, 2): <i>x</i> <strong>increased by 3</strong>, so the point moved <strong>right</strong> 3, though the equation says minus 3.</p>
+
+  <table class="symtab">
+    <tr><th>In the equation</th><th>Where</th><th>What happens to each point</th></tr>
+    <tr><td class="m"><i>f</i>(<i>x</i> − 3)</td><td>inside</td><td><i>x</i> increases by 3: right 3, the opposite of − 3</td></tr>
+    <tr><td class="m"><i>f</i>(<i>x</i> + 3)</td><td>inside</td><td><i>x</i> decreases by 3: left 3</td></tr>
+    <tr><td class="m"><i>f</i>(<i>x</i>) + 3</td><td>outside</td><td><i>y</i> increases by 3: up 3, the same</td></tr>
+    <tr><td class="m"><i>f</i>(<i>x</i>) − 3</td><td>outside</td><td><i>y</i> decreases by 3: down 3</td></tr>
+  </table>
+  <p>The same rule covers flips and stretches in Part 2.</p>
+
+  <div class="check" data-q="c4">
+    <div class="check-q"><span class="ask"><i>f</i> passes through (5, 2). Which point is on</span><span class="m"><i>y</i> = <i>f</i>(<i>x</i> + 1)</span><span class="ask">?</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="eyebrow">4 · Outside</div>
+  <h2>A number added outside moves it up or down</h2>
+
+  <div class="rulebox">
+    <span class="tag">Up or down</span>
+    <span class="m"><i>y</i> = <i>f</i>(<i>x</i>) + <i>k</i>: &nbsp; (<i>x</i>, <i>y</i>) → (<i>x</i>, <i>y</i> + <i>k</i>)</span>
+    <span class="cond">plus is up, minus is down</span>
+  </div>
+
+  <p>Every point keeps its <i>x</i> and moves straight up or down, so the whole graph does.</p>
+  <div class="gfig" data-g="up"></div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Graph</span><span class="m"><i>y</i> = |<i>x</i>| − 2</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">parent: <i>y</i> = |<i>x</i>|, &nbsp;(−2, 2), (−1, 1), (0, 0), (1, 1), (2, 2)</span><span class="why">A V with its corner at (0, 0).</span></li>
+      <li><span class="m">− 2 is outside: (<i>x</i>, <i>y</i>) → (<i>x</i>, <i>y</i> − 2)</span><span class="why">Same way: subtract 2 from every <i>y</i>.</span></li>
+      <li class="ans"><span class="m">(−2, 0), (−1, −1), (0, −2), (1, −1), (2, 0)</span><span class="why">Same V, every point 2 lower.</span><div class="gfig sm" data-g="absDown"></div></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c1">
+    <div class="check-q"><span class="ask">Compared with <span class="m"><i>y</i> = √<span class="rad"><i>x</i></span></span>, the graph of</span><span class="m"><i>y</i> = √<span class="rad"><i>x</i></span> + 4</span><span class="ask">is moved</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="eyebrow">5 · Inside</div>
+  <h2>A number added inside moves it sideways, opposite the sign</h2>
+
+  <div class="rulebox">
+    <span class="tag">Left or right</span>
+    <span class="m"><i>y</i> = <i>f</i>(<i>x</i> − <i>h</i>): &nbsp; (<i>x</i>, <i>y</i>) → (<i>x</i> + <i>h</i>, <i>y</i>)</span>
+    <span class="cond"><i>x</i> − 2 is right 2 &nbsp;·&nbsp; <i>x</i> + 2 is left 2</span>
+  </div>
+
+  <p>Every point keeps its <i>y</i> and slides sideways, the opposite way to the sign.</p>
+  <div class="gfig" data-g="right"></div>
+
+  <div class="keybox">
+    <span class="tag">A quick check</span>
+    <p>What <i>x</i> makes the inside 0? That is where the parent's vertex, corner or starting point goes.</p>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Graph</span><span class="m"><i>y</i> = (<i>x</i> + 3)<sup>2</sup></span></div>
+    <ol class="walk-steps">
+      <li><span class="m">parent: <i>y</i> = <i>x</i><sup>2</sup>, &nbsp;(−2, 4), (−1, 1), (0, 0), (1, 1), (2, 4)</span><span class="why">A U with its vertex at (0, 0).</span></li>
+      <li><span class="m">+ 3 is inside: (<i>x</i>, <i>y</i>) → (<i>x</i> − 3, <i>y</i>)</span><span class="why">The opposite way: subtract 3 from every <i>x</i>. Check: <span class="m"><i>x</i> + 3 = 0</span> at <span class="m"><i>x</i> = −3</span>.</span></li>
+      <li class="ans"><span class="m">(−5, 4), (−4, 1), (−3, 0), (−2, 1), (−1, 4)</span><span class="why">Same U, every point 3 to the left.</span><div class="gfig sm" data-g="sqLeft"></div></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c2">
+    <div class="check-q"><span class="ask">Compared with <span class="m"><i>y</i> = |<i>x</i>|</span>, the graph of</span><span class="m"><i>y</i> = |<i>x</i> − 5|</span><span class="ask">is moved</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+
+  <h3>Which way?</h3>
+  <p>One move each. Inside or outside first, then the direction.</p>
+  <div id="drWhich"></div>
+</section>
+
+<section id="s6">
+  <div class="eyebrow">6 · Backwards</div>
+  <h2>Writing the equation from the move</h2>
+  <p>Up and down go outside, as they are. Sideways goes inside, with the opposite sign.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Write the equation</span><span class="m"><i>y</i> = <i>x</i><sup>2</sup>, moved left 1</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">left: inside</span><span class="why">Sideways moves change <i>x</i>, so they go inside.</span></li>
+      <li><span class="m">left 1 is + 1: &nbsp;(<i>x</i> + 1)</span><span class="why">Inside goes the opposite way, so left needs a plus.</span></li>
+      <li class="ans"><span class="m"><i>y</i> = (<i>x</i> + 1)<sup>2</sup></span><span class="why">Check: <span class="m"><i>x</i> + 1 = 0</span> at <span class="m"><i>x</i> = −1</span>. The vertex is at (−1, 0).</span></li>
+    </ol>
+  </div>
+
+  <h3>From words</h3>
+  <div id="ldWords"></div>
+
+  <h3>From a picture</h3>
+  <p>The dashed graph is the parent. Find where the vertex or starting point went.</p>
+  <div id="ldPics"></div>
+</section>
+
+<section id="s7">
+  <div class="eyebrow">7 · Common mistakes</div>
+  <h2>Three wrong moves</h2>
+  <p>Each card shows a wrong idea. Click its button to test it with a number. The two sides come out different, which proves the idea is wrong.</p>
+  <div id="trapHost"></div>
+</section>
+
+<section id="s8">
+  <div class="eyebrow">8 · Check yourself</div>
+  <h2>Six on your own</h2>
+  <p>If you miss one, the feedback names the section to go back to.</p>
+  <div id="quizHost"></div>
+  <div class="score">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span class="n" id="scoreN">0</span><span class="count">of 6</span>
+    </div>
+    <div class="say" id="scoreSay">Answer all six to see where you stand.</div>
+  </div>
+</section>
+
+<section id="s9">
+  <div class="eyebrow">9 · Keep this</div>
+  <h2>Cheat sheet</h2>
+  <div class="cheat">
+    <h3>The rule of thumb</h3>
+    <ol class="steps-list">
+      <li><strong>Inside <i>f</i>( ):</strong> changes <i>x</i>, the opposite way.</li>
+      <li><strong>Outside <i>f</i>( ):</strong> changes <i>y</i>, the same way.</li>
+    </ol>
+    <h3>Shifts</h3>
+    <table class="symtab">
+      <tr><th>In the equation</th><th>The graph</th><th>Each point goes to</th></tr>
+      <tr><td class="m"><i>f</i>(<i>x</i>) + <i>k</i></td><td>up <i>k</i></td><td class="m">(<i>x</i>, <i>y</i> + <i>k</i>)</td></tr>
+      <tr><td class="m"><i>f</i>(<i>x</i>) − <i>k</i></td><td>down <i>k</i></td><td class="m">(<i>x</i>, <i>y</i> − <i>k</i>)</td></tr>
+      <tr><td class="m"><i>f</i>(<i>x</i> − <i>h</i>)</td><td>right <i>h</i></td><td class="m">(<i>x</i> + <i>h</i>, <i>y</i>)</td></tr>
+      <tr><td class="m"><i>f</i>(<i>x</i> + <i>h</i>)</td><td>left <i>h</i></td><td class="m">(<i>x</i> − <i>h</i>, <i>y</i>)</td></tr>
+    </table>
+  </div>
+
+  <div class="next">
+    <div class="nextcard">
+      <div class="n">Done</div><div class="t">Part 1</div>
+      <p>The rule of thumb, and shifts.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Next</div><div class="t">Part 2</div>
+      <p>Flips, and stretches up, down and sideways.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Then</div><div class="t">Part 3</div>
+      <p>Several moves, one at a time.</p>
+    </div>
+  </div>
+  <div class="colophon">
+    Math 1200 · College Algebra · supplement to ALEKS §2.6<br>
+    Practice only. Nothing here is graded or submitted.<br>
+    Your progress is saved on this device only.
+  </div>
+</section>
+
+</main>
+<script>
+/* Math 1200 · exponent crash course · shared engine
+   A lesson supplies a LESSON config object; this builds the interactive parts.
+
+   LESSON = {
+     storeKey : localStorage key, unique per lesson
+     checks   : { key: {ask?, m?, opts:[{t, ok?, fb}]} }   all MC items
+     inline   : [keys]   rendered into existing .check[data-q="key"] hosts
+     quiz     : [keys]   rendered into #quizHost, scored together
+     traps    : [{bad, why, sub, left:{lbl,val}, right:{lbl,val}}]
+     rules    : [{id, nm, frm}]
+     generic  : { RULEID: "why that rule does not apply, generically" }
+     problems : [{start, steps:[{rule, result, note, wrong:{RULEID:msg}}]}]
+     verdicts : {all, most, few}   score copy
+     solver   : {connector, ask, ok, last, done}   optional solver wording;
+                connector "" suits inequalities, where "=" between lines is false
+   }                                                                        */
+
+var EXP = (function(){
+"use strict";
+
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+function el(tag, cls, html){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+
+function rep(sym, n, cls){
+  var a = [];
+  for(var i = 0; i < n; i++) a.push({t: sym, cls: cls});
+  return a;
+}
+
+function chipRow(host, items){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.innerHTML = "";
+  items.forEach(function(it, i){
+    if(i) host.appendChild(el("span", "dot", "·"));
+    host.appendChild(el("span", "chip" + (it.cls ? " " + it.cls : ""), it.t));
+  });
+}
+
+/* a fraction, as math HTML */
+function frac(n, d){
+  return "<span class='fr'><span>" + n + "</span><span>" + d + "</span></span>";
+}
+
+/* a radical: sqrt(inner), or nth root when idx is given */
+function root(inner, idx){
+  return (idx ? "<span class='idx'>" + idx + "</span>" : "") +
+         "√<span class='rad'>" + inner + "</span>";
+}
+
+function init(L){
+  var correct = {};
+  try{
+    var saved = window.localStorage.getItem(L.storeKey);
+    if(saved) correct = JSON.parse(saved) || {};
+  }catch(e){ correct = {}; }
+
+  function persist(){
+    try{ window.localStorage.setItem(L.storeKey, JSON.stringify(correct)); }catch(e){}
+  }
+
+  var TOTAL = L.inline.length + L.quiz.length;
+
+  /* Count only this page's questions. A saved store can hold keys from an
+     older version of the lesson (a split moves questions out), and counting
+     those would push the meter past TOTAL. */
+  function paintMeter(){
+    var n = 0;
+    L.inline.concat(L.quiz).forEach(function(k){ if(correct[k]) n++; });
+    var fill = $("#meterFill"), num = $("#meterNum");
+    if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
+    if(num) num.textContent = n + " / " + TOTAL + " correct";
+  }
+
+  /* ---------------- multiple choice ---------------- */
+  /* Options are authored correct-first for reviewability, then shuffled here,
+     so the right answer is never in a predictable slot. */
+  function shuffled(arr){
+    var a = arr.slice(), i, j, t;
+    for(i = a.length - 1; i > 0; i--){
+      j = Math.floor(Math.random() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildCheck(host, key, cfg){
+    var optsHost = $(".opts", host), fb = $(".fb", host);
+    var order = shuffled(cfg.opts);
+    order.forEach(function(o){
+      var b = el("button", "opt", "<span class='m'>" + o.t + "</span>");
+      b.type = "button";
+      b._ok = !!o.ok;
+      b.addEventListener("click", function(){
+        $$(".opt", optsHost).forEach(function(c){ c.disabled = true; });
+        if(o.ok){
+          b.classList.add("right");
+          fb.className = "fb show ok";
+          correct[key] = true; persist(); paintMeter();
+        }else{
+          b.classList.add("wrongpick");
+          $$(".opt", optsHost).forEach(function(c){
+            if(c._ok) c.classList.add("right");
+          });
+          fb.className = "fb show no";
+        }
+        fb.innerHTML = o.fb;
+        if(L.quiz.indexOf(key) !== -1) paintScore();
+      });
+      optsHost.appendChild(b);
+    });
+  }
+
+  L.inline.forEach(function(key){
+    var host = $(".check[data-q='" + key + "']");
+    if(host) buildCheck(host, key, L.checks[key]);
+  });
+
+  var quizHost = $("#quizHost");
+  if(quizHost){
+    L.quiz.forEach(function(key, i){
+      var cfg = L.checks[key];
+      var card = el("div", "check");
+      card.innerHTML =
+        "<div class='check-q'><span class='ask'>" + (i + 1) + ". " + cfg.ask + "</span>" +
+        "<span class='m'>" + cfg.m + "</span></div>" +
+        "<div class='opts'></div><div class='fb'></div>";
+      quizHost.appendChild(card);
+      buildCheck(card, key, cfg);
+    });
+  }
+
+  function paintScore(){
+    var n = 0;
+    L.quiz.forEach(function(k){ if(correct[k]) n++; });
+    var nEl = $("#scoreN"), sEl = $("#scoreSay");
+    if(!nEl || !sEl) return;
+    nEl.textContent = n;
+    var answered = $$("#quizHost .fb.show").length;
+    var total = L.quiz.length;
+    if(answered < total){
+      sEl.textContent = answered + " of " + total + " answered. Keep going.";
+    }else if(n === total){
+      sEl.textContent = L.verdicts.all;
+    }else if(n >= total - 2){
+      sEl.textContent = L.verdicts.most;
+    }else{
+      sEl.textContent = L.verdicts.few;
+    }
+  }
+
+  /* ---------------- traps ---------------- */
+  var trapHost = $("#trapHost");
+  if(trapHost && L.traps){
+    L.traps.forEach(function(t){
+      var card = el("div", "trap");
+      card.innerHTML =
+        "<div class='trap-head'><span class='never'>" + (t.badge || "Never") + "</span>" +
+        "<span class='m'>" + t.bad + "</span></div><p>" + t.why + "</p>";
+      var btn = el("button", "btn", "Test it with " + t.sub);
+      btn.type = "button";
+      var out = el("div", "subst");
+      out.style.display = "none";
+      out.innerHTML =
+        "<div class='side'><span class='lbl'>" + t.left.lbl + "</span><span class='m'>" + t.left.val + "</span></div>" +
+        "<div class='side'><span class='lbl'>" + t.right.lbl + "</span><span class='m'>" + t.right.val + "</span></div>" +
+        "<span class='verdict'>" + (t.verdict || "not equal") + "</span>";
+      btn.addEventListener("click", function(){
+        var shown = out.style.display !== "none";
+        out.style.display = shown ? "none" : "flex";
+        btn.textContent = shown ? ("Test it with " + t.sub) : "Hide";
+      });
+      card.appendChild(btn);
+      card.appendChild(out);
+      trapHost.appendChild(card);
+    });
+  }
+
+  /* ---------------- rule chooser ---------------- */
+  var workEl = $("#solverWork");
+  if(workEl && L.problems){
+    var pi = 0, history = [];
+    var SV = L.solver || {};
+    var CONN = (SV.connector == null) ? "=" : SV.connector;
+    var ASK  = SV.ask  || "Which rule can you legally use on this line?";
+    var DONE = SV.done || "Fully simplified — every base appears once, nothing sits in a bracket, and no exponent is negative.";
+    var OKM  = SV.ok   || "Yes — that one is legal here.";
+    var LAST = SV.last || "That is the answer.";
+    var fbEl = $("#solverFb"), rulesEl = $("#solverRules");
+    var whichEl = $("#solverWhich"), tabsEl = $("#solverTabs");
+    var finishEl = $("#solverFinish"), doneEl = $("#solverDone"), nextEl = $("#solverNext");
+    var promptEl = $("#solverPrompt");
+
+    L.rules.forEach(function(r){
+      var b = el("button", "rulebtn",
+        "<span class='nm'>" + r.nm + "</span><span class='frm'>" + r.frm + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){ pick(r.id); });
+      rulesEl.appendChild(b);
+    });
+
+    L.problems.forEach(function(p, i){
+      var t = el("button", "tab", String(i + 1));
+      t.type = "button";
+      t.addEventListener("click", function(){ load(i); });
+      tabsEl.appendChild(t);
+    });
+
+    function render(){
+      var p = L.problems[pi];
+      workEl.innerHTML = "";
+      var first = el("div", history.length ? "line past" : "line now");
+      first.innerHTML = "<span class='eq'></span><span class='m'>" + p.start + "</span>";
+      workEl.appendChild(first);
+
+      history.forEach(function(h, i){
+        var isLast = (i === history.length - 1) && (history.length === p.steps.length);
+        var ln = el("div", "line " + (isLast ? "done" : "past"));
+        ln.innerHTML = "<span class='eq'>" + CONN + "</span><span class='m'>" + h.result + "</span>" +
+                       "<span class='usedtag'>" + h.nm + "</span>";
+        workEl.appendChild(ln);
+        if(h.note){
+          var nt = el("div", "line");
+          nt.innerHTML = "<span class='eq'></span><span class='note'>" + h.note + "</span>";
+          workEl.appendChild(nt);
+        }
+      });
+
+      $$(".tab", tabsEl).forEach(function(t, i){
+        t.className = "tab" + (i === pi ? " on" : "");
+      });
+      whichEl.textContent = "Problem " + (pi + 1) + " of " + L.problems.length;
+
+      var finished = history.length === p.steps.length;
+      $$(".rulebtn", rulesEl).forEach(function(b){ b.disabled = finished; });
+      finishEl.style.display = finished ? "flex" : "none";
+      promptEl.innerHTML = finished ? DONE : ASK;
+      if(finished){
+        doneEl.textContent = p.steps.length + " steps, " + p.steps.length + " decisions";
+        nextEl.textContent = (pi === L.problems.length - 1) ? "Back to problem 1" : "Next problem";
+      }
+    }
+
+    function pick(id){
+      var p = L.problems[pi];
+      if(history.length >= p.steps.length) return;
+      var step = p.steps[history.length];
+      if(id === step.rule){
+        var r = L.rules.filter(function(x){ return x.id === id; })[0];
+        history.push({result: step.result, note: step.note, nm: r.nm});
+        fbEl.className = "solver-fb ok";
+        fbEl.innerHTML = (history.length === p.steps.length) ? LAST : OKM;
+        render();
+      }else{
+        fbEl.className = "solver-fb no";
+        fbEl.innerHTML = (step.wrong && step.wrong[id]) ? step.wrong[id] : L.generic[id];
+      }
+    }
+
+    function load(i){
+      pi = i; history = [];
+      fbEl.className = "solver-fb"; fbEl.innerHTML = "";
+      render();
+    }
+
+    nextEl.addEventListener("click", function(){
+      load((pi + 1) % L.problems.length);
+      $(".solver").scrollIntoView({behavior: "smooth", block: "start"});
+    });
+
+    load(0);
+  }
+
+  paintMeter();
+  paintScore();
+}
+
+/* ---------------- numbers ----------------
+   A value as it should read on the page: true minus sign, halves written as
+   fractions, no floating-point dust. plain=true keeps decimals (slider read-outs). */
+var HALF = {"0.5":"&frac12;", "1.5":"3/2", "2.5":"5/2", "3.5":"7/2", "4.5":"9/2",
+            "5.5":"11/2", "6.5":"13/2", "7.5":"15/2"};
+function num(v, plain){
+  var r = Math.round(v * 100) / 100;
+  var s = String(Math.abs(r));
+  if(!plain && HALF[s]) s = HALF[s];
+  return (r < 0 ? "−" : "") + s;
+}
+
+/* ---------------- sets of numbers ----------------
+   A SET is a list of pieces [left, right, openLeft, openRight] — the same
+   shape nline draws. null on a side = runs off to infinity. [] = empty.
+
+   SET.fromTest(test, crit) builds the exact set where test(x) is true, given
+   every point where the truth could change (the critical values). Between
+   two neighbouring critical values the truth cannot change, so testing one
+   number per gap and each critical value itself decides everything.       */
+var SET = (function(){
+  function fromTest(test, crit){
+    var c = crit.slice().sort(function(a, b){ return a - b; })
+                .filter(function(v, i, a){ return i === 0 || v !== a[i - 1]; });
+    if(!c.length) return test(0) ? [[null, null, false, false]] : [];
+    var regions = [{lo:null, hi:c[0], x:c[0] - 1}];
+    c.forEach(function(v, i){
+      var nx = c[i + 1];
+      regions.push({pt:true, lo:v, hi:v, x:v});
+      regions.push({lo:v, hi:(nx == null ? null : nx), x:(nx == null ? v + 1 : (v + nx) / 2)});
+    });
+    var out = [], cur = null;
+    regions.forEach(function(r){
+      if(test(r.x)){
+        if(!cur) cur = [r.lo, r.hi, !r.pt, !r.pt];
+        else { cur[1] = r.hi; cur[3] = !r.pt; }
+      }else if(cur){ out.push(cur); cur = null; }
+    });
+    if(cur) out.push(cur);
+    return out;
+  }
+
+  var SYM = {lt:"&lt;", le:"&le;", gt:"&gt;", ge:"&ge;"};
+  function rel(r, v){
+    return {lt:function(x){ return x < v; }, le:function(x){ return x <= v; },
+            gt:function(x){ return x > v; }, ge:function(x){ return x >= v; }}[r];
+  }
+
+  function fmt(P){
+    if(!P.length) return "no solution";
+    return P.map(function(p){
+      if(p[0] == null && p[1] == null) return "(&minus;&infin;, &infin;)";
+      if(p[0] != null && p[0] === p[1]) return "{" + num(p[0]) + "}";
+      var L = (p[0] == null) ? "(&minus;&infin;" : (p[2] ? "(" : "[") + num(p[0]);
+      var R = (p[1] == null) ? "&infin;)" : num(p[1]) + (p[3] ? ")" : "]");
+      return L + ", " + R;
+    }).join(" &cup; ");
+  }
+
+  /* "one piece" / "two pieces" / "no solution" / "all real numbers" */
+  function shape(P){
+    if(!P.length) return "no solution";
+    if(P.length === 1 && P[0][0] == null && P[0][1] == null) return "all real numbers";
+    if(P.length === 1 && P[0][0] != null && P[0][0] === P[0][1]) return "a single number";
+    return P.length === 1 ? "one piece" : "two pieces";
+  }
+
+  function has(P, x){
+    return P.some(function(p){
+      var okL = (p[0] == null) || (p[2] ? x > p[0] : x >= p[0]);
+      var okR = (p[1] == null) || (p[3] ? x < p[1] : x <= p[1]);
+      return okL && okR;
+    });
+  }
+
+  return {fromTest:fromTest, rel:rel, SYM:SYM, fmt:fmt, shape:shape, has:has};
+})();
+
+/* ---------------- number lines ----------------
+   One axis, with zero or more shaded pieces on it.
+
+     nline({ticks:[-1,4], pieces:[[-1,null,true,false]]})
+
+   A PIECE is [left, right, openLeft, openRight] in axis coordinates; null on a
+   side means the shading runs off that end. No pieces at all = the empty set.
+   A fifth entry of true draws the shading without its endpoint dots.
+   Returns an SVG string, so it drops straight into innerHTML.
+
+     ticks : key values, labelled bold. An entry may be [value, "label"].
+     grid  : small tick + light label at every integer (default on when the
+             axis spans 24 or fewer units), so a student can count along it
+     ghost : a value to mark with a dashed ring (an endpoint not yet decided)
+     pin   : {v, ok, label}  a marker above the axis for a tested number
+     arc   : {a, b, label}   a bracket above the axis, for a distance
+     cls   : "dim" for an input row, "ok" for a result worth colouring      */
+var NL = {W:560, PAD:26};
+function nlGeom(cfg){
+  var lo = (cfg.lo == null) ? -6 : cfg.lo;
+  var hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var span = NL.W - 2 * NL.PAD;
+  return {lo:lo, hi:hi, x:function(v){ return NL.PAD + (v - lo) / (hi - lo) * span; }};
+}
+/* the axis value under a click, from its horizontal fraction across the svg */
+function nlValueAt(cfg, frac){
+  var g = nlGeom(cfg);
+  return g.lo + (frac * NL.W - NL.PAD) / (NL.W - 2 * NL.PAD) * (g.hi - g.lo);
+}
+function nline(cfg){
+  var g = nlGeom(cfg), lo = g.lo, hi = g.hi, x = g.x, W = NL.W, PAD = NL.PAD;
+  var top = (cfg.pin || cfg.arc) ? 40 : 6;
+  var Y = top + 12, H = Y + 34, R = 7;
+  var s = '<svg class="nl' + (cfg.cls ? " " + cfg.cls : "") +
+          '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">';
+  s += '<line class="ax" x1="' + PAD + '" y1="' + Y + '" x2="' + (W - PAD) + '" y2="' + Y + '"/>';
+  s += '<polygon class="head" points="' + (PAD - 15) + ',' + Y + ' ' +
+       (PAD - 3) + ',' + (Y - 5.5) + ' ' + (PAD - 3) + ',' + (Y + 5.5) + '"/>';
+  s += '<polygon class="head" points="' + (W - PAD + 15) + ',' + Y + ' ' +
+       (W - PAD + 3) + ',' + (Y - 5.5) + ' ' + (W - PAD + 3) + ',' + (Y + 5.5) + '"/>';
+
+  var keys = (cfg.ticks || []).map(function(t){
+    return (t instanceof Array) ? {v:t[0], t:t[1]} : {v:t, t:num(t)};
+  });
+  var grid = (cfg.grid == null) ? (hi - lo <= 24) : cfg.grid;
+  if(grid){
+    for(var k = Math.ceil(lo); k <= Math.floor(hi); k++){
+      var near = keys.some(function(kk){ return Math.abs(kk.v - k) < 0.6; });
+      s += '<line class="tk minor" x1="' + x(k) + '" y1="' + (Y - 4) + '" x2="' + x(k) + '" y2="' + (Y + 4) + '"/>';
+      if(!near) s += '<text class="minor" x="' + x(k) + '" y="' + (Y + 24) + '">' + num(k) + '</text>';
+    }
+  }
+
+  /* ticks go under the shading, so an open circle stays visibly open */
+  keys.forEach(function(t){
+    s += '<line class="tk" x1="' + x(t.v) + '" y1="' + (Y - 6) + '" x2="' + x(t.v) +
+         '" y2="' + (Y + 6) + '"/>';
+  });
+
+  (cfg.pieces || []).forEach(function(p){
+    var a = (p[0] == null) ? PAD - 13 : x(p[0]);
+    var b = (p[1] == null) ? W - PAD + 13 : x(p[1]);
+    s += '<line class="seg" x1="' + a + '" y1="' + Y + '" x2="' + b + '" y2="' + Y + '"/>';
+  });
+  (cfg.pieces || []).forEach(function(p){
+    if(p[4]) return;                       /* [.., true] = shading only, no dots */
+    if(p[0] != null){
+      s += '<circle class="pt ' + (p[2] ? "open" : "closed") + '" cx="' + x(p[0]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+    if(p[1] != null && p[1] !== p[0]){
+      s += '<circle class="pt ' + (p[3] ? "open" : "closed") + '" cx="' + x(p[1]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+  });
+  if(cfg.ghost != null){
+    s += '<circle class="pt ghost" cx="' + x(cfg.ghost) + '" cy="' + Y + '" r="' + R + '"/>';
+  }
+
+  keys.forEach(function(t){
+    s += '<text class="key" x="' + x(t.v) + '" y="' + (Y + 25) + '">' + t.t + '</text>';
+  });
+
+  if(cfg.arc){
+    var xa = x(cfg.arc.a), xb = x(cfg.arc.b), ay = Y - 20;
+    s += '<path class="arc" d="M' + xa + ',' + (Y - 9) + ' V' + ay + ' H' + xb + ' V' + (Y - 9) + '"/>';
+    if(cfg.arc.label){
+      s += '<text class="arclbl" x="' + ((xa + xb) / 2) + '" y="' + (ay - 7) + '">' + cfg.arc.label + '</text>';
+    }
+  }
+  if(cfg.pin){
+    var px = x(Math.max(lo, Math.min(hi, cfg.pin.v)));
+    s += '<g class="pin ' + (cfg.pin.ok ? "yes" : "no") + '">' +
+         '<line x1="' + px + '" y1="' + (Y - 26) + '" x2="' + px + '" y2="' + (Y - 10) + '"/>' +
+         '<polygon points="' + (px - 6) + ',' + (Y - 12) + ' ' + (px + 6) + ',' + (Y - 12) + ' ' + px + ',' + (Y - 3) + '"/>' +
+         '<circle cx="' + px + '" cy="' + Y + '" r="4.5"/>';
+    if(cfg.pin.label) s += '<text x="' + px + '" y="' + (Y - 31) + '">' + cfg.pin.label + '</text>';
+    s += '</g>';
+  }
+  return s + '</svg>';
+}
+
+/* A labelled stack: input rows, a rule, then the result row.
+   rows = [[label, nlineCfg], ...]; the LAST row is the result.          */
+function nstack(host, rows){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var last = rows.length - 1;
+  host.innerHTML = rows.map(function(r, i){
+    var cfg = r[1] || {};
+    if(i < last && cfg.cls == null) cfg.cls = "dim";
+    var none = (i === last) && !(cfg.pieces && cfg.pieces.length);
+    return '<div class="nlrow' + (i === last ? " res" : "") + '">' +
+           '<span class="lbl' + (none ? " none" : "") + '">' + r[0] + '</span>' +
+           nline(cfg) + '</div>';
+  }).join("");
+}
+
+/* ---------------- worked examples, one line at a time ----------------
+   <div class="walk">
+     <div class="walk-q"><span class="m">2x + 3 &gt; 7</span></div>
+     <ol class="walk-steps">
+       <li><span class="m">2x &gt; 4</span><span class="why">Subtract 3.</span></li>
+     </ol>
+   </div>
+   Lines stay hidden until asked for, so a student can try each one on paper
+   first.                                                                 */
+function walks(){
+  $$(".walk").forEach(function(w){
+    var steps = $$(".walk-steps > li", w);
+    if(!steps.length) return;
+    var shown = 0;
+    var bar = el("div", "walk-ctrls");
+    var nextB = el("button", "btn on", ""); nextB.type = "button";
+    var allB = el("button", "btn", "Show all"); allB.type = "button";
+    var hint = el("span", "walk-hint", "");
+    bar.appendChild(nextB); bar.appendChild(allB); bar.appendChild(hint);
+    w.appendChild(bar);
+    function paint(){
+      steps.forEach(function(li, i){ li.style.display = (i < shown) ? "" : "none"; });
+      var done = shown >= steps.length;
+      nextB.textContent = done ? "Start over" : (shown ? "Next step" : "Show first step");
+      allB.style.display = done ? "none" : "";
+      hint.textContent = done ? "Could you do it again without looking?"
+                              : shown + " of " + steps.length + " steps shown. Try the next one on paper first.";
+    }
+    nextB.addEventListener("click", function(){
+      shown = (shown >= steps.length) ? 0 : shown + 1; paint();
+    });
+    allB.addEventListener("click", function(){ shown = steps.length; paint(); });
+    paint();
+  });
+}
+
+/* ---------------- quick-fire drill ----------------
+   drill("#host", {
+     items   : [{m, a, why}]          a = the key of the right choice
+     choices : [{k, t}]               the buttons
+     end     : "closing line"
+   })                                                                   */
+function drill(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.classList.add("drill");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='drill-q m'></div><div class='drill-btns'></div><div class='drill-fb'></div>";
+  var q = $(".drill-q", host), fb = $(".drill-fb", host), cnt = $(".count", host);
+  var pips = $(".pips", host), btns = $(".drill-btns", host);
+  var i = 0, marks = [], label = {};
+  var choiceBtns = cfg.choices.map(function(c){
+    label[c.k] = c.t;
+    var b = el("button", "btn", c.t); b.type = "button";
+    b.addEventListener("click", function(){ answer(c.k); });
+    btns.appendChild(b);
+    return b;
+  });
+  var nextB = el("button", "btn on", "Next"); nextB.type = "button";
+  btns.appendChild(nextB);
+  nextB.addEventListener("click", function(){
+    if(i === cfg.items.length - 1){ i = 0; marks = []; } else { i++; }
+    draw();
+  });
+
+  function drawPips(){
+    pips.innerHTML = "";
+    cfg.items.forEach(function(_, k){
+      pips.appendChild(el("span", "pip" +
+        (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") + (k === i ? " now" : "")));
+    });
+  }
+  function draw(){
+    q.innerHTML = cfg.items[i].m;
+    cnt.textContent = (i + 1) + " of " + cfg.items.length;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    choiceBtns.forEach(function(b){ b.disabled = false; b.classList.remove("right", "wrongpick"); });
+    nextB.style.display = "none";
+    drawPips();
+  }
+  function answer(k){
+    var it = cfg.items[i], right = (k === it.a);
+    if(marks[i] === undefined) marks[i] = right;
+    choiceBtns.forEach(function(b, j){
+      b.disabled = true;
+      var ck = cfg.choices[j].k;
+      if(ck === it.a) b.classList.add("right");
+      else if(ck === k) b.classList.add("wrongpick");
+    });
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not this one &mdash; it's <strong>" + label[it.a] + "</strong>. ") + it.why;
+    var lastOne = (i === cfg.items.length - 1);
+    nextB.textContent = lastOne ? "Start again" : "Next";
+    nextB.style.display = "";
+    if(lastOne){
+      var n = marks.filter(function(v){ return v; }).length;
+      fb.innerHTML += "<div class='drill-end'>" + n + " of " + cfg.items.length +
+        " right first time. " + (cfg.end || "") + "</div>";
+    }
+    drawPips();
+  }
+  draw();
+}
+
+/* ---------------- test-a-number ----------------
+   tester("#host", {
+     problems : [{label, set, ticks, test(x) -> {html, ok}}]
+     lo, hi, step, start
+     hidden   : true = the shading starts hidden, so the student predicts it
+   })
+   A slider (or a click on the line) moves a pin; the page substitutes that
+   number and says whether it lands in the set.                          */
+function tester(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var pi = 0, xv = (cfg.start == null) ? 0 : cfg.start, show = !cfg.hidden;
+  var lo = (cfg.lo == null) ? -6 : cfg.lo, hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var step = cfg.step || 0.5;
+  host.classList.add("tester");
+  host.innerHTML =
+    (cfg.problems.length > 1 ? "<div class='ctrls tp-probs'></div>" : "") +
+    "<div class='tp-line'></div>" +
+    "<div class='tp-slide'><span class='ctrl-label'>Move the point</span>" +
+      "<input type='range' min='" + lo + "' max='" + hi + "' step='" + step + "' value='" + xv +
+      "' aria-label='the number to test'></div>" +
+    "<div class='tp-out'></div>" +
+    "<div class='ctrls'><button type='button' class='btn tp-show'></button></div>";
+  var probs = $(".tp-probs", host), lineEl = $(".tp-line", host);
+  var range = $("input", host), out = $(".tp-out", host), showB = $(".tp-show", host);
+
+  if(probs){
+    probs.appendChild(el("span", "ctrl-label", "Inequality"));
+    cfg.problems.forEach(function(p, i){
+      var b = el("button", "btn" + (i === 0 ? " on" : ""), "<span class='m'>" + p.label + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){
+        $$(".btn", probs).forEach(function(o){ o.classList.remove("on"); });
+        b.classList.add("on"); pi = i; show = !cfg.hidden; draw();
+      });
+      probs.appendChild(b);
+    });
+  }
+  function lineCfg(){
+    var p = cfg.problems[pi];
+    return {lo:lo, hi:hi, ticks:p.ticks || [], pieces:show ? p.set : [], cls:"ok",
+            pin:{v:xv, ok:p.test(xv).ok, label:"x = " + num(xv, true)}};
+  }
+  function draw(){
+    var p = cfg.problems[pi], r = p.test(xv), n = num(xv, true);
+    lineEl.innerHTML = nline(lineCfg());
+    out.className = "tp-out " + (r.ok ? "yes" : "no");
+    out.innerHTML = "<span class='m'>" + r.html + "</span>" +
+      "<span class='tp-verdict'>" + (r.ok ? "true, so " + n + " is in the set"
+                                          : "false, so " + n + " is not in the set") + "</span>";
+    showB.textContent = show ? "Hide the shading" : "Show every number that works";
+  }
+  range.addEventListener("input", function(){ xv = parseFloat(range.value); draw(); });
+  lineEl.addEventListener("click", function(e){
+    var svg = $("svg", lineEl); if(!svg) return;
+    var r = svg.getBoundingClientRect();
+    var v = Math.round(nlValueAt(lineCfg(), (e.clientX - r.left) / r.width) / step) * step;
+    xv = Math.max(lo, Math.min(hi, v)); range.value = xv; draw();
+  });
+  showB.addEventListener("click", function(){ show = !show; draw(); });
+  draw();
+}
+
+return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
+        root: root, num: num, SET: SET, nline: nline, nlValueAt: nlValueAt,
+        nstack: nstack, walks: walks, drill: drill, tester: tester, init: init};
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var $ = EXP.$, $$ = EXP.$$, num = EXP.num;
+
+var X = "<i>x</i>", Y = "<i>y</i>", F = "<i>f</i>";
+function sup(n){ return "<sup>" + n + "</sup>"; }
+function cbrt(x){ return x < 0 ? -Math.pow(-x, 1 / 3) : Math.pow(x, 1 / 3); }
+
+/* ---- writing equations ----------------------------------------------- */
+/* x − h, read the way it's written: h = -3 gives "x + 3" */
+function inner(h){ return !h ? X : X + (h > 0 ? " − " + h : " + " + (-h)); }
+/* + k, or − k, or nothing */
+function plus(k){ return !k ? "" : (k > 0 ? " + " + num(k) : " − " + num(-k)); }
+/* the number in front: 1 is invisible, −1 is just a minus */
+function coef(a){ return a === 1 ? "" : a === -1 ? "−" : num(a); }
+/* a point, as text */
+function pt(x, y){ return "(" + num(x) + ", " + num(y) + ")"; }
+
+/* the parents. eq(h) is the parent with x − h inside */
+var PAR = {
+  lin:  {f:function(x){ return x; },      eq:function(h){ return inner(h); },
+         pts:[[-1,-1],[0,0],[1,1]]},
+  sq:   {f:function(x){ return x * x; },  eq:function(h){ return h ? "(" + inner(h) + ")" + sup(2) : X + sup(2); },
+         pts:[[-2,4],[-1,1],[0,0],[1,1],[2,4]], nm:"x²"},
+  abs:  {f:Math.abs,                      eq:function(h){ return "|" + inner(h) + "|"; },
+         pts:[[-2,2],[-1,1],[0,0],[1,1],[2,2]], nm:"|x|"},
+  sqrt: {f:Math.sqrt, from:0,             eq:function(h){ return EXP.root(inner(h)); },
+         pts:[[0,0],[1,1],[4,2],[9,3]], nm:"√x"},
+  cube: {f:function(x){ return x * x * x; }, eq:function(h){ return h ? "(" + inner(h) + ")" + sup(3) : X + sup(3); },
+         pts:[[-1,-1],[0,0],[1,1]], nm:"x³"},
+  cbrt: {f:cbrt,                          eq:function(h){ return EXP.root(inner(h), 3); },
+         pts:[[-8,-2],[-1,-1],[0,0],[1,1],[8,2]], nm:"∛x"}
+};
+/* y = a·f(x − h) + k, as a function and as HTML */
+function tf(p, a, h, k){
+  var P = PAR[p];
+  return function(x){ return a * P.f(x - h) + k; };
+}
+function teq(p, a, h, k){ return Y + " = " + coef(a) + PAR[p].eq(h) + plus(k); }
+/* where a square root graph begins */
+function tdom(p, h){ return PAR[p].from != null ? [PAR[p].from + h, Infinity] : null; }
+
+/* ---- drawing ----------------------------------------------------------
+   graph({x:[lo,hi], y:[lo,hi], w, lab, curves:[{f, dom, cls} | {poly:[[x,y]..], cls}],
+          pts:[{x, y, cls, lb, dx, dy}], moves:[[x1,y1,x2,y2]], alt})
+   Units are equal on both axes, so shapes are true. Curves are clipped to
+   the window; a curve breaks wherever f has no value.                    */
+var GID = 0;
+function graph(c){
+  var x0 = c.x[0], x1 = c.x[1], y0 = c.y[0], y1 = c.y[1];
+  var W = c.w || 320, P = 14, u = (W - 2 * P) / (x1 - x0), H = Math.round(2 * P + u * (y1 - y0));
+  function px(x){ return +(P + (x - x0) * u).toFixed(2); }
+  function py(y){ return +(P + (y1 - y) * u).toFixed(2); }
+  var id = "gclip" + (++GID), s = "", i;
+  s += "<defs><clipPath id='" + id + "'><rect x='" + P + "' y='" + P + "' width='" + (W - 2 * P) +
+       "' height='" + (H - 2 * P) + "'/></clipPath></defs>";
+  for(i = Math.ceil(x0); i <= x1; i++)
+    s += "<line class='gp-g' x1='" + px(i) + "' y1='" + py(y0) + "' x2='" + px(i) + "' y2='" + py(y1) + "'/>";
+  for(i = Math.ceil(y0); i <= y1; i++)
+    s += "<line class='gp-g' x1='" + px(x0) + "' y1='" + py(i) + "' x2='" + px(x1) + "' y2='" + py(i) + "'/>";
+  if(y0 <= 0 && y1 >= 0) s += "<line class='gp-a' x1='" + px(x0) + "' y1='" + py(0) + "' x2='" + px(x1) + "' y2='" + py(0) + "'/>";
+  if(x0 <= 0 && x1 >= 0) s += "<line class='gp-a' x1='" + px(0) + "' y1='" + py(y0) + "' x2='" + px(0) + "' y2='" + py(y1) + "'/>";
+  var lab = (c.lab == null) ? 2 : c.lab;
+  if(lab){
+    for(i = Math.ceil(x0); i <= x1; i++){
+      if(!i || i % lab || i === x0 || i === x1) continue;
+      s += "<text class='gp-t' x='" + px(i) + "' y='" + (py(0) + 13) + "'>" + num(i) + "</text>";
+    }
+    for(i = Math.ceil(y0); i <= y1; i++){
+      if(!i || i % lab || i === y0 || i === y1) continue;
+      s += "<text class='gp-t' x='" + (px(0) - 10) + "' y='" + (py(i) + 4) + "'>" + num(i) + "</text>";
+    }
+  }
+  (c.curves || []).forEach(function(cv){
+    var d = "";
+    if(cv.poly){
+      d = cv.poly.map(function(q, j){ return (j ? "L" : "M") + px(q[0]) + "," + py(q[1]); }).join("");
+    }else{
+      var a = Math.max(x0 - 1, cv.dom ? cv.dom[0] : -Infinity), b = Math.min(x1 + 1, cv.dom ? cv.dom[1] : Infinity);
+      var n = 360, pen = false, k, x, y;
+      for(k = 0; k <= n; k++){
+        x = a + (b - a) * k / n; y = cv.f(x);
+        if(isFinite(y) && Math.abs(y) < 1e4){
+          d += (pen ? "L" : "M") + px(x) + "," + py(y); pen = true;
+        }else pen = false;
+      }
+    }
+    s += "<path class='" + (cv.cls || "gp-new") + "' clip-path='url(#" + id + ")' d='" + d + "'/>";
+  });
+  (c.moves || []).forEach(function(m){
+    s += "<line class='gp-mv' clip-path='url(#" + id + ")' x1='" + px(m[0]) + "' y1='" + py(m[1]) +
+         "' x2='" + px(m[2]) + "' y2='" + py(m[3]) + "'/>";
+  });
+  (c.pts || []).forEach(function(q){
+    if(q.x < x0 || q.x > x1 || q.y < y0 || q.y > y1) return;
+    s += "<circle class='" + (q.cls || "gp-pn") + "' cx='" + px(q.x) + "' cy='" + py(q.y) + "' r='" + (q.cls === "gp-pp" ? 3.6 : 4.2) + "'/>";
+    if(q.lb) s += "<text class='gp-lb' x='" + (px(q.x) + (q.dx == null ? 7 : q.dx)) + "' y='" + (py(q.y) + (q.dy == null ? -7 : q.dy)) +
+                  "' text-anchor='" + (q.anchor || "start") + "'>" + q.lb + "</text>";
+  });
+  return "<svg class='gp' viewBox='0 0 " + W + " " + H + "' role='img' aria-label='" + (c.alt || "graph") + "'>" + s + "</svg>";
+}
+
+/* parent dashed, transformed solid, with each key point's move drawn */
+function pair(p, a, h, k, win, opt){
+  opt = opt || {};
+  var P = PAR[p], pts = [], moves = [];
+  P.pts.forEach(function(q){
+    var nx = q[0] + h, ny = a * q[1] + k;
+    if(opt.moves !== false && (nx !== q[0] || ny !== q[1])){
+      pts.push({x:q[0], y:q[1], cls:"gp-pp"});
+      moves.push([q[0], q[1], nx, ny]);
+    }
+    pts.push({x:nx, y:ny});
+  });
+  return graph({x:win.x, y:win.y, w:win.w, lab:win.lab,
+    curves:[{f:P.f, dom:tdom(p, 0), cls:"gp-par"}, {f:tf(p, a, h, k), dom:tdom(p, h)}],
+    pts:pts, moves:moves,
+    alt:"dashed parent y = " + P.nm + " and the transformed graph"});
+}
+function cap(fig, html){ return fig + "<div class='gcap'>" + html + "</div>"; }
+
+/* ---- the fixed figures --------------------------------------------------- */
+var FIGS = {
+  up: cap(pair("sq", 1, 0, 3, {x:[-4, 4], y:[-1, 8]}),
+          "Dashed: <span class='m'>" + Y + " = " + X + sup(2) + "</span>. Solid: <span class='m'>" + teq("sq", 1, 0, 3) + "</span>. Every point up 3."),
+  absDown: pair("abs", 1, 0, -2, {x:[-4, 4], y:[-3, 4]}),
+  right: cap(pair("sq", 1, 2, 0, {x:[-3, 5], y:[-1, 6]}),
+          "Dashed: <span class='m'>" + Y + " = " + X + sup(2) + "</span>. Solid: <span class='m'>" + teq("sq", 1, 2, 0) + "</span>. Every point right 2."),
+  sqLeft: pair("sq", 1, -3, 0, {x:[-7, 2], y:[-1, 6]})
+};
+$$("[data-g]").forEach(function(h){ h.innerHTML = FIGS[h.getAttribute("data-g")]; });
+
+/* the six parent cards: each window fits its key points, and every point is
+   labelled on the graph. A label sits where the curve isn't:
+   [x, y, spot, dx?], spot one of l r al ar bl br (left, right, above-, below-);
+   dx, when given, pushes the label further sideways, e.g. clear of an axis. */
+var SPOT = {l:[-8, 4, "end"], r:[8, 4, "start"], al:[-7, -6, "end"], ar:[7, -6, "start"],
+            bl:[-7, 16, "end"], br:[7, 16, "start"]};
+var CARDS = [
+  ["lin",  "A straight line through (0, 0).", {x:[-4, 4], y:[-3, 3]},
+           [[-1, -1, "al"], [0, 0, "br"], [1, 1, "br"]]],
+  ["sq",   "A U shape. Vertex (0, 0).", {x:[-4, 4], y:[-1, 5]},
+           [[-2, 4, "l"], [-1, 1, "l"], [0, 0, "br"], [1, 1, "r"], [2, 4, "r"]]],
+  ["abs",  "A V shape. Corner (0, 0).", {x:[-4, 4], y:[-1, 4]},
+           [[-2, 2, "bl"], [-1, 1, "bl"], [0, 0, "br"], [1, 1, "br"], [2, 2, "br"]]],
+  ["cube", "Low on the left, high on the right. Flat for a moment at (0, 0).", {x:[-4, 4], y:[-3, 3]},
+           [[-1, -1, "al"], [0, 0, "br"], [1, 1, "br"]]],
+  ["sqrt", "Starts at (0, 0) and only goes right.", {x:[-1, 12], y:[-1, 4]},
+           [[0, 0, "br"], [1, 1, "br"], [4, 2, "br"], [9, 3, "br"]]],
+  ["cbrt", "A cube root graph lying on its side. Goes both ways.", {x:[-9, 9], y:[-4, 4]},
+           [[-8, -2, "br"], [-1, -1, "br", 26], [0, 0, "al"], [1, 1, "br"], [8, 2, "al"]]]
+];
+function card(c){
+  var p = c[0], win = c[2];
+  return graph({x:win.x, y:win.y, w:360, lab:0,
+    curves:[{f:PAR[p].f, dom:tdom(p, 0)}],
+    pts:c[3].map(function(q){
+      var s = SPOT[q[2]];
+      return {x:q[0], y:q[1], lb:pt(q[0], q[1]), dx:(q[3] == null ? s[0] : q[3]), dy:s[1], anchor:s[2]};
+    }), alt:"y = " + (PAR[p].nm || "x") + ", with its key points labelled"});
+}
+function mini(p, w){
+  var P = PAR[p];
+  return graph({x:[-5, 5], y:[-5, 5], w:w || 200, lab:0,
+    curves:[{f:P.f, dom:tdom(p, 0)}],
+    pts:P.pts.map(function(q){ return {x:q[0], y:q[1]}; }), alt:"y = " + (P.nm || "x")});
+}
+$("#parents").innerHTML = CARDS.map(function(c){
+  return "<div class='pcard'>" + card(c) + "<span class='pc-eq m'>" + teq(c[0], 1, 0, 0) + "</span>" +
+         "<div class='pc-d'>" + c[1] + "</div></div>";
+}).join("");
+
+EXP.init({
+  storeKey: "m1200-graphs-01",
+  inline: ["n1","n2","c4","c1","c2"],
+  quiz:   ["q10","q7","q11","q12","q9","q13"],
+
+  checks: {
+    n1: { opts:[
+      {t:"(−3, 9)", ok:true, fb:"Right. Put in −3: <i>f</i>(−3) = (−3)<sup>2</sup> = 9. A negative squared is positive."},
+      {t:"(−3, −9)", fb:"Put in −3: (−3)<sup>2</sup> = (−3)(−3) = 9. A negative squared is positive, so <i>y</i> is 9."},
+      {t:"(9, 3)", fb:"The <i>x</i> comes first. Put in 9 and you get <i>f</i>(9) = 81, not 3."},
+      {t:"(3, 6)", fb:"3<sup>2</sup> means 3 · 3 = 9, not 3 · 2 = 6."}
+    ]},
+    n2: { opts:[
+      {t:"<i>y</i> = |<i>x</i> + 2|", ok:true, fb:"Right. Put <i>x</i> + 2 in where <i>x</i> was, so the + 2 goes inside the bars."},
+      {t:"<i>y</i> = |<i>x</i>| + 2", fb:"That's <i>f</i>(<i>x</i>) + 2: work out |<i>x</i>|, then add 2. Here the + 2 is in the brackets, so it goes inside the bars."},
+      {t:"<i>y</i> = |<i>x</i> − 2|", fb:"That's <i>f</i>(<i>x</i> − 2). Copy what's in the brackets exactly: <i>x</i> + 2."},
+      {t:"<i>y</i> = |<i>x</i>| − 2", fb:"That's <i>f</i>(<i>x</i>) − 2, with the 2 outside and the sign changed."}
+    ]},
+    c4: { opts:[
+      {t:"(4, 2)", ok:true, fb:"Right. The + 1 is inside, so <i>x</i> goes the opposite way: 5 − 1 = 4. Check: <i>f</i>(4 + 1) = <i>f</i>(5) = 2."},
+      {t:"(6, 2)", fb:"Inside goes the opposite way. + 1 inside subtracts 1 from <i>x</i>: 5 − 1 = 4."},
+      {t:"(5, 3)", fb:"That's <i>f</i>(<i>x</i>) + 1, with the 1 outside. Inside changes <i>x</i>, not <i>y</i>."},
+      {t:"(5, 1)", fb:"A number inside changes <i>x</i>, not <i>y</i>."}
+    ]},
+    c1: { opts:[
+      {t:"up 4", ok:true, fb:"Right. The +4 is outside the root, so every <i>y</i>-value goes up 4. It starts at (0, 4)."},
+      {t:"down 4", fb:"Outside does what it says: +4 is up."},
+      {t:"left 4", fb:"That would be √(<i>x</i> + 4), with the 4 inside the root."},
+      {t:"right 4", fb:"That would be √(<i>x</i> − 4), with the 4 inside the root."}
+    ]},
+    c2: { opts:[
+      {t:"right 5", ok:true, fb:"Right. <i>x</i> − 5 = 0 at <i>x</i> = 5, so the corner moves to (5, 0)."},
+      {t:"left 5", fb:"Inside goes opposite the sign. <i>x</i> − 5 = 0 at <i>x</i> = 5, which is to the right."},
+      {t:"down 5", fb:"That would be |<i>x</i>| − 5, with the 5 outside."},
+      {t:"up 5", fb:"The 5 is inside the bars, so it moves the graph sideways."}
+    ]},
+
+    q7: { ask:"Compared with <span class='m'><i>y</i> = <i>x</i><sup>3</sup></span>, the graph of <span class='m'><i>y</i> = (<i>x</i> + 6)<sup>3</sup></span> is moved", m:"", opts:[
+      {t:"left 6", ok:true, fb:"<i>x</i> + 6 = 0 at <i>x</i> = −6. Inside goes opposite the sign."},
+      {t:"right 6", fb:"Inside goes opposite the sign: <i>x</i> + 6 = 0 at <i>x</i> = −6, on the left. See section 5."},
+      {t:"up 6", fb:"The 6 is inside the bracket, so it moves the graph sideways. See section 5."},
+      {t:"down 6", fb:"The 6 is inside the bracket, so it moves the graph sideways. See section 5."}
+    ]},
+    q9: { ask:"Which equation is <span class='m'><i>y</i> = <i>x</i><sup>2</sup></span> moved down 5?", m:"", opts:[
+      {t:"<i>y</i> = <i>x</i><sup>2</sup> − 5", ok:true, fb:"Up and down go outside, as they are: − 5."},
+      {t:"<i>y</i> = (<i>x</i> − 5)<sup>2</sup>", fb:"A number inside moves it sideways: that's right 5. See section 6."},
+      {t:"<i>y</i> = (<i>x</i> + 5)<sup>2</sup>", fb:"A number inside moves it sideways: that's left 5. See section 6."},
+      {t:"<i>y</i> = <i>x</i><sup>2</sup> + 5", fb:"Outside does what it says: + 5 is up. Down needs − 5. See section 4."}
+    ]},
+    q10: { ask:"<i>f</i> passes through (2, −1). Which point is on", m:"<i>y</i> = <i>f</i>(<i>x</i> − 4)", opts:[
+      {t:"(6, −1)", ok:true, fb:"Inside goes the opposite way: − 4 adds 4 to <i>x</i>. Check: <i>f</i>(6 − 4) = <i>f</i>(2) = −1."},
+      {t:"(−2, −1)", fb:"That subtracts 4, the same way as the sign. Inside goes the opposite way. See section 3."},
+      {t:"(2, −5)", fb:"That's <i>f</i>(<i>x</i>) − 4, with the 4 outside. Inside changes <i>x</i>. See section 3."},
+      {t:"(2, 3)", fb:"A number inside changes <i>x</i>, not <i>y</i>. See section 3."}
+    ]},
+    q11: { ask:"<i>f</i> passes through (3, 4). Which point is on", m:"<i>y</i> = <i>f</i>(<i>x</i>) − 6", opts:[
+      {t:"(3, −2)", ok:true, fb:"Outside, the same way: 4 − 6 = −2. <i>x</i> stays."},
+      {t:"(9, 4)", fb:"The − 6 is outside, so it changes <i>y</i>. See section 4."},
+      {t:"(−3, 4)", fb:"The − 6 is outside, so it changes <i>y</i>, not <i>x</i>. See section 4."},
+      {t:"(3, 10)", fb:"Outside goes the same way as the sign: − 6 is down. See section 4."}
+    ]},
+    q12: { ask:"The dashed graph is <span class='m'><i>y</i> = |<i>x</i>|</span>. The solid one is",
+           m: graph({x:[-3, 6], y:[-1, 5], w:260, curves:[{f:PAR.abs.f, cls:"gp-par"}, {f:tf("abs", 1, 3, 0)}],
+                     pts:[{x:3, y:0}], alt:"a V with its corner at (3, 0)"}),
+           opts:[
+      {t:"<i>y</i> = |<i>x</i> − 3|", ok:true, fb:"The corner moved right 3, to (3, 0). Right is inside, with a minus."},
+      {t:"<i>y</i> = |<i>x</i> + 3|", fb:"<i>x</i> + 3 = 0 at <i>x</i> = −3, on the left. Right needs a minus. See section 5."},
+      {t:"<i>y</i> = |<i>x</i>| − 3", fb:"That moves it down 3. The corner is still on the <i>x</i>-axis. See section 4."},
+      {t:"<i>y</i> = |<i>x</i>| + 3", fb:"That moves it up 3. The corner is still on the <i>x</i>-axis. See section 4."}
+    ]},
+    q13: { ask:"Which equation is <span class='m'><i>y</i> = <i>x</i><sup>3</sup></span> moved up 4?", m:"", opts:[
+      {t:"<i>y</i> = <i>x</i><sup>3</sup> + 4", ok:true, fb:"Up goes outside, as it is: + 4."},
+      {t:"<i>y</i> = (<i>x</i> + 4)<sup>3</sup>", fb:"Inside moves it sideways: that's left 4. See section 6."},
+      {t:"<i>y</i> = (<i>x</i> − 4)<sup>3</sup>", fb:"Inside moves it sideways: that's right 4. See section 6."},
+      {t:"<i>y</i> = <i>x</i><sup>3</sup> − 4", fb:"Outside does what it says: − 4 is down. See section 4."}
+    ]}
+  },
+
+  verdicts: {
+    all:"All six. Shifts are done. Part 2 uses the same rule for flips and stretches.",
+    most:"Close. Redo the misses on paper, using the section each one names.",
+    few:"Go back to section 3, then redo the drill in section 5."
+  },
+
+  traps: [
+    {bad:"<i>y</i> = (<i>x</i> + 3)<sup>2</sup> moves <i>y</i> = <i>x</i><sup>2</sup> right 3", badge:"Wrong",
+     why:"Inside goes opposite the sign. The inside is 0 at <i>x</i> = −3, so the vertex is on the left.",
+     sub:"x = −3 and x = 3", verdict:"the vertex is at x = −3",
+     left:{lbl:"(x + 3)² at x = −3", val:"0"},
+     right:{lbl:"(x + 3)² at x = 3", val:"36"}},
+    {bad:"<i>y</i> = <i>x</i><sup>2</sup> − 4 is <i>y</i> = <i>x</i><sup>2</sup> moved right 4", badge:"Wrong",
+     why:"The − 4 is outside, so it moves the graph down 4. Right 4 is (<i>x</i> − 4)<sup>2</sup>, with the 4 inside.",
+     sub:"x = 0", verdict:"not equal",
+     left:{lbl:"x² − 4 at x = 0", val:"−4"},
+     right:{lbl:"(x − 4)² at x = 0", val:"16"}},
+    {bad:"<i>y</i> = √<span class='rad'><i>x</i> − 2</span> and <i>y</i> = √<span class='rad'><i>x</i></span> − 2 are the same graph", badge:"Wrong",
+     why:"Inside moves sideways, outside moves up and down. The first starts at (2, 0); the second starts at (0, −2).",
+     sub:"x = 0", verdict:"different graphs",
+     left:{lbl:"√(x − 2) at x = 0", val:"√(−2): no value"},
+     right:{lbl:"√x − 2 at x = 0", val:"−2"}}
+  ]
+});
+
+EXP.walks();
+
+/* ---- name the parent ---- */
+EXP.drill("#drParents", {
+  items: [
+    {m:mini("cbrt", 260), a:"cbrt", why:"It goes both ways and lies on its side, through (1, 1) and (8, 2). The square root stops at (0, 0)."},
+    {m:mini("sq", 260),   a:"sq",   why:"A U with a rounded bottom at (0, 0)."},
+    {m:mini("sqrt", 260), a:"sqrt", why:"It starts at (0, 0) and only goes right: there's no square root of a negative number."},
+    {m:mini("abs", 260),  a:"abs",  why:"A V with a sharp corner at (0, 0)."},
+    {m:mini("cube", 260), a:"cube", why:"Low on the left, high on the right, flat for a moment at (0, 0)."},
+    {m:mini("lin", 260),  a:"lin",  why:"A straight line through (0, 0), up 1 for every 1 across."}
+  ],
+  choices: ["lin", "sq", "cube", "abs", "sqrt", "cbrt"].map(function(p){
+    return {k:p, t:"<span class='m'>" + teq(p, 1, 0, 0) + "</span>"};
+  }),
+  end: "These six shapes are the start of every problem."
+});
+
+/* ---- which way? ---- */
+EXP.drill("#drWhich", {
+  items: [
+    {m:teq("sq", 1, 0, 6),    a:"up",    why:"+6 is outside: up 6."},
+    {m:teq("sq", 1, 6, 0),    a:"right", why:"<i>x</i> − 6 = 0 at <i>x</i> = 6: right 6."},
+    {m:teq("abs", 1, -1, 0),  a:"left",  why:"<i>x</i> + 1 = 0 at <i>x</i> = −1: left 1."},
+    {m:teq("sqrt", 1, 0, -3), a:"down",  why:"−3 is outside the root: down 3."},
+    {m:teq("cube", 1, -2, 0), a:"left",  why:"<i>x</i> + 2 = 0 at <i>x</i> = −2: left 2."},
+    {m:teq("cbrt", 1, 4, 0),  a:"right", why:"<i>x</i> − 4 = 0 at <i>x</i> = 4: right 4."},
+    {m:teq("abs", 1, 0, -7),  a:"down",  why:"−7 is outside the bars: down 7."},
+    {m:teq("cube", 1, 0, 1),  a:"up",    why:"+1 is outside: up 1."}
+  ],
+  choices: [{k:"up", t:"up"}, {k:"down", t:"down"}, {k:"left", t:"left"}, {k:"right", t:"right"}],
+  end: "Inside goes opposite the sign; outside does what it says."
+});
+
+/* ---- stepped practice ----------------------------------------------------
+   ladder(host, items, {wide, end, goal})
+   items: [{m, parts:[{ask, opts:[right first, ...], why}]}]
+   Options are authored right-first and shuffled here.                       */
+function ladder(sel, items, cfg){
+  var host = $(sel); if(!host) return;
+  cfg = cfg || {};
+  host.className = "drill" + (cfg.wide ? " wide" : "");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='ld-goal'></div><div class='ld-q m'></div><div class='ld-done'></div><div class='ld-ask'></div>" +
+    "<div class='ld-opts'></div><div class='drill-fb'></div><div class='ld-final'></div>" +
+    "<div class='drill-btns'><button type='button' class='btn on ld-next'></button></div>";
+  var goalEl = $(".ld-goal", host), finEl = $(".ld-final", host), qEl = $(".ld-q", host), doneEl = $(".ld-done", host), askEl = $(".ld-ask", host),
+      optsEl = $(".ld-opts", host), fb = $(".drill-fb", host), cnt = $(".count", host),
+      pips = $(".pips", host), next = $(".ld-next", host);
+  var i = 0, p = 0, clean = true, marks = [];
+
+  function shuffled(n){
+    var a = [], j, t, k;
+    for(k = 0; k < n; k++) a.push(k);
+    for(k = n - 1; k > 0; k--){ j = Math.floor(Math.random() * (k + 1)); t = a[k]; a[k] = a[j]; a[j] = t; }
+    return a;
+  }
+  function drawPips(){
+    pips.innerHTML = "";
+    items.forEach(function(_, k){
+      pips.appendChild(EXP.el("span", "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
+                                     (k === i ? " now" : "")));
+    });
+  }
+  function drawItem(){
+    p = 0; clean = true;
+    goalEl.innerHTML = items[i].goal || cfg.goal || "";
+    qEl.innerHTML = items[i].m;
+    doneEl.innerHTML = "";
+    finEl.innerHTML = "";
+    cnt.textContent = "Problem " + (i + 1) + " of " + items.length;
+    drawPips();
+    drawPart();
+  }
+  function drawPart(){
+    var it = items[i], part = it.parts[p], n = it.parts.length;
+    askEl.innerHTML = (n > 1 ? "<span class='ld-step'>Step " + (p + 1) + " of " + n + "</span>" : "") + part.ask;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    next.style.display = "none";
+    optsEl.innerHTML = "";
+    shuffled(part.opts.length).forEach(function(k){
+      var b = EXP.el("button", "ldbtn", part.opts[k]);
+      b.type = "button"; b._k = k;
+      b.addEventListener("click", function(){ answer(k, b); });
+      optsEl.appendChild(b);
+    });
+  }
+  function answer(k, b){
+    var it = items[i], part = it.parts[p], right = (k === 0), last = (p === it.parts.length - 1);
+    if(!right) clean = false;
+    $$(".ldbtn", optsEl).forEach(function(c){ c.disabled = true; if(c._k === 0) c.classList.add("right"); });
+    if(!right) b.classList.add("wrongpick");
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not quite. ") + part.why;
+    if(last){
+      if(it.done) finEl.innerHTML = "<span class='lbl'>" + (it.doneLbl || cfg.doneLbl || "Finished") +
+        "</span><span class='m'>" + it.done + "</span>";
+      if(marks[i] === undefined) marks[i] = clean;
+      drawPips();
+      if(i === items.length - 1){
+        var got = marks.filter(function(v){ return v; }).length;
+        fb.innerHTML += "<div class='drill-end'>" + got + " of " + items.length + " right first time. " + (cfg.end || "") + "</div>";
+      }
+    }
+    next.textContent = !last ? "Next step" : (i < items.length - 1 ? "Next problem" : "Start again");
+    next.style.display = "";
+  }
+  next.addEventListener("click", function(){
+    var it = items[i];
+    if(p < it.parts.length - 1){
+      doneEl.insertAdjacentHTML("beforeend", "<div class='ld-line'><span>" + it.parts[p].ask +
+        "</span><span class='m'>" + it.parts[p].opts[0] + "</span></div>");
+      p++; drawPart();
+    }else{
+      if(i < items.length - 1) i++; else { i = 0; marks = []; }
+      drawItem();
+    }
+  });
+  drawItem();
+}
+function one(m, ask, opts, why){ return {m:m, parts:[{ask:ask, opts:opts, why:why}]}; }
+
+
+/* notation -> equation, and back. "Let f(x) = parent" is the goal line;
+   options are written right first. */
+function fn(s){ return Y + " = " + F + "(" + s + ")"; }
+function fq(p, m, ask, opts, why){
+  return {goal:"Let <span class='m'>" + F + "(" + X + ") = " + PAR[p].eq(0) + "</span>.", m:m,
+          parts:[{ask:ask, opts:opts, why:why}]};
+}
+var EQ = "This equation is", BACK = "In <i>f</i> notation, this is";
+ladder("#ldNotation", [
+  fq("sq", fn(inner(3)), EQ, [teq("sq", 1, 3, 0), teq("sq", 1, 0, -3), teq("sq", 1, -3, 0), teq("sq", 1, 0, 3)],
+    "Put <i>x</i> − 3 in where <i>x</i> was: (<i>x</i> − 3)<sup>2</sup>. The − 3 goes inside the brackets."),
+  fq("sqrt", fn(X) + " + 4", EQ, [teq("sqrt", 1, 0, 4), teq("sqrt", 1, -4, 0), teq("sqrt", 1, 4, 0), teq("sqrt", 1, 0, -4)],
+    "Work out √<i>x</i> first, then add 4. The + 4 goes outside the root."),
+  fq("cube", fn(inner(-1)), EQ, [teq("cube", 1, -1, 0), teq("cube", 1, 0, 1), teq("cube", 1, 1, 0), teq("cube", 1, 0, -1)],
+    "Put <i>x</i> + 1 in where <i>x</i> was: (<i>x</i> + 1)<sup>3</sup>."),
+  fq("abs", fn(X) + " − 5", EQ, [teq("abs", 1, 0, -5), teq("abs", 1, 5, 0), teq("abs", 1, -5, 0), teq("abs", 1, 0, 5)],
+    "Work out |<i>x</i>| first, then subtract 5. The − 5 goes outside the bars."),
+  fq("sqrt", fn(inner(2)), EQ, [teq("sqrt", 1, 2, 0), teq("sqrt", 1, 0, -2), teq("sqrt", 1, -2, 0), teq("sqrt", 1, 0, 2)],
+    "Put <i>x</i> − 2 in where <i>x</i> was, so it goes under the root."),
+  fq("sq", fn(X) + " + 1", EQ, [teq("sq", 1, 0, 1), teq("sq", 1, -1, 0), teq("sq", 1, 1, 0), teq("sq", 1, 0, -1)],
+    "Work out <i>x</i><sup>2</sup> first, then add 1."),
+  fq("abs", teq("abs", 1, -4, 0), BACK, [fn(inner(-4)), fn(X) + " + 4", fn(inner(4)), fn(X) + " − 4"],
+    "The + 4 is inside the bars, so it goes inside the brackets: <i>f</i>(<i>x</i> + 4)."),
+  fq("sq", teq("sq", 1, 0, -7), BACK, [fn(X) + " − 7", fn(inner(7)), fn(inner(-7)), fn(X) + " + 7"],
+    "The − 7 comes after <i>x</i><sup>2</sup> is worked out, so it's outside: <i>f</i>(<i>x</i>) − 7.")
+], {wide:true, end:"Inside the brackets, it goes in for x. Outside, it's done last."});
+
+/* words -> equation. Options as [p, a, h, k], right first. One move each:
+   several moves are Part 3. */
+function wordsItem(m, opts, why){
+  return one(m, "The new equation is", opts.map(function(o){ return teq(o[0], o[1], o[2], o[3]); }), why);
+}
+ladder("#ldWords", [
+  wordsItem(Y + " = |" + X + "|, &nbsp;moved right 3",
+    [["abs", 1, 3, 0], ["abs", 1, -3, 0], ["abs", 1, 0, 3], ["abs", 1, 0, -3]],
+    "Right 3 is inside, with the opposite sign: |<i>x</i> − 3|."),
+  wordsItem(Y + " = " + EXP.root(X) + ", &nbsp;moved up 5",
+    [["sqrt", 1, 0, 5], ["sqrt", 1, -5, 0], ["sqrt", 1, 0, -5], ["sqrt", 1, 5, 0]],
+    "Up is outside the root, as it is: √<i>x</i> + 5."),
+  wordsItem(Y + " = " + X + sup(3) + ", &nbsp;moved left 2",
+    [["cube", 1, -2, 0], ["cube", 1, 2, 0], ["cube", 1, 0, -2], ["cube", 1, 0, 2]],
+    "Left 2 is inside, with the opposite sign: (<i>x</i> + 2)<sup>3</sup>."),
+  wordsItem(Y + " = " + X + sup(2) + ", &nbsp;moved down 6",
+    [["sq", 1, 0, -6], ["sq", 1, 6, 0], ["sq", 1, -6, 0], ["sq", 1, 0, 6]],
+    "Down is outside, as it is: <i>x</i><sup>2</sup> − 6.")
+], {wide:true, goal:"Write the equation.", end:"Sideways goes inside with the opposite sign. Up and down go outside."});
+
+/* picture -> equation. The picture is drawn from the right answer. */
+function picItem(p, a, h, k, win, wrong, why){
+  var opts = [[p, a, h, k]].concat(wrong);
+  return one(graph({x:win.x, y:win.y, w:280,
+               curves:[{f:PAR[p].f, dom:tdom(p, 0), cls:"gp-par"}, {f:tf(p, a, h, k), dom:tdom(p, h)}],
+               pts:[{x:h, y:k}], alt:"a shifted graph"}),
+             "The equation of the solid graph is",
+             opts.map(function(o){ return teq(o[0], o[1], o[2], o[3]); }), why);
+}
+ladder("#ldPics", [
+  picItem("sq", 1, 2, 0, {x:[-3, 6], y:[-1, 6]},
+    [["sq", 1, -2, 0], ["sq", 1, 0, 2], ["sq", 1, 0, -2]],
+    "The vertex moved right 2, to (2, 0). Right is <i>x</i> − 2, inside."),
+  picItem("sqrt", 1, 0, -2, {x:[-2, 9], y:[-3, 3]},
+    [["sqrt", 1, 2, 0], ["sqrt", 1, -2, 0], ["sqrt", 1, 0, 2]],
+    "It starts at (0, −2): down 2. Down is − 2, outside."),
+  picItem("sqrt", 1, -3, 0, {x:[-5, 7], y:[-1, 4]},
+    [["sqrt", 1, 3, 0], ["sqrt", 1, 0, 3], ["sqrt", 1, 0, -3]],
+    "It starts at (−3, 0): left 3. Left is <i>x</i> + 3, inside the root.")
+], {wide:true, goal:"Match the graph.", end:"Find the vertex or starting point first. Then read the move off it."});
+
+})();
+</script>
+</body>
+</html>
