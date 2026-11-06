@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -524,7 +529,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Quadratics · Module 14</div>
   <h1>From standard form to vertex form</h1>
   <p class="lead">Standard form <span class="m"><i>y</i> = <i>ax</i><sup>2</sup> + <i>bx</i> + <i>c</i></span> hides the vertex. Vertex form <span class="m"><i>y</i> = <i>a</i>(<i>x</i> − <i>h</i>)<sup>2</sup> + <i>k</i></span> shows it. There are two ways to get from one to the other. Both give the same answer.</p>
-  <p>Do <strong>Completing the Square, Part 1</strong> first if "half it, square it" is new to you. No calculator needed.</p>
+  <p>Do <strong><a class="xref" href="completing-square-1-the-move.html">Completing the Square, Part 1</a></strong> first if "half it, square it" is new to you. No calculator needed.</p>
   <p style="font-size:14.5px">Module 14 (§3.1): <em>Rewriting a quadratic function to find its vertex and sketch its graph</em>, and <em>Finding the x-intercept(s) and the vertex of a parabola</em>.</p>
   <ol class="pagemap">
     <li><a href="#s1">Reading vertex form</a></li>
@@ -575,7 +580,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <section id="s2">
   <div class="eyebrow">2 · Method 1, when a = 1</div>
   <h2>Complete the square: add it, then take it away</h2>
-  <p>In Part 1 you added the number to <strong>both sides</strong> of an equation. A function like <span class="m"><i>y</i> = <i>x</i><sup>2</sup> − 6<i>x</i> + 5</span> has only one side to work on. So add the number and subtract it straight away. Together that adds zero, so the function doesn't change.</p>
+  <p>In <a class="xref" href="completing-square-1-the-move.html">Part 1</a> you added the number to <strong>both sides</strong> of an equation. A function like <span class="m"><i>y</i> = <i>x</i><sup>2</sup> − 6<i>x</i> + 5</span> has only one side to work on. So add the number and subtract it straight away. Together that adds zero, so the function doesn't change.</p>
 
   <div class="walk">
     <div class="walk-q"><span class="ask">Write in vertex form</span><span class="m"><i>y</i> = <i>x</i><sup>2</sup> − 6<i>x</i> + 5</span></div>
@@ -697,11 +702,11 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>Two ways to find <i>h</i> and <i>k</i>.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Next · Module 15</div><div class="t">End behavior</div>
+      <div class="n">Next · Module 15</div><div class="t"><a class="xref" href="polynomial-end-behavior.html">End behavior</a></div>
       <p>Which way a polynomial's graph heads at each end.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Then · Module 15</div><div class="t">Zeros and multiplicity</div>
+      <div class="n">Then · Module 15</div><div class="t"><a class="xref" href="zeros-and-multiplicity.html">Zeros and multiplicity</a></div>
       <p>Where the graph meets the <i>x</i>-axis, and what it does there.</p>
     </div>
   </div>

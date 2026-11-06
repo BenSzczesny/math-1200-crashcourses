@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -550,8 +555,8 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <section id="top">
   <div class="eyebrow">Graphs · Part 2 of 3</div>
   <h1>Flip it, stretch it, squeeze it</h1>
-  <p class="lead">A minus sign flips a graph. A number that multiplies stretches or squeezes it. Each one follows Part 1's rule: <strong>inside changes <i>x</i>, the opposite way. Outside changes <i>y</i>, the same way.</strong></p>
-  <p>Do Part 1 first. Part 3 puts several moves together. No calculator needed.</p>
+  <p class="lead">A minus sign flips a graph. A number that multiplies stretches or squeezes it. Each one follows <a class="xref" href="graphs-1-shifts.html">Part 1</a>'s rule: <strong>inside changes <i>x</i>, the opposite way. Outside changes <i>y</i>, the same way.</strong></p>
+  <p>Do <a class="xref" href="graphs-1-shifts.html">Part 1</a> first. <a class="xref" href="graphs-3-several-moves.html">Part 3</a> puts several moves together. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS (§2.6): <em>Transforming the graph of a function by reflecting over an axis</em>, <em>Transforming the graph of a function by shrinking or stretching</em>, and <em>How the leading coefficient affects the graph of an absolute value function</em>.</p>
   <ol class="pagemap">
     <li><a href="#s1">Flip over the x-axis</a></li>
@@ -740,7 +745,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <tr><td class="m"><i>a</i> · <i>f</i>(<i>x</i>)</td><td>taller if <i>a</i> &gt; 1, flatter if 0 &lt; <i>a</i> &lt; 1</td><td class="m">(<i>x</i>, <i>a</i> · <i>y</i>)</td></tr>
       <tr><td class="m"><i>f</i>(<i>b</i><i>x</i>)</td><td>narrower if <i>b</i> &gt; 1, wider if 0 &lt; <i>b</i> &lt; 1</td><td class="m">(<span class="fr"><span><i>x</i></span><span><i>b</i></span></span>, <i>y</i>)</td></tr>
     </table>
-    <p style="font-size:14.5px">Shifts are in Part 1's cheat sheet.</p>
+    <p style="font-size:14.5px">Shifts are in <a class="xref" href="graphs-1-shifts.html">Part 1</a>'s cheat sheet.</p>
   </div>
 
   <div class="next">
@@ -749,7 +754,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>Flips, and stretches up, down and sideways.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Next</div><div class="t">Part 3</div>
+      <div class="n">Next</div><div class="t"><a class="xref" href="graphs-3-several-moves.html">Part 3</a></div>
       <p>Several moves, one at a time, in order.</p>
     </div>
   </div>

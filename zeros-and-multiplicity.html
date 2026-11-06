@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -500,7 +505,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Polynomials · Module 15</div>
   <h1>Zeros, multiplicity, and what the graph does there</h1>
   <p class="lead">A zero is where the graph meets the <i>x</i>-axis. Factored form shows every zero. The power on each factor says whether the graph <strong>crosses</strong> there or <strong>touches and turns back</strong>.</p>
-  <p>Do <strong>End Behavior</strong> first: section 5 here uses it. No calculator needed.</p>
+  <p>Do <strong><a class="xref" href="polynomial-end-behavior.html">End Behavior</a></strong> first: section 5 here uses it. No calculator needed.</p>
   <p style="font-size:14.5px">Module 15 (§3.2): <em>Finding zeros of a polynomial function written in factored form</em>, <em>Finding zeros and their multiplicities given a polynomial function written in factored form</em>, <em>Finding x- and y-intercepts given a polynomial function</em>, and <em>Inferring properties of a polynomial function from its graph</em>.</p>
   <ol class="pagemap">
     <li><a href="#s1">Zeros come from factors</a></li>
@@ -661,7 +666,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>Where the graph meets the axis, and what it does there.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Before this · Module 15</div><div class="t">End behavior</div>
+      <div class="n">Before this · Module 15</div><div class="t"><a class="xref" href="polynomial-end-behavior.html">End behavior</a></div>
       <p>If the ends of the sketch were the hard part, go back to it.</p>
     </div>
   </div>

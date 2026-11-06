@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -487,7 +492,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <h1>Absolute value inequalities: split it, then join it</h1>
   <p class="lead"><span class="m">|<i>x</i>|</span> is the distance from <span class="m"><i>x</i></span> to 0. So <span class="m">|<i>x</i>| &lt; 3</span> asks for the numbers <strong>less than 3 away</strong> from 0, and <span class="m">|<i>x</i>| &gt; 3</span> asks for the numbers <strong>more than 3 away</strong>.</p>
   <p>To solve one, split it into two inequalities, just like you split <span class="m">|<i>A</i>| = <i>b</i></span> into two equations. The new part is the word that joins them: <strong>and</strong> or <strong>or</strong>.</p>
-  <p style="font-size:14.5px">ALEKS topics: <em>Solving an absolute value inequality</em>, problem types 1, 3, 4 and 5 (§1.7). Uses Lesson 1 (writing the answer) and Lesson 2 (solving).</p>
+  <p style="font-size:14.5px">ALEKS topics: <em>Solving an absolute value inequality</em>, problem types 1, 3, 4 and 5 (§1.7). Uses <a class="xref" href="inequalities-1-interval-notation.html">Lesson 1</a> (writing the answer) and <a class="xref" href="inequalities-2-solving.html">Lesson 2</a> (solving).</p>
   <ol class="pagemap">
     <li><a href="#s1">Absolute value is distance</a></li>
     <li><a href="#s2">Split, then join</a></li>
@@ -638,8 +643,8 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
     <li>Get the absolute value alone on one side.</li>
     <li>Look at the right side.<small>Negative? Stop. Less than gives no solution; greater than gives all real numbers.</small></li>
     <li>Split into two parts.<small>Less than: <strong>and</strong>. Greater than: <strong>or</strong>. Second part: negative right side, flipped sign.</small></li>
-    <li>Solve each part, like Lesson 2.</li>
-    <li>Combine and write the interval, like Lesson 1.</li>
+    <li>Solve each part, like <a class="xref" href="inequalities-2-solving.html">Lesson 2</a>.</li>
+    <li>Combine and write the interval, like <a class="xref" href="inequalities-1-interval-notation.html">Lesson 1</a>.</li>
   </ol>
 
   <h3 style="margin-top:28px">Four splits that go wrong</h3>

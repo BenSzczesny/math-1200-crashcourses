@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -565,7 +570,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Piecewise functions · Part 2 of 2</div>
   <h1>Cut the plane into strips, and draw one rule in each</h1>
   <p class="lead">The conditions in a piecewise function only talk about <span class="m"><i>x</i></span>. So each condition is a vertical strip of the plane. <strong>In each strip, draw that strip's rule, and nothing else.</strong></p>
-  <p>Do Part 1 first: you need to read the conditions. You also need to graph a line from its equation, like <span class="m"><i>y</i> = −<i>x</i></span> or <span class="m"><i>y</i> = <i>x</i> − 3</span>. No calculator needed.</p>
+  <p>Do <a class="xref" href="piecewise-1-evaluating.html">Part 1</a> first: you need to read the conditions. You also need to graph a line from its equation, like <span class="m"><i>y</i> = −<i>x</i></span> or <span class="m"><i>y</i> = <i>x</i> − 3</span>. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS topic: <em>Graphing a piecewise-defined function: Problem type 1</em> (§2.7).</p>
   <ol class="pagemap">
     <li><a href="#s1">The conditions are strips</a></li>
@@ -716,7 +721,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>Graphing, strip by strip.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Also · Module 13</div><div class="t">Composition</div>
+      <div class="n">Also · Module 13</div><div class="t"><a class="xref" href="composition-of-functions.html">Composition</a></div>
       <p>The output of one function as the input of another.</p>
     </div>
   </div>

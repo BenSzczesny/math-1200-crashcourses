@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -516,7 +521,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Exponents · Lesson 2 of 3</div>
   <h1>A negative exponent sends a factor across the fraction bar</h1>
   <p class="lead"><span class="m"><i>x</i><sup>−3</sup> = <span class="fr"><span>1</span><span><i>x</i><sup>3</sup></span></span></span>. The minus sign on an exponent <strong>doesn't make anything negative</strong>. It tells you the factor belongs on the other side of the fraction bar.</p>
-  <p>All four rules from Lesson 1 still work with negative exponents. This lesson adds one move, and shows where it goes wrong. No calculator needed.</p>
+  <p>All four rules from <a class="xref" href="01-exponent-rules.html">Lesson 1</a> still work with negative exponents. This lesson adds one move, and shows where it goes wrong. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS topics: <em>Evaluating an expression with a negative exponent: Negative integer base</em> · <em>Rewriting an algebraic expression without a negative exponent</em> · <em>Product rule with negative exponents</em> · <em>Quotient rule with negative exponents</em> · <em>Power and quotient rules with negative exponents</em> · <em>Power, product, and quotient rules with negative exponents</em> (§R.2).</p>
   <ol class="pagemap">
     <li><a href="#s1">Where they come from</a></li>
@@ -534,7 +539,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <section id="s1">
   <div class="eyebrow">1 · Where they come from</div>
   <h2>Run the quotient rule past zero</h2>
-  <p>In Lesson 1 the top exponent was always bigger. Now let the bottom be bigger. The bottom below has four <span class="m"><i>x</i></span>'s. Change the top and compare two things: what's left after cancelling, and what the quotient rule gives.</p>
+  <p>In <a class="xref" href="01-exponent-rules.html">Lesson 1</a> the top exponent was always bigger. Now let the bottom be bigger. The bottom below has four <span class="m"><i>x</i></span>'s. Change the top and compare two things: what's left after cancelling, and what the quotient rule gives.</p>
 
   <div class="expand">
     <div class="ctrls" style="margin-bottom:16px">
@@ -677,7 +682,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <section id="s5">
   <div class="eyebrow">5 · Lesson 1's rules, with negatives</div>
   <h2>Negatives inside brackets</h2>
-  <p>The Lesson 1 rules work exactly the same with negative exponents. Just be careful with the signs: <span class="m"><i>x</i><sup>−3</sup> <span class="op">·</span> <i>x</i><sup>5</sup> = <i>x</i><sup>−3+5</sup> = <i>x</i><sup>2</sup></span>.</p>
+  <p>The <a class="xref" href="01-exponent-rules.html">Lesson 1</a> rules work exactly the same with negative exponents. Just be careful with the signs: <span class="m"><i>x</i><sup>−3</sup> <span class="op">·</span> <i>x</i><sup>5</sup> = <i>x</i><sup>−3+5</sup> = <i>x</i><sup>2</sup></span>.</p>
   <p>The one that costs marks is a <strong>power of a power</strong>. It still just multiplies the exponents, signs included. Multiply first. Only then check whether the result is negative.</p>
 
   <div class="compare">
@@ -711,14 +716,14 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <section id="s6">
   <div class="eyebrow">6 · Common mistakes</div>
   <h2>Four mistakes with negative exponents</h2>
-  <p>Test each one with a small number, the same way as in Lesson 1.</p>
+  <p>Test each one with a small number, the same way as in <a class="xref" href="01-exponent-rules.html">Lesson 1</a>.</p>
   <div id="trapHost"></div>
 </section>
 
 <section id="s7">
   <div class="eyebrow">7 · Putting it together</div>
   <h2>Practice one step at a time</h2>
-  <p>Your tools: Lesson 1's four rules, plus <em>move it across the bar</em>. You pick; the page does the algebra. A good order: <strong>clear brackets, combine, move negatives, then work out the numbers.</strong></p>
+  <p>Your tools: <a class="xref" href="01-exponent-rules.html">Lesson 1</a>'s four rules, plus <em>move it across the bar</em>. You pick; the page does the algebra. A good order: <strong>clear brackets, combine, move negatives, then work out the numbers.</strong></p>
 
   <div class="solver">
     <div class="solver-head">
@@ -782,7 +787,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>Zero and negative exponents.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Next</div><div class="t">Lesson 3</div>
+      <div class="n">Next</div><div class="t"><a class="xref" href="03-rational-exponents.html">Lesson 3</a></div>
       <p>Fractional exponents and roots.</p>
     </div>
   </div>

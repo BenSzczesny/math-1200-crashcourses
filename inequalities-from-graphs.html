@@ -1,0 +1,1724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inequalities from Graphs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
+<style>
+/* Math 1200 · exponent crash course · shared theme
+   Neutral professional palette: graphite accent, warm-neutral paper.
+   Correctness colour is SEMANTIC (--ok / --wrong) and deliberately separate
+   from the accent, so "right" never reads as "emphasised". */
+
+:root{
+  --paper:#F6F6F4; --surface:#FFFFFF; --surface-2:#EDEDEA;
+  --ink:#1B1C1B; --ink-2:#4F524F; --ink-3:#858885;
+  --rule:#E0E0DB; --rule-strong:#C6C7C1;
+  --accent:#33403F; --accent-2:#1F2827; --accent-wash:#E9EBEA;
+  --on-accent:#FFFFFF;
+  --ok:#3D6B55; --ok-wash:#E8EEEB;
+  --wrong:#96453A; --wrong-wash:#F4E9E7;
+  --chip:#EEEEEB;
+  --shadow:0 1px 2px rgba(27,28,27,.05), 0 8px 24px -14px rgba(27,28,27,.20);
+  --serif:"Newsreader", Georgia, "Times New Roman", serif;
+  --sans:"Karla", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+    --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+    --rule:#2D302E; --rule-strong:#3F423F;
+    --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+    --on-accent:#141514;
+    --ok:#7CBB9C; --ok-wash:#1B2721;
+    --wrong:#DA9184; --wrong-wash:#2B1D1A;
+    --chip:#212422;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141514; --surface:#1B1D1C; --surface-2:#232624;
+  --ink:#EAEBE8; --ink-2:#ADB0AD; --ink-3:#818481;
+  --rule:#2D302E; --rule-strong:#3F423F;
+  --accent:#C3CBC9; --accent-2:#DFE4E2; --accent-wash:#232726;
+  --on-accent:#141514;
+  --ok:#7CBB9C; --ok-wash:#1B2721;
+  --wrong:#DA9184; --wrong-wash:#2B1D1A;
+  --chip:#212422;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px -14px rgba(0,0,0,.65);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--paper);
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.topbar-in{
+  max-width:820px; margin:0 auto; padding:10px 24px;
+  display:flex; align-items:center; gap:16px; justify-content:space-between;
+}
+.brandmark{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.brandmark b{color:var(--ink-2); font-weight:500}
+.brandmark a{color:var(--ink-2); text-decoration:none}
+.brandmark a:hover{color:var(--ink); text-decoration:underline}
+.brandmark a:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.meter{display:flex; align-items:center; gap:10px}
+.meter-track{width:120px; height:5px; border-radius:99px; background:var(--rule); overflow:hidden}
+.meter-fill{height:100%; width:0%; background:var(--accent); transition:width .35s ease}
+.meter-num{font-family:var(--mono); font-size:11.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; white-space:nowrap}
+/* phones: the bar keeps one line; the title truncates and the track goes */
+@media (max-width:560px){
+  .topbar-in{padding:9px 16px; gap:10px}
+  .brandmark{overflow:hidden; text-overflow:ellipsis; min-width:0}
+  .meter-track{display:none}
+  main{padding:0 16px 80px}
+}
+
+/* ---------- page frame ---------- */
+main{max-width:820px; margin:0 auto; padding:0 24px 96px}
+section{padding:44px 0; border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(34px,6vw,52px);
+  line-height:1.08; margin:0 0 16px; letter-spacing:-.015em; text-wrap:balance;
+}
+h2{
+  font-family:var(--serif); font-weight:600; font-size:clamp(25px,3.6vw,32px);
+  line-height:1.2; margin:0 0 14px; letter-spacing:-.01em; text-wrap:balance;
+}
+h3{font-family:var(--sans); font-weight:700; font-size:15px; margin:0 0 8px}
+p{margin:0 0 16px; max-width:62ch; color:var(--ink-2)}
+p.lead{font-size:19px; color:var(--ink)}
+strong{color:var(--ink); font-weight:700}
+ul.plain{margin:0 0 16px; padding-left:20px; max-width:62ch; color:var(--ink-2)}
+ul.plain li{margin-bottom:7px}
+
+/* ---------- math ---------- */
+.m{font-family:var(--serif); font-size:1.18em; line-height:1.35; white-space:nowrap}
+.m i{font-style:italic}
+.m sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.m .op{padding:0 .18em; color:var(--ink-2)}
+/* An inline-grid takes its baseline from the numerator, so anything written
+   after a fraction lands level with the top half. Centring the box on the
+   parent's x-height puts the bar where a reader expects it. */
+.fr{display:inline-grid; vertical-align:middle; text-align:center; margin:0 .14em}
+.fr > span{padding:0 .4em}
+.fr > span + span{border-top:1.6px solid currentColor; padding-top:.1em; margin-top:.1em}
+.rad{border-top:1.5px solid currentColor; padding:.06em .18em 0 .1em; margin-left:-.06em}
+.idx{font-size:.58em; vertical-align:.75em; margin-right:-.32em; line-height:0}
+.big{font-size:1.5em}
+
+/* ---------- factor chips ---------- */
+.expand{
+  background:var(--surface); border:1px solid var(--rule); border-radius:10px;
+  padding:20px; margin:0 0 20px; box-shadow:var(--shadow);
+}
+.expand-row{display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px}
+.chiprow{display:flex; flex-wrap:wrap; align-items:center; gap:5px; min-height:34px}
+.chip{
+  font-family:var(--mono); font-size:14px;
+  min-width:30px; height:32px; padding:0 8px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--chip); border:1px solid var(--rule-strong); border-radius:6px;
+  color:var(--ink);
+}
+.chip.a{background:var(--accent-wash); border-color:var(--accent); color:var(--accent-2)}
+.chip.b{background:var(--ok-wash); border-color:var(--ok); color:var(--ok)}
+.chip.gone{opacity:.3; text-decoration:line-through; text-decoration-color:var(--wrong)}
+.dot{font-family:var(--mono); color:var(--ink-3); font-size:13px}
+.count{
+  font-family:var(--mono); font-size:12px; color:var(--ink-2);
+  background:var(--surface-2); border-radius:6px; padding:3px 9px;
+}
+.stack{display:flex; flex-direction:column; gap:10px}
+.overline{border-top:1.6px solid var(--rule-strong); padding-top:10px}
+
+/* ---------- controls ---------- */
+button{font-family:inherit; font-size:inherit; cursor:pointer}
+.btn{
+  font-family:var(--sans); font-weight:500; font-size:14px;
+  padding:8px 15px; border-radius:8px; border:1px solid var(--rule-strong);
+  background:var(--surface); color:var(--ink); transition:background .15s, border-color .15s;
+}
+.btn:hover{background:var(--surface-2); border-color:var(--accent)}
+.btn.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn:focus-visible, .opt:focus-visible, .rulebtn:focus-visible, .tab:focus-visible{
+  outline:2.5px solid var(--accent); outline-offset:2px;
+}
+.ctrls{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px}
+.ctrl-label{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-right:4px}
+
+/* ---------- rule statement ---------- */
+.rulebox{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px;
+  background:var(--accent-wash); border-left:3px solid var(--accent);
+  border-radius:0 10px 10px 0; padding:18px 22px; margin:0 0 20px;
+}
+.rulebox .tag{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-2);
+}
+.rulebox .m{font-size:1.5em; color:var(--ink)}
+/* a condition on a rule, e.g. (a ≠ 0): lower case matters, so never a .tag */
+.rulebox .cond{font-family:var(--serif); font-size:16px; color:var(--ink-2)}
+.rulebox .cond i{font-style:italic}
+@media (max-width:560px){ .rulebox .m{white-space:normal} }
+
+/* ---------- side-by-side compare ---------- */
+.compare{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; background:var(--surface)}
+.compare > div{padding:18px 20px}
+.compare > div + div{border-left:1px solid var(--rule)}
+.compare .hd{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* only the stacked statements are blocks — an inline .m inside a caption stays inline */
+.compare > div > .m{display:block; margin-bottom:8px}
+.compare small{color:var(--ink-2); font-size:13.5px; line-height:1.45; display:block}
+@media (max-width:640px){
+  .compare{grid-template-columns:1fr}
+  .compare > div + div{border-left:0; border-top:1px solid var(--rule)}
+}
+
+/* ---------- traps ---------- */
+.trap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; margin:0 0 14px}
+.trap-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:6px}
+.never{
+  font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--wrong); background:var(--wrong-wash); border-radius:5px; padding:3px 8px; white-space:nowrap;
+}
+.trap p{margin:8px 0 12px; font-size:15px}
+.subst{display:flex; flex-wrap:wrap; gap:10px 26px; margin-top:12px; padding-top:14px; border-top:1px dashed var(--rule-strong)}
+.subst .side{display:flex; flex-direction:column; gap:4px}
+.subst .side .lbl{font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.verdict{font-family:var(--mono); font-size:13px; color:var(--wrong); align-self:center}
+
+/* ---------- multiple choice ---------- */
+.check{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; margin:22px 0 0; box-shadow:var(--shadow)}
+.check-q{display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin-bottom:14px}
+.check-q .ask{font-weight:700; color:var(--ink); font-size:15px}
+.opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:8px}
+.opt{
+  font-family:var(--sans); text-align:left; padding:11px 14px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  transition:border-color .15s, background .15s;
+}
+/* Options are mostly math (nowrap is right) but some are prose — "no solution",
+   "it cannot be simplified" — which must wrap rather than clip. */
+.opt .m{white-space:normal; display:inline-block}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok); background:var(--ok-wash)}
+.opt.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.fb{margin-top:12px; font-size:14.5px; line-height:1.5; display:none}
+.fb.show{display:block}
+.fb.ok{color:var(--ok)}
+.fb.no{color:var(--wrong)}
+
+/* ---------- two-button drill (factor-or-term, splits-or-not) ---------- */
+.drill{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:22px 20px; box-shadow:var(--shadow)}
+.drill-top{display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px}
+.drill-q{font-family:var(--serif); font-size:clamp(22px,3.4vw,30px); line-height:1.35; padding:6px 0 14px}
+.drill-q i{font-style:italic}
+.drill-q.m{white-space:normal}
+.drill-q sup{font-size:.6em; vertical-align:.62em; line-height:0}
+.drill-btns{display:flex; flex-wrap:wrap; gap:8px}
+.drill-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:3em}
+.drill-fb.ok{color:var(--ok)}
+.drill-fb.no{color:var(--wrong)}
+.pips{display:flex; flex-wrap:wrap; gap:5px}
+.pip{width:9px; height:9px; border-radius:99px; background:var(--rule); border:1px solid var(--rule-strong)}
+.pip.ok{background:var(--ok); border-color:var(--ok)}
+.pip.no{background:var(--wrong); border-color:var(--wrong)}
+.pip.now{box-shadow:0 0 0 3px var(--accent-wash); border-color:var(--accent)}
+
+/* ---------- rule chooser ---------- */
+.solver{background:var(--surface); border:1px solid var(--rule); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+.solver-head{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--rule); background:var(--surface-2)}
+.solver-head .which{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3)}
+.tabs{display:flex; flex-wrap:wrap; gap:6px}
+.tab{font-family:var(--mono); font-size:12px; padding:5px 11px; border-radius:6px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink-2)}
+.tab.on{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.work{padding:22px 20px; display:flex; flex-direction:column; gap:2px; overflow-x:auto}
+.line{display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:7px 0}
+.line .eq{font-family:var(--serif); font-size:1.18em; color:var(--ink-3); width:14px; flex:none}
+.line.now .m{color:var(--ink)}
+.line.past .m{color:var(--ink-2)}
+.line .note{color:var(--ink-3); font-size:13px; line-height:1.45}
+.usedtag{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--accent-2); background:var(--accent-wash); border-radius:5px; padding:2px 8px}
+.line.done .m{color:var(--ok); font-weight:600}
+.picker{padding:16px 20px 20px; border-top:1px solid var(--rule)}
+.picker .prompt{font-size:14px; font-weight:700; color:var(--ink); margin-bottom:12px}
+.rulegrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:8px}
+.rulebtn{
+  font-family:var(--sans); text-align:left; padding:10px 13px; border-radius:8px;
+  border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink);
+  display:flex; flex-direction:column; gap:3px; transition:border-color .15s, background .15s;
+}
+.rulebtn:hover:not(:disabled){border-color:var(--accent); background:var(--surface-2)}
+.rulebtn:disabled{opacity:.5; cursor:default}
+.rulebtn .nm{font-weight:700; font-size:14px}
+.rulebtn .frm{font-family:var(--serif); font-size:14.5px; color:var(--ink-3)}
+.rulebtn .frm i{font-style:italic}
+.rulebtn .frm sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.solver-fb{margin-top:14px; font-size:14.5px; line-height:1.5; min-height:1.5em}
+.solver-fb.no{color:var(--wrong)}
+.solver-fb.ok{color:var(--ok)}
+.finish{display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:16px}
+
+/* ---------- scoreboard ---------- */
+.score{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px;
+  border:1px solid var(--rule); border-radius:10px; padding:18px 22px; background:var(--surface); margin-top:26px;
+}
+.score .n{font-family:var(--serif); font-size:36px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1}
+.score .say{font-size:14.5px; color:var(--ink-2); max-width:44ch}
+
+/* ---------- factor tree (lesson 3) ---------- */
+.treewrap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
+.treewrap svg{display:block; max-width:100%; height:auto}
+.tree-line{stroke:var(--rule-strong); stroke-width:1.5}
+.tree-node{font-family:var(--mono); font-size:14px; fill:var(--ink)}
+.tree-leaf-ring{fill:none; stroke:var(--rule-strong); stroke-width:1.5}
+.tree-leaf-ring.p1{stroke:var(--accent); stroke-width:2.2}
+.tree-leaf-ring.p2{stroke:var(--ok); stroke-width:2.2}
+.tree-legend{display:flex; flex-wrap:wrap; gap:10px 20px; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid var(--rule)}
+.swatch{display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:12px; color:var(--ink-2)}
+.swatch i{width:13px; height:13px; border-radius:99px; border:2.2px solid var(--rule-strong); display:inline-block}
+.swatch.p1 i{border-color:var(--accent)}
+.swatch.p2 i{border-color:var(--ok)}
+
+/* ---------- closing ---------- */
+.next{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; margin-top:20px}
+.nextcard{border:1px solid var(--rule); border-radius:10px; padding:16px 18px; background:var(--surface)}
+.nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
+.nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
+.nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+.nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
+.colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
+
+/* ---------- number lines (inequalities crash course) ---------- */
+.nlbox{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.nlrow{display:grid; grid-template-columns:minmax(96px,auto) 1fr; gap:6px 14px; align-items:center}
+.nlrow + .nlrow{margin-top:8px}
+.nlrow .lbl{font-family:var(--serif); font-size:17px; text-align:right; color:var(--ink); white-space:nowrap}
+.nlrow .lbl i{font-style:italic}
+.nlrow.res{border-top:1px solid var(--rule-strong); padding-top:12px; margin-top:12px}
+.nlrow.res .lbl{font-weight:600}
+.nlrow.res .lbl.none{color:var(--wrong)}
+svg.nl{display:block; width:100%; height:auto; overflow:visible}
+svg.nl .ax{stroke:var(--ink-3); stroke-width:1.6; fill:none}
+svg.nl .head{fill:var(--ink-3); stroke:none}
+svg.nl .tk{stroke:var(--ink-2); stroke-width:1.8}
+svg.nl .tk.minor{stroke:var(--ink-3); stroke-width:1.2}
+svg.nl text{font-family:var(--mono); text-anchor:middle}
+svg.nl text.key{font-size:17px; font-weight:500; fill:var(--ink)}
+svg.nl text.minor{font-size:13px; fill:var(--ink-3)}
+svg.nl .seg{stroke:var(--accent); stroke-width:7; stroke-linecap:butt; fill:none}
+svg.nl .pt{stroke:var(--accent); stroke-width:2.6}
+svg.nl .pt.open{fill:var(--surface)}
+svg.nl .pt.closed{fill:var(--accent)}
+svg.nl .pt.ghost{fill:none; stroke:var(--ink-3); stroke-dasharray:3 3}
+svg.nl.dim .seg{stroke:var(--ink-3)}
+svg.nl.dim .pt{stroke:var(--ink-3)}
+svg.nl.dim .pt.closed{fill:var(--ink-3)}
+svg.nl.ok .seg{stroke:var(--ok)}
+svg.nl.ok .pt{stroke:var(--ok)}
+svg.nl.ok .pt.closed{fill:var(--ok)}
+svg.nl .arc{fill:none; stroke:var(--accent); stroke-width:1.8}
+svg.nl .arclbl{font-size:15px; fill:var(--accent-2); font-weight:500}
+svg.nl .pin line{stroke-width:2}
+svg.nl .pin text{font-size:14px; font-weight:500}
+svg.nl .pin.yes line{stroke:var(--ok)}   svg.nl .pin.yes polygon, svg.nl .pin.yes circle{fill:var(--ok)}   svg.nl .pin.yes text{fill:var(--ok)}
+svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no circle{fill:var(--wrong)} svg.nl .pin.no text{fill:var(--wrong)}
+.nlnote{font-size:14.5px; color:var(--ink-2); margin-top:14px; padding-top:12px; border-top:1px solid var(--rule); line-height:1.5}
+.nlgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(430px,1fr)); gap:26px}
+.nlgrid > div + div{padding-top:20px; border-top:1px solid var(--rule)}
+@media (min-width:1000px){ .nlgrid > div + div{padding-top:0; border-top:none} }
+@media (max-width:520px){ .nlgrid{grid-template-columns:1fr} .nlrow{grid-template-columns:minmax(72px,auto) 1fr} }
+.nlgrid .hd{font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:10px}
+/* a math statement heading a box: never uppercased, since x and X differ */
+.boxhd{font-family:var(--serif); font-size:21px; color:var(--ink); padding-bottom:10px; margin-bottom:12px; border-bottom:1px solid var(--rule)}
+.boxhd i{font-style:italic}
+.hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
+
+/* ---------- page map ---------- */
+/* A contents list, not tiles: numbered rows on hairlines, reading down two
+   columns on wide screens and one on phones. */
+.pagemap{list-style:none; counter-reset:pm; margin:26px 0 0; padding:0; columns:2 250px; column-gap:44px}
+.pagemap::before{content:"On this page"; display:block; column-span:all; margin:0 0 6px; padding-bottom:8px;
+  border-bottom:1px solid var(--rule-strong); font-family:var(--mono); font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3)}
+.pagemap li{counter-increment:pm; break-inside:avoid}
+.pagemap a{display:block; position:relative; padding:8px 2px 8px 36px; border-bottom:1px solid var(--rule);
+  color:var(--ink); text-decoration:none; font-size:15.5px; line-height:1.35}
+.pagemap a::before{content:counter(pm, decimal-leading-zero); position:absolute; left:2px; top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{color:var(--accent-2); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.pagemap a:hover::before{color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:3px}
+
+/* ---------- key idea / watch out ---------- */
+.keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
+.keybox .tag, .warn .tag{display:block; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-2); margin-bottom:6px}
+.keybox p, .warn p{margin:0; color:var(--ink); max-width:none}
+.keybox p + p, .warn p + p{margin-top:8px}
+.keybox ul{margin:4px 0 0; padding-left:20px; color:var(--ink)}
+.keybox li{margin-bottom:4px}
+.warn{background:var(--wrong-wash); border-left:3px solid var(--wrong); border-radius:0 10px 10px 0; padding:14px 20px; margin:0 0 20px}
+.warn .tag{color:var(--wrong)}
+
+/* ---------- symbol table ---------- */
+.symtab{width:100%; border-collapse:collapse; background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow:hidden; margin:0 0 20px; font-size:15.5px}
+.symtab th{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); font-weight:500; text-align:left; padding:10px 14px; background:var(--surface-2); border-bottom:1px solid var(--rule)}
+.symtab td{padding:10px 14px; border-bottom:1px solid var(--rule); color:var(--ink); vertical-align:middle}
+.symtab tr:last-child td{border-bottom:0}
+.symtab td.m, .symtab td .m{font-size:1.15em}
+.dotic{display:inline-block; width:14px; height:14px; border-radius:99px; border:2.4px solid var(--ok); vertical-align:-2px; margin-right:6px}
+.dotic.closed{background:var(--ok)}
+@media (max-width:560px){ .symtab{font-size:14px} .symtab th, .symtab td{padding:8px 9px} }
+
+/* ---------- worked example, one step at a time ---------- */
+.walk{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; box-shadow:var(--shadow); margin:0 0 20px}
+.walk-q{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 14px; padding-bottom:12px; border-bottom:1px solid var(--rule)}
+.walk-q .ask{font-weight:700; font-size:15px}
+.walk-q .m{font-size:1.4em}
+.walk-steps{list-style:none; margin:0; padding:6px 0 0}
+.walk-steps li{display:grid; grid-template-columns:minmax(150px,auto) 1fr; gap:4px 20px; align-items:baseline; padding:9px 0; border-bottom:1px dashed var(--rule)}
+.walk-steps li:last-child{border-bottom:0}
+.walk-steps li .m{font-size:1.3em}
+.walk-steps li.ans .m{color:var(--ok); font-weight:600}
+.walk-steps .why{font-size:14.5px; color:var(--ink-2); line-height:1.45}
+.walk-steps .why b{color:var(--wrong)}
+@media (max-width:560px){ .walk-steps li{grid-template-columns:1fr} }
+.walk-ctrls{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin-top:12px}
+.walk-hint{font-size:13.5px; color:var(--ink-3)}
+.walk + .walk{margin-top:-4px}
+
+/* ---------- test-a-number ---------- */
+.tester{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.tester .tp-probs{margin-bottom:10px}
+.tester .tp-line{cursor:crosshair}
+.tp-slide{display:flex; align-items:center; gap:12px; margin:10px 0 4px}
+.tp-slide input{flex:1; accent-color:var(--accent); min-width:0; height:28px}
+.tp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; margin:8px 0 12px; font-size:15px}
+.tp-out.yes{background:var(--ok-wash)}
+.tp-out.no{background:var(--wrong-wash)}
+.tp-verdict{font-weight:700}
+.tp-out.yes .tp-verdict{color:var(--ok)}
+.tp-out.no .tp-verdict{color:var(--wrong)}
+
+/* ---------- explorers (and/or, flip, distance) ---------- */
+.xp{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 22px; box-shadow:var(--shadow); margin:0 0 20px}
+.xp-row{display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:10px}
+.xp-row .ctrl-label{min-width:74px}
+.stepper{display:inline-flex; align-items:center; border:1px solid var(--rule-strong); border-radius:8px; overflow:hidden}
+.stepper button{border:0; background:var(--surface-2); color:var(--ink); width:34px; height:34px; font-size:17px}
+.stepper button:hover{background:var(--accent-wash)}
+.stepper button:focus-visible{outline:2.5px solid var(--accent); outline-offset:-2px}
+.stepper span{min-width:44px; text-align:center; font-family:var(--serif); font-size:18px}
+.xp-stmt{font-family:var(--serif); font-size:clamp(20px,3vw,26px); padding:10px 0 4px; border-top:1px solid var(--rule); margin-top:6px}
+.xp-stmt i{font-style:italic}
+.xp-out{display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:12px 14px; border-radius:8px; background:var(--ok-wash); margin-top:12px; font-size:15px}
+.xp-out .m{font-size:1.3em}
+.xp-out .shape{font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ok); font-weight:500}
+.xp-out.empty{background:var(--wrong-wash)} .xp-out.empty .shape{color:var(--wrong)}
+.xp-say{font-size:14.5px; color:var(--ink-2); margin-top:10px}
+
+/* ---------- build-the-graph drill ---------- */
+.gb .drill-q{padding-bottom:6px}
+.gb .xp-row{margin:6px 0}
+.btn.right{border-color:var(--ok); background:var(--ok-wash)}
+.btn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+.btn:disabled{cursor:default}
+.drill-end{margin-top:10px; padding-top:10px; border-top:1px solid var(--rule); color:var(--ink-2)}
+
+/* ---------- numbered method (steps-list) ---------- */
+.steps-list{list-style:none; counter-reset:rc; margin:0 0 20px; padding:0}
+.steps-list > li{counter-increment:rc; position:relative; padding:12px 16px 12px 52px; border:1px solid var(--rule); border-radius:10px; background:var(--surface); margin-bottom:8px; color:var(--ink)}
+.steps-list > li::before{content:counter(rc); position:absolute; left:14px; top:11px; width:26px; height:26px; border-radius:99px; background:var(--accent); color:var(--on-accent); font-family:var(--mono); font-size:13px; display:flex; align-items:center; justify-content:center}
+.steps-list > li small{display:block; color:var(--ink-2); font-size:14px; margin-top:2px}
+
+/* ---------- cheat sheet ---------- */
+.cheat{border:1.5px solid var(--accent); border-radius:12px; padding:20px 22px; background:var(--surface)}
+.cheat h3{font-family:var(--serif); font-size:21px; font-weight:600; margin:0 0 12px}
+.cheat ul{margin:0; padding-left:20px; color:var(--ink)}
+.cheat li{margin-bottom:6px}
+.cheat .symtab{margin:10px 0 14px}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important; animation:none !important; scroll-behavior:auto !important}
+}
+</style>
+<style>
+/* inequalities-from-graphs lesson only */
+.gp{display:block; width:100%; height:auto}
+.gp-g{stroke:var(--rule); stroke-width:1}
+.gp-a{stroke:var(--ink-3); stroke-width:1.4}
+.gp-t{font-family:var(--mono); font-size:10.5px; fill:var(--ink-3); text-anchor:middle}
+.gp-new{fill:none; stroke:var(--accent-2); stroke-width:2.8; stroke-linejoin:round; stroke-linecap:round}
+.gp-dim{fill:none; stroke:var(--ink-3); stroke-width:2.2; stroke-linejoin:round; stroke-linecap:round; opacity:.55}
+.gp-hl{fill:none; stroke:var(--ok); stroke-width:3.6; stroke-linejoin:round; stroke-linecap:round}
+/* the interval is blue, so it can't be confused with the green stretch of curve above it */
+:root{--band:#2A68AD}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){--band:#86B8EC} }
+:root[data-theme="dark"]{--band:#86B8EC}
+.gp-band{stroke:var(--band); stroke-width:7; stroke-linecap:butt; opacity:.85}
+.gp-bd{fill:var(--band); stroke:var(--band); stroke-width:2.4}
+.gp-bd.open{fill:var(--surface)}
+.gp-as{stroke:var(--wrong); stroke-width:1.8; stroke-dasharray:6 5}
+.gp-pn{fill:var(--accent-2)}
+.gp-lb{font-family:var(--mono); font-size:11.5px; fill:var(--ink-2); font-weight:500}
+.gfig{margin:6px 0 20px; max-width:340px}
+.gcap{font-size:13.5px; color:var(--ink-2); margin-top:6px; line-height:1.45}
+.check-q svg.gp{max-width:280px; margin-top:6px}
+.walk-steps li .gfig{grid-column:1/-1; margin:10px 0 2px}
+.walk-steps li > .m{white-space:normal}
+.reader{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:18px 20px; margin:18px 0 22px; box-shadow:var(--shadow)}
+.reader .ctrls{margin:0 0 12px}
+.rd-fig{max-width:360px}
+.rd-out{margin-top:12px; font-size:15.5px; line-height:1.5; min-height:3em; color:var(--ink-2)}
+.rd-out .m{font-size:1.18em; color:var(--ink)}
+.rd-out .ans{color:var(--ok); font-weight:600}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Inequalities from Graphs</b></div>
+    <div class="meter">
+      <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-num" id="meterNum">0 / 11 correct</div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+<section id="top">
+  <div class="eyebrow">Inequalities · Module 18</div>
+  <h1>Inequalities from graphs</h1>
+  <p class="lead">An inequality like <span class="m"><i>f</i>(<i>x</i>) &gt; 0</span> asks one question: where is the graph of <span class="m"><i>f</i></span> above the <i>x</i>-axis? Sketch the graph, and you can read the answer off it.</p>
+  <p>The sketches here come from the three <strong><a class="xref" href="graphing-rational-1-the-ends.html">Graphing Rational Functions</a></strong> courses. Do those first if you can. Sections 3 and 5 recap what you need. <strong><a class="xref" href="sign-charts-polynomial-and-rational-inequalities.html">Sign Charts</a></strong> solves the same problems a second way, by testing numbers. Either one works. No calculator needed.</p>
+  <p style="font-size:14.5px">Module 18 (§3.7): <em>Solving a quadratic inequality written in factored form</em>, <em>Solving a quadratic inequality</em>, <em>Solving a polynomial inequality</em> (problem types 1, 2 and 4), and <em>Solving a rational inequality: Problem type 1</em>.</p>
+  <ol class="pagemap">
+    <li><a href="#s1">Above the axis</a></li>
+    <li><a href="#s2">Touch points and asymptotes</a></li>
+    <li><a href="#s3">Sketch a polynomial</a></li>
+    <li><a href="#s4">Zero on one side</a></li>
+    <li><a href="#s5">Fractions</a></li>
+    <li><a href="#s6">Common mistakes</a></li>
+    <li><a href="#s7">Check yourself</a></li>
+    <li><a href="#s8">Cheat sheet</a></li>
+  </ol>
+</section>
+
+<section id="s1">
+  <div class="eyebrow">1 · The idea</div>
+  <h2>Above the axis means positive</h2>
+  <p>Every point on the graph of <span class="m"><i>f</i></span> is <span class="m">(<i>x</i>, <i>f</i>(<i>x</i>))</span>. Its height is <span class="m"><i>f</i>(<i>x</i>)</span>. A point above the <i>x</i>-axis has a positive height, and a point below has a negative one. So:</p>
+
+  <div class="rulebox">
+    <span class="tag">Reading an inequality off a graph</span>
+    <span><span class="m"><i>f</i>(<i>x</i>) &gt; 0</span>: where the graph is above the <i>x</i>-axis.</span>
+    <span><span class="m"><i>f</i>(<i>x</i>) &lt; 0</span>: where the graph is below it.</span>
+    <span><span class="m"><i>f</i>(<i>x</i>) = 0</span>: where it meets the axis. These are the zeros.</span>
+  </div>
+  <p>The answer is a set of <i>x</i>-values, so read it along the <i>x</i>-axis. Move left to right and note where the graph goes above and where it goes below.</p>
+
+  <div class="keybox">
+    <span class="tag">≥ and ≤ include the zeros</span>
+    <p><span class="m">≥ 0</span> means above <strong>or on</strong> the axis. So the zeros are in the answer, with square brackets. With <span class="m">&gt;</span> or <span class="m">&lt;</span>, the zeros are left out, with round brackets.</p>
+  </div>
+
+  <p>Try it. Pick an inequality, and the graph marks the <i>x</i>-values that work. Say the answer to yourself before you click.</p>
+  <div id="rdA"></div>
+
+  <div class="check" data-q="c1">
+    <div class="check-q"><span class="ask">From this graph of <i>f</i>, where is <span class="m"><i>f</i>(<i>x</i>) ≥ 0</span>?</span><span data-g="c1fig"></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="eyebrow">2 · Special points</div>
+  <h2>Touch points and asymptotes</h2>
+  <p>Two kinds of point need care.</p>
+
+  <h3>A touch point</h3>
+  <p>Where the graph touches the axis and turns back, <span class="m"><i>f</i></span> is 0. So that point counts for <span class="m">≥</span> and <span class="m">≤</span>, even when the graph is on the wrong side all around it. Then it goes in the answer on its own, in braces, like <span class="m">{1}</span>. For <span class="m">&gt;</span> and <span class="m">&lt;</span> it's left out, which splits the piece around it in two.</p>
+
+  <h3>A vertical asymptote</h3>
+  <p>The graph has no point on a vertical asymptote, because <span class="m"><i>f</i></span> doesn't exist there. So an asymptote is never in the answer, not even with <span class="m">≥</span> or <span class="m">≤</span>. It always gets a round bracket.</p>
+
+  <p>Graph 1 touches the axis at 1. Graph 2 has an asymptote at −2. Try all four inequalities on each.</p>
+  <div id="rdB"></div>
+
+  <div class="check" data-q="c2">
+    <div class="check-q"><span class="ask">From this graph of <i>f</i>, where is <span class="m"><i>f</i>(<i>x</i>) ≤ 0</span>?</span><span data-g="c2fig"></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s3">
+  <div class="eyebrow">3 · Sketch it</div>
+  <h2>Sketch a polynomial, then read it</h2>
+  <p>Usually you get a formula, not a graph. So sketch the graph first. You don't need the heights of the bumps. You only need which side of the axis the graph is on.</p>
+
+  <div class="keybox">
+    <span class="tag">The sketch, from factored form</span>
+    <ul>
+      <li><strong>Zeros:</strong> set each factor to 0.</li>
+      <li><strong>The ends:</strong> multiply the <i>x</i> term from each factor to get the leading term. Plus: above on the right. Minus: below. Even power: the left end is on the same side. Odd: the other side.</li>
+      <li><strong>Walk left from the right end.</strong> At each zero, an odd power changes the sign: the graph crosses. An even power keeps it: the graph touches and turns back.</li>
+    </ul>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Solve</span><span class="m"><i>x</i>(<i>x</i> + 2)(<i>x</i> − 2) ≤ 0</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">zeros 0, −2 and 2</span><span class="why">Set each factor to 0. Each has power 1, so the graph crosses at all three.</span></li>
+      <li><span class="m">leading term <i>x</i> · <i>x</i> · <i>x</i> = <i>x</i><sup>3</sup></span><span class="why">Plus and odd: above on the right, below on the left.</span></li>
+      <li><span class="m">above, then below, above, below</span><span class="why">Start above on the right and walk left. Every power is odd, so the sign changes at 2, at 0 and at −2. It arrives below on the left, which matches the ends. Check one point: <span class="m"><i>f</i>(1) = 1 · 3 · (−1) = −3</span>, below the axis, as drawn.</span><div class="gfig" data-g="w3"></div></li>
+      <li class="ans"><span class="m">(−∞, −2] ∪ [0, 2]</span><span class="why">≤ 0 means on or below the axis. The zeros are in.</span></li>
+    </ol>
+  </div>
+
+  <div class="keybox">
+    <span class="tag">Not sure of the picture?</span>
+    <p>Put one number into <span class="m"><i>f</i></span> and see if the result is positive or negative. That tells you which side of the axis the graph is on there. Doing that on every piece is the sign-chart method.</p>
+  </div>
+
+  <div class="check" data-q="c3">
+    <div class="check-q"><span class="ask">Solve</span><span class="m">−(<i>x</i> + 1)(<i>x</i> − 2)(<i>x</i> − 4) ≥ 0</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s4">
+  <div class="eyebrow">4 · Get it ready</div>
+  <h2>Zero on one side, then factor</h2>
+  <p>Reading the graph only works when the inequality compares <span class="m"><i>f</i>(<i>x</i>)</span> with 0. So move everything to one side first, then factor.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Solve</span><span class="m"><i>x</i><sup>3</sup> &lt; 6<i>x</i><sup>2</sup> − 9<i>x</i></span></div>
+    <ol class="walk-steps">
+      <li><span class="m"><i>x</i><sup>3</sup> − 6<i>x</i><sup>2</sup> + 9<i>x</i> &lt; 0</span><span class="why">Subtract 6<i>x</i><sup>2</sup> and add 9<i>x</i>. Now the right side is 0.</span></li>
+      <li><span class="m"><i>x</i>(<i>x</i><sup>2</sup> − 6<i>x</i> + 9) &lt; 0</span><span class="why">Every term has an <i>x</i>. Take it out.</span></li>
+      <li><span class="m"><i>x</i>(<i>x</i> − 3)<sup>2</sup> &lt; 0</span><span class="why"><i>x</i><sup>2</sup> − 6<i>x</i> + 9 is a perfect square: (<i>x</i> − 3)(<i>x</i> − 3).</span></li>
+      <li><span class="m">0 is odd, 3 is even, ends like <i>x</i><sup>3</sup></span><span class="why"><i>x</i> has power 1. (<i>x</i> − 3)<sup>2</sup> has power 2. The leading term is <i>x</i> · <i>x</i><sup>2</sup> = <i>x</i><sup>3</sup>: above on the right, below on the left.</span></li>
+      <li><span class="m">start above; keep at 3; change at 0</span><span class="why">Even at 3: it touches and stays above. Odd at 0: it crosses to below, which matches the left end. Check one point: <span class="m"><i>f</i>(1) = 1 · 4 = 4</span>, above the axis.</span><div class="gfig" data-g="w4"></div></li>
+      <li class="ans"><span class="m">(−∞, 0)</span><span class="why">&lt; 0 means strictly below. That's only left of 0. At 3 the graph touches the axis, so <span class="m"><i>f</i>(3) = 0</span>, and 0 &lt; 0 is false.</span></li>
+    </ol>
+  </div>
+
+  <div class="warn">
+    <span class="tag">Never divide both sides by x</span>
+    <p>Divide <span class="m"><i>x</i><sup>3</sup> &lt; 6<i>x</i><sup>2</sup> − 9<i>x</i></span> by <span class="m"><i>x</i></span> and you get <span class="m">(<i>x</i> − 3)<sup>2</sup> &lt; 0</span>, which has no solution. But <span class="m"><i>x</i> = −1</span> works: <span class="m">−1 &lt; 6 + 9</span>. When <span class="m"><i>x</i></span> is negative, dividing should flip the sign, and you can't tell when it is. Move everything to one side and factor <span class="m"><i>x</i></span> out instead.</p>
+    <p>Fractions are the same. Never multiply both sides by the bottom. Subtract to get 0 on one side, then combine into one fraction. The <a class="xref" href="sign-charts-polynomial-and-rational-inequalities.html">Sign Charts</a> course works one through.</p>
+  </div>
+
+  <div class="check" data-q="c4">
+    <div class="check-q"><span class="ask">Solve</span><span class="m"><i>x</i><sup>3</sup> + 2<i>x</i><sup>2</sup> &lt; 3<i>x</i></span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s5">
+  <div class="eyebrow">5 · Fractions</div>
+  <h2>Rational inequalities: the same walk</h2>
+  <p>A fraction's graph meets the axis where its top is 0. It breaks at a vertical asymptote where its bottom is 0. Both are key numbers, and one rule covers both.</p>
+
+  <div class="rulebox">
+    <span class="tag">The walk</span>
+    <span><strong>Right end:</strong> leading term over leading term, then simplify. Plus is above, minus is below.</span>
+    <span><strong>Odd power, top or bottom:</strong> the sign changes.</span>
+    <span><strong>Even power, top or bottom:</strong> the sign stays.</span>
+  </div>
+  <p>Why: an odd power like <span class="m">(<i>x</i> − 3)</span> changes sign as <span class="m"><i>x</i></span> passes 3, so the fraction does too. An even power like <span class="m">(<i>x</i> + 1)<sup>2</sup></span> is positive on both sides of −1, so the fraction keeps its sign. <strong><a class="xref" href="graphing-rational-2-even-and-odd.html">Even Keeps, Odd Changes</a></strong> has more on this, and practice.</p>
+  <p>Asymptotes are never in the answer. Holes aren't either, because the graph has no point there. Cancel a common factor first, and leave its <i>x</i> out of the answer.</p>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Solve</span><span class="m"><span class="fr"><span><i>x</i> + 2</span><span><i>x</i> − 3</span></span> ≤ 0</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">top 0 at −2, bottom 0 at 3</span><span class="why">−2 is a zero and 3 is an asymptote. Both have power 1, so the sign changes at both.</span></li>
+      <li><span class="m">ends: <span class="fr"><span><i>x</i></span><span><i>x</i></span></span> = 1</span><span class="why">So the horizontal asymptote is <span class="m"><i>y</i> = 1</span>, and both ends are above the axis.</span></li>
+      <li><span class="m">start above; change at 3; change at −2</span><span class="why">It's below between −2 and 3, then above left of −2. That matches the left end. Check: <span class="m"><i>f</i>(0) = <span class="fr"><span>2</span><span>−3</span></span></span>, negative, as drawn.</span><div class="gfig" data-g="w5a"></div></li>
+      <li class="ans"><span class="m">[−2, 3)</span><span class="why">On or below the axis. −2 is a zero, so it's in. 3 is the asymptote, so it's out.</span></li>
+    </ol>
+  </div>
+
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Solve</span><span class="m"><span class="fr"><span>(<i>x</i> + 3)(<i>x</i> − 1)</span><span>(<i>x</i> + 1)<sup>2</sup></span></span> &gt; 0</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">zeros −3 and 1, asymptote −1</span><span class="why">Both zeros have power 1, so the sign changes at each. The asymptote's power is 2, even, so the sign stays there.</span></li>
+      <li><span class="m">ends: <span class="fr"><span><i>x</i> · <i>x</i></span><span><i>x</i><sup>2</sup></span></span> = 1</span><span class="why">So the horizontal asymptote is <span class="m"><i>y</i> = 1</span>, and both ends are above the axis.</span></li>
+      <li><span class="m">start above; change at 1; keep at −1; change at −3</span><span class="why">It's below between −1 and 1, still below between −3 and −1, then above left of −3. That matches the left end. Check: <span class="m"><i>f</i>(0) = −3</span> and <span class="m"><i>f</i>(−2) = −3</span>, both below.</span><div class="gfig" data-g="w5b"></div></li>
+      <li class="ans"><span class="m">(−∞, −3) ∪ (1, ∞)</span><span class="why">Strictly above the axis, so the zeros are out.</span></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c5">
+    <div class="check-q"><span class="ask">Solve</span><span class="m"><span class="fr"><span><i>x</i> + 3</span><span>(<i>x</i> − 2)<sup>2</sup></span></span> ≥ 0</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
+</section>
+
+<section id="s6">
+  <div class="eyebrow">6 · Common mistakes</div>
+  <h2>Four wrong answers</h2>
+  <p>Each card shows a wrong answer. Click its button to test a number it gets wrong.</p>
+  <div id="trapHost"></div>
+</section>
+
+<section id="s7">
+  <div class="eyebrow">7 · Check yourself</div>
+  <h2>Six on your own</h2>
+  <p>Sketch each one on paper first. If you miss one, the feedback names the section to go back to.</p>
+  <div id="quizHost"></div>
+  <div class="score">
+    <div style="display:flex; align-items:baseline; gap:10px">
+      <span class="n" id="scoreN">0</span><span class="count">of 6</span>
+    </div>
+    <div class="say" id="scoreSay">Answer all six to see where you stand.</div>
+  </div>
+</section>
+
+<section id="s8">
+  <div class="eyebrow">8 · Keep this</div>
+  <h2>Cheat sheet</h2>
+  <div class="cheat">
+    <h3>Inequalities from a graph</h3>
+    <ol class="steps-list">
+      <li><strong>Read it:</strong> <span class="m"><i>f</i>(<i>x</i>) &gt; 0</span> is above the axis, <span class="m"><i>f</i>(<i>x</i>) &lt; 0</span> is below.</li>
+      <li><strong>Brackets:</strong> ≥ and ≤ include the zeros, even a touch point on its own. An asymptote is never in.<small><span class="m"><i>x</i><sup>2</sup>(<i>x</i> − 4) ≥ 0</span>: &nbsp;<span class="m">{0} ∪ [4, ∞)</span></small></li>
+      <li><strong>Get 0 on one side, then factor.</strong> Never divide or multiply both sides by something with <i>x</i> in it.</li>
+      <li><strong>Start at the right end:</strong> leading term over leading term. Plus is above, minus is below.</li>
+      <li><strong>Walk left:</strong> at each zero or asymptote, an odd power changes the sign and an even power keeps it.</li>
+      <li><strong>Check:</strong> you should arrive at the left end the leading terms gave you. Or put one number in.</li>
+    </ol>
+  </div>
+
+  <div class="next">
+    <div class="nextcard">
+      <div class="n">Done</div><div class="t">Inequalities from graphs</div>
+      <p>Sketch it, then read the answer off the axis.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Same problems · Module 18</div><div class="t"><a class="xref" href="sign-charts-polynomial-and-rational-inequalities.html">Sign Charts</a></div>
+      <p>Test one number per piece. Good for checking a sketch.</p>
+    </div>
+  </div>
+  <div class="colophon">
+    Math 1200 · College Algebra · supplement to ALEKS §3.7<br>
+    Practice only. Nothing here is graded or submitted.<br>
+    Your progress is saved on this device only.
+  </div>
+</section>
+
+</main>
+<script>
+/* Math 1200 · exponent crash course · shared engine
+   A lesson supplies a LESSON config object; this builds the interactive parts.
+
+   LESSON = {
+     storeKey : localStorage key, unique per lesson
+     checks   : { key: {ask?, m?, opts:[{t, ok?, fb}]} }   all MC items
+     inline   : [keys]   rendered into existing .check[data-q="key"] hosts
+     quiz     : [keys]   rendered into #quizHost, scored together
+     traps    : [{bad, why, sub, left:{lbl,val}, right:{lbl,val}}]
+     rules    : [{id, nm, frm}]
+     generic  : { RULEID: "why that rule does not apply, generically" }
+     problems : [{start, steps:[{rule, result, note, wrong:{RULEID:msg}}]}]
+     verdicts : {all, most, few}   score copy
+     solver   : {connector, ask, ok, last, done}   optional solver wording;
+                connector "" suits inequalities, where "=" between lines is false
+   }                                                                        */
+
+var EXP = (function(){
+"use strict";
+
+var $ = function(s, r){ return (r || document).querySelector(s); };
+var $$ = function(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+
+function el(tag, cls, html){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+
+function rep(sym, n, cls){
+  var a = [];
+  for(var i = 0; i < n; i++) a.push({t: sym, cls: cls});
+  return a;
+}
+
+function chipRow(host, items){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.innerHTML = "";
+  items.forEach(function(it, i){
+    if(i) host.appendChild(el("span", "dot", "·"));
+    host.appendChild(el("span", "chip" + (it.cls ? " " + it.cls : ""), it.t));
+  });
+}
+
+/* a fraction, as math HTML */
+function frac(n, d){
+  return "<span class='fr'><span>" + n + "</span><span>" + d + "</span></span>";
+}
+
+/* a radical: sqrt(inner), or nth root when idx is given */
+function root(inner, idx){
+  return (idx ? "<span class='idx'>" + idx + "</span>" : "") +
+         "√<span class='rad'>" + inner + "</span>";
+}
+
+function init(L){
+  var correct = {};
+  try{
+    var saved = window.localStorage.getItem(L.storeKey);
+    if(saved) correct = JSON.parse(saved) || {};
+  }catch(e){ correct = {}; }
+
+  function persist(){
+    try{ window.localStorage.setItem(L.storeKey, JSON.stringify(correct)); }catch(e){}
+  }
+
+  var TOTAL = L.inline.length + L.quiz.length;
+
+  /* Count only this page's questions. A saved store can hold keys from an
+     older version of the lesson (a split moves questions out), and counting
+     those would push the meter past TOTAL. */
+  function paintMeter(){
+    var n = 0;
+    L.inline.concat(L.quiz).forEach(function(k){ if(correct[k]) n++; });
+    var fill = $("#meterFill"), num = $("#meterNum");
+    if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
+    if(num) num.textContent = n + " / " + TOTAL + " correct";
+  }
+
+  /* ---------------- multiple choice ---------------- */
+  /* Options are authored correct-first for reviewability, then shuffled here,
+     so the right answer is never in a predictable slot. */
+  function shuffled(arr){
+    var a = arr.slice(), i, j, t;
+    for(i = a.length - 1; i > 0; i--){
+      j = Math.floor(Math.random() * (i + 1));
+      t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function buildCheck(host, key, cfg){
+    var optsHost = $(".opts", host), fb = $(".fb", host);
+    var order = shuffled(cfg.opts);
+    order.forEach(function(o){
+      var b = el("button", "opt", "<span class='m'>" + o.t + "</span>");
+      b.type = "button";
+      b._ok = !!o.ok;
+      b.addEventListener("click", function(){
+        $$(".opt", optsHost).forEach(function(c){ c.disabled = true; });
+        if(o.ok){
+          b.classList.add("right");
+          fb.className = "fb show ok";
+          correct[key] = true; persist(); paintMeter();
+        }else{
+          b.classList.add("wrongpick");
+          $$(".opt", optsHost).forEach(function(c){
+            if(c._ok) c.classList.add("right");
+          });
+          fb.className = "fb show no";
+        }
+        fb.innerHTML = o.fb;
+        if(L.quiz.indexOf(key) !== -1) paintScore();
+      });
+      optsHost.appendChild(b);
+    });
+  }
+
+  L.inline.forEach(function(key){
+    var host = $(".check[data-q='" + key + "']");
+    if(host) buildCheck(host, key, L.checks[key]);
+  });
+
+  var quizHost = $("#quizHost");
+  if(quizHost){
+    L.quiz.forEach(function(key, i){
+      var cfg = L.checks[key];
+      var card = el("div", "check");
+      card.innerHTML =
+        "<div class='check-q'><span class='ask'>" + (i + 1) + ". " + cfg.ask + "</span>" +
+        "<span class='m'>" + cfg.m + "</span></div>" +
+        "<div class='opts'></div><div class='fb'></div>";
+      quizHost.appendChild(card);
+      buildCheck(card, key, cfg);
+    });
+  }
+
+  function paintScore(){
+    var n = 0;
+    L.quiz.forEach(function(k){ if(correct[k]) n++; });
+    var nEl = $("#scoreN"), sEl = $("#scoreSay");
+    if(!nEl || !sEl) return;
+    nEl.textContent = n;
+    var answered = $$("#quizHost .fb.show").length;
+    var total = L.quiz.length;
+    if(answered < total){
+      sEl.textContent = answered + " of " + total + " answered. Keep going.";
+    }else if(n === total){
+      sEl.textContent = L.verdicts.all;
+    }else if(n >= total - 2){
+      sEl.textContent = L.verdicts.most;
+    }else{
+      sEl.textContent = L.verdicts.few;
+    }
+  }
+
+  /* ---------------- traps ---------------- */
+  var trapHost = $("#trapHost");
+  if(trapHost && L.traps){
+    L.traps.forEach(function(t){
+      var card = el("div", "trap");
+      card.innerHTML =
+        "<div class='trap-head'><span class='never'>" + (t.badge || "Never") + "</span>" +
+        "<span class='m'>" + t.bad + "</span></div><p>" + t.why + "</p>";
+      var btn = el("button", "btn", "Test it with " + t.sub);
+      btn.type = "button";
+      var out = el("div", "subst");
+      out.style.display = "none";
+      out.innerHTML =
+        "<div class='side'><span class='lbl'>" + t.left.lbl + "</span><span class='m'>" + t.left.val + "</span></div>" +
+        "<div class='side'><span class='lbl'>" + t.right.lbl + "</span><span class='m'>" + t.right.val + "</span></div>" +
+        "<span class='verdict'>" + (t.verdict || "not equal") + "</span>";
+      btn.addEventListener("click", function(){
+        var shown = out.style.display !== "none";
+        out.style.display = shown ? "none" : "flex";
+        btn.textContent = shown ? ("Test it with " + t.sub) : "Hide";
+      });
+      card.appendChild(btn);
+      card.appendChild(out);
+      trapHost.appendChild(card);
+    });
+  }
+
+  /* ---------------- rule chooser ---------------- */
+  var workEl = $("#solverWork");
+  if(workEl && L.problems){
+    var pi = 0, history = [];
+    var SV = L.solver || {};
+    var CONN = (SV.connector == null) ? "=" : SV.connector;
+    var ASK  = SV.ask  || "Which rule can you legally use on this line?";
+    var DONE = SV.done || "Fully simplified — every base appears once, nothing sits in a bracket, and no exponent is negative.";
+    var OKM  = SV.ok   || "Yes — that one is legal here.";
+    var LAST = SV.last || "That is the answer.";
+    var fbEl = $("#solverFb"), rulesEl = $("#solverRules");
+    var whichEl = $("#solverWhich"), tabsEl = $("#solverTabs");
+    var finishEl = $("#solverFinish"), doneEl = $("#solverDone"), nextEl = $("#solverNext");
+    var promptEl = $("#solverPrompt");
+
+    L.rules.forEach(function(r){
+      var b = el("button", "rulebtn",
+        "<span class='nm'>" + r.nm + "</span><span class='frm'>" + r.frm + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){ pick(r.id); });
+      rulesEl.appendChild(b);
+    });
+
+    L.problems.forEach(function(p, i){
+      var t = el("button", "tab", String(i + 1));
+      t.type = "button";
+      t.addEventListener("click", function(){ load(i); });
+      tabsEl.appendChild(t);
+    });
+
+    function render(){
+      var p = L.problems[pi];
+      workEl.innerHTML = "";
+      var first = el("div", history.length ? "line past" : "line now");
+      first.innerHTML = "<span class='eq'></span><span class='m'>" + p.start + "</span>";
+      workEl.appendChild(first);
+
+      history.forEach(function(h, i){
+        var isLast = (i === history.length - 1) && (history.length === p.steps.length);
+        var ln = el("div", "line " + (isLast ? "done" : "past"));
+        ln.innerHTML = "<span class='eq'>" + CONN + "</span><span class='m'>" + h.result + "</span>" +
+                       "<span class='usedtag'>" + h.nm + "</span>";
+        workEl.appendChild(ln);
+        if(h.note){
+          var nt = el("div", "line");
+          nt.innerHTML = "<span class='eq'></span><span class='note'>" + h.note + "</span>";
+          workEl.appendChild(nt);
+        }
+      });
+
+      $$(".tab", tabsEl).forEach(function(t, i){
+        t.className = "tab" + (i === pi ? " on" : "");
+      });
+      whichEl.textContent = "Problem " + (pi + 1) + " of " + L.problems.length;
+
+      var finished = history.length === p.steps.length;
+      $$(".rulebtn", rulesEl).forEach(function(b){ b.disabled = finished; });
+      finishEl.style.display = finished ? "flex" : "none";
+      promptEl.innerHTML = finished ? DONE : ASK;
+      if(finished){
+        doneEl.textContent = p.steps.length + " steps, " + p.steps.length + " decisions";
+        nextEl.textContent = (pi === L.problems.length - 1) ? "Back to problem 1" : "Next problem";
+      }
+    }
+
+    function pick(id){
+      var p = L.problems[pi];
+      if(history.length >= p.steps.length) return;
+      var step = p.steps[history.length];
+      if(id === step.rule){
+        var r = L.rules.filter(function(x){ return x.id === id; })[0];
+        history.push({result: step.result, note: step.note, nm: r.nm});
+        fbEl.className = "solver-fb ok";
+        fbEl.innerHTML = (history.length === p.steps.length) ? LAST : OKM;
+        render();
+      }else{
+        fbEl.className = "solver-fb no";
+        fbEl.innerHTML = (step.wrong && step.wrong[id]) ? step.wrong[id] : L.generic[id];
+      }
+    }
+
+    function load(i){
+      pi = i; history = [];
+      fbEl.className = "solver-fb"; fbEl.innerHTML = "";
+      render();
+    }
+
+    nextEl.addEventListener("click", function(){
+      load((pi + 1) % L.problems.length);
+      $(".solver").scrollIntoView({behavior: "smooth", block: "start"});
+    });
+
+    load(0);
+  }
+
+  paintMeter();
+  paintScore();
+}
+
+/* ---------------- numbers ----------------
+   A value as it should read on the page: true minus sign, halves written as
+   fractions, no floating-point dust. plain=true keeps decimals (slider read-outs). */
+var HALF = {"0.5":"&frac12;", "1.5":"3/2", "2.5":"5/2", "3.5":"7/2", "4.5":"9/2",
+            "5.5":"11/2", "6.5":"13/2", "7.5":"15/2"};
+function num(v, plain){
+  var r = Math.round(v * 100) / 100;
+  var s = String(Math.abs(r));
+  if(!plain && HALF[s]) s = HALF[s];
+  return (r < 0 ? "−" : "") + s;
+}
+
+/* ---------------- sets of numbers ----------------
+   A SET is a list of pieces [left, right, openLeft, openRight] — the same
+   shape nline draws. null on a side = runs off to infinity. [] = empty.
+
+   SET.fromTest(test, crit) builds the exact set where test(x) is true, given
+   every point where the truth could change (the critical values). Between
+   two neighbouring critical values the truth cannot change, so testing one
+   number per gap and each critical value itself decides everything.       */
+var SET = (function(){
+  function fromTest(test, crit){
+    var c = crit.slice().sort(function(a, b){ return a - b; })
+                .filter(function(v, i, a){ return i === 0 || v !== a[i - 1]; });
+    if(!c.length) return test(0) ? [[null, null, false, false]] : [];
+    var regions = [{lo:null, hi:c[0], x:c[0] - 1}];
+    c.forEach(function(v, i){
+      var nx = c[i + 1];
+      regions.push({pt:true, lo:v, hi:v, x:v});
+      regions.push({lo:v, hi:(nx == null ? null : nx), x:(nx == null ? v + 1 : (v + nx) / 2)});
+    });
+    var out = [], cur = null;
+    regions.forEach(function(r){
+      if(test(r.x)){
+        if(!cur) cur = [r.lo, r.hi, !r.pt, !r.pt];
+        else { cur[1] = r.hi; cur[3] = !r.pt; }
+      }else if(cur){ out.push(cur); cur = null; }
+    });
+    if(cur) out.push(cur);
+    return out;
+  }
+
+  var SYM = {lt:"&lt;", le:"&le;", gt:"&gt;", ge:"&ge;"};
+  function rel(r, v){
+    return {lt:function(x){ return x < v; }, le:function(x){ return x <= v; },
+            gt:function(x){ return x > v; }, ge:function(x){ return x >= v; }}[r];
+  }
+
+  function fmt(P){
+    if(!P.length) return "no solution";
+    return P.map(function(p){
+      if(p[0] == null && p[1] == null) return "(&minus;&infin;, &infin;)";
+      if(p[0] != null && p[0] === p[1]) return "{" + num(p[0]) + "}";
+      var L = (p[0] == null) ? "(&minus;&infin;" : (p[2] ? "(" : "[") + num(p[0]);
+      var R = (p[1] == null) ? "&infin;)" : num(p[1]) + (p[3] ? ")" : "]");
+      return L + ", " + R;
+    }).join(" &cup; ");
+  }
+
+  /* "one piece" / "two pieces" / "no solution" / "all real numbers" */
+  function shape(P){
+    if(!P.length) return "no solution";
+    if(P.length === 1 && P[0][0] == null && P[0][1] == null) return "all real numbers";
+    if(P.length === 1 && P[0][0] != null && P[0][0] === P[0][1]) return "a single number";
+    return P.length === 1 ? "one piece" : "two pieces";
+  }
+
+  function has(P, x){
+    return P.some(function(p){
+      var okL = (p[0] == null) || (p[2] ? x > p[0] : x >= p[0]);
+      var okR = (p[1] == null) || (p[3] ? x < p[1] : x <= p[1]);
+      return okL && okR;
+    });
+  }
+
+  return {fromTest:fromTest, rel:rel, SYM:SYM, fmt:fmt, shape:shape, has:has};
+})();
+
+/* ---------------- number lines ----------------
+   One axis, with zero or more shaded pieces on it.
+
+     nline({ticks:[-1,4], pieces:[[-1,null,true,false]]})
+
+   A PIECE is [left, right, openLeft, openRight] in axis coordinates; null on a
+   side means the shading runs off that end. No pieces at all = the empty set.
+   A fifth entry of true draws the shading without its endpoint dots.
+   Returns an SVG string, so it drops straight into innerHTML.
+
+     ticks : key values, labelled bold. An entry may be [value, "label"].
+     grid  : small tick + light label at every integer (default on when the
+             axis spans 24 or fewer units), so a student can count along it
+     ghost : a value to mark with a dashed ring (an endpoint not yet decided)
+     pin   : {v, ok, label}  a marker above the axis for a tested number
+     arc   : {a, b, label}   a bracket above the axis, for a distance
+     cls   : "dim" for an input row, "ok" for a result worth colouring      */
+var NL = {W:560, PAD:26};
+function nlGeom(cfg){
+  var lo = (cfg.lo == null) ? -6 : cfg.lo;
+  var hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var span = NL.W - 2 * NL.PAD;
+  return {lo:lo, hi:hi, x:function(v){ return NL.PAD + (v - lo) / (hi - lo) * span; }};
+}
+/* the axis value under a click, from its horizontal fraction across the svg */
+function nlValueAt(cfg, frac){
+  var g = nlGeom(cfg);
+  return g.lo + (frac * NL.W - NL.PAD) / (NL.W - 2 * NL.PAD) * (g.hi - g.lo);
+}
+function nline(cfg){
+  var g = nlGeom(cfg), lo = g.lo, hi = g.hi, x = g.x, W = NL.W, PAD = NL.PAD;
+  var top = (cfg.pin || cfg.arc) ? 40 : 6;
+  var Y = top + 12, H = Y + 34, R = 7;
+  var s = '<svg class="nl' + (cfg.cls ? " " + cfg.cls : "") +
+          '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet">';
+  s += '<line class="ax" x1="' + PAD + '" y1="' + Y + '" x2="' + (W - PAD) + '" y2="' + Y + '"/>';
+  s += '<polygon class="head" points="' + (PAD - 15) + ',' + Y + ' ' +
+       (PAD - 3) + ',' + (Y - 5.5) + ' ' + (PAD - 3) + ',' + (Y + 5.5) + '"/>';
+  s += '<polygon class="head" points="' + (W - PAD + 15) + ',' + Y + ' ' +
+       (W - PAD + 3) + ',' + (Y - 5.5) + ' ' + (W - PAD + 3) + ',' + (Y + 5.5) + '"/>';
+
+  var keys = (cfg.ticks || []).map(function(t){
+    return (t instanceof Array) ? {v:t[0], t:t[1]} : {v:t, t:num(t)};
+  });
+  var grid = (cfg.grid == null) ? (hi - lo <= 24) : cfg.grid;
+  if(grid){
+    for(var k = Math.ceil(lo); k <= Math.floor(hi); k++){
+      var near = keys.some(function(kk){ return Math.abs(kk.v - k) < 0.6; });
+      s += '<line class="tk minor" x1="' + x(k) + '" y1="' + (Y - 4) + '" x2="' + x(k) + '" y2="' + (Y + 4) + '"/>';
+      if(!near) s += '<text class="minor" x="' + x(k) + '" y="' + (Y + 24) + '">' + num(k) + '</text>';
+    }
+  }
+
+  /* ticks go under the shading, so an open circle stays visibly open */
+  keys.forEach(function(t){
+    s += '<line class="tk" x1="' + x(t.v) + '" y1="' + (Y - 6) + '" x2="' + x(t.v) +
+         '" y2="' + (Y + 6) + '"/>';
+  });
+
+  (cfg.pieces || []).forEach(function(p){
+    var a = (p[0] == null) ? PAD - 13 : x(p[0]);
+    var b = (p[1] == null) ? W - PAD + 13 : x(p[1]);
+    s += '<line class="seg" x1="' + a + '" y1="' + Y + '" x2="' + b + '" y2="' + Y + '"/>';
+  });
+  (cfg.pieces || []).forEach(function(p){
+    if(p[4]) return;                       /* [.., true] = shading only, no dots */
+    if(p[0] != null){
+      s += '<circle class="pt ' + (p[2] ? "open" : "closed") + '" cx="' + x(p[0]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+    if(p[1] != null && p[1] !== p[0]){
+      s += '<circle class="pt ' + (p[3] ? "open" : "closed") + '" cx="' + x(p[1]) +
+           '" cy="' + Y + '" r="' + R + '"/>';
+    }
+  });
+  if(cfg.ghost != null){
+    s += '<circle class="pt ghost" cx="' + x(cfg.ghost) + '" cy="' + Y + '" r="' + R + '"/>';
+  }
+
+  keys.forEach(function(t){
+    s += '<text class="key" x="' + x(t.v) + '" y="' + (Y + 25) + '">' + t.t + '</text>';
+  });
+
+  if(cfg.arc){
+    var xa = x(cfg.arc.a), xb = x(cfg.arc.b), ay = Y - 20;
+    s += '<path class="arc" d="M' + xa + ',' + (Y - 9) + ' V' + ay + ' H' + xb + ' V' + (Y - 9) + '"/>';
+    if(cfg.arc.label){
+      s += '<text class="arclbl" x="' + ((xa + xb) / 2) + '" y="' + (ay - 7) + '">' + cfg.arc.label + '</text>';
+    }
+  }
+  if(cfg.pin){
+    var px = x(Math.max(lo, Math.min(hi, cfg.pin.v)));
+    s += '<g class="pin ' + (cfg.pin.ok ? "yes" : "no") + '">' +
+         '<line x1="' + px + '" y1="' + (Y - 26) + '" x2="' + px + '" y2="' + (Y - 10) + '"/>' +
+         '<polygon points="' + (px - 6) + ',' + (Y - 12) + ' ' + (px + 6) + ',' + (Y - 12) + ' ' + px + ',' + (Y - 3) + '"/>' +
+         '<circle cx="' + px + '" cy="' + Y + '" r="4.5"/>';
+    if(cfg.pin.label) s += '<text x="' + px + '" y="' + (Y - 31) + '">' + cfg.pin.label + '</text>';
+    s += '</g>';
+  }
+  return s + '</svg>';
+}
+
+/* A labelled stack: input rows, a rule, then the result row.
+   rows = [[label, nlineCfg], ...]; the LAST row is the result.          */
+function nstack(host, rows){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var last = rows.length - 1;
+  host.innerHTML = rows.map(function(r, i){
+    var cfg = r[1] || {};
+    if(i < last && cfg.cls == null) cfg.cls = "dim";
+    var none = (i === last) && !(cfg.pieces && cfg.pieces.length);
+    return '<div class="nlrow' + (i === last ? " res" : "") + '">' +
+           '<span class="lbl' + (none ? " none" : "") + '">' + r[0] + '</span>' +
+           nline(cfg) + '</div>';
+  }).join("");
+}
+
+/* ---------------- worked examples, one line at a time ----------------
+   <div class="walk">
+     <div class="walk-q"><span class="m">2x + 3 &gt; 7</span></div>
+     <ol class="walk-steps">
+       <li><span class="m">2x &gt; 4</span><span class="why">Subtract 3.</span></li>
+     </ol>
+   </div>
+   Lines stay hidden until asked for, so a student can try each one on paper
+   first.                                                                 */
+function walks(){
+  $$(".walk").forEach(function(w){
+    var steps = $$(".walk-steps > li", w);
+    if(!steps.length) return;
+    var shown = 0;
+    var bar = el("div", "walk-ctrls");
+    var nextB = el("button", "btn on", ""); nextB.type = "button";
+    var allB = el("button", "btn", "Show all"); allB.type = "button";
+    var hint = el("span", "walk-hint", "");
+    bar.appendChild(nextB); bar.appendChild(allB); bar.appendChild(hint);
+    w.appendChild(bar);
+    function paint(){
+      steps.forEach(function(li, i){ li.style.display = (i < shown) ? "" : "none"; });
+      var done = shown >= steps.length;
+      nextB.textContent = done ? "Start over" : (shown ? "Next step" : "Show first step");
+      allB.style.display = done ? "none" : "";
+      hint.textContent = done ? "Could you do it again without looking?"
+                              : shown + " of " + steps.length + " steps shown. Try the next one on paper first.";
+    }
+    nextB.addEventListener("click", function(){
+      shown = (shown >= steps.length) ? 0 : shown + 1; paint();
+    });
+    allB.addEventListener("click", function(){ shown = steps.length; paint(); });
+    paint();
+  });
+}
+
+/* ---------------- quick-fire drill ----------------
+   drill("#host", {
+     items   : [{m, a, why}]          a = the key of the right choice
+     choices : [{k, t}]               the buttons
+     end     : "closing line"
+   })                                                                   */
+function drill(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  host.classList.add("drill");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='drill-q m'></div><div class='drill-btns'></div><div class='drill-fb'></div>";
+  var q = $(".drill-q", host), fb = $(".drill-fb", host), cnt = $(".count", host);
+  var pips = $(".pips", host), btns = $(".drill-btns", host);
+  var i = 0, marks = [], label = {};
+  var choiceBtns = cfg.choices.map(function(c){
+    label[c.k] = c.t;
+    var b = el("button", "btn", c.t); b.type = "button";
+    b.addEventListener("click", function(){ answer(c.k); });
+    btns.appendChild(b);
+    return b;
+  });
+  var nextB = el("button", "btn on", "Next"); nextB.type = "button";
+  btns.appendChild(nextB);
+  nextB.addEventListener("click", function(){
+    if(i === cfg.items.length - 1){ i = 0; marks = []; } else { i++; }
+    draw();
+  });
+
+  function drawPips(){
+    pips.innerHTML = "";
+    cfg.items.forEach(function(_, k){
+      pips.appendChild(el("span", "pip" +
+        (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") + (k === i ? " now" : "")));
+    });
+  }
+  function draw(){
+    q.innerHTML = cfg.items[i].m;
+    cnt.textContent = (i + 1) + " of " + cfg.items.length;
+    fb.className = "drill-fb"; fb.innerHTML = "";
+    choiceBtns.forEach(function(b){ b.disabled = false; b.classList.remove("right", "wrongpick"); });
+    nextB.style.display = "none";
+    drawPips();
+  }
+  function answer(k){
+    var it = cfg.items[i], right = (k === it.a);
+    if(marks[i] === undefined) marks[i] = right;
+    choiceBtns.forEach(function(b, j){
+      b.disabled = true;
+      var ck = cfg.choices[j].k;
+      if(ck === it.a) b.classList.add("right");
+      else if(ck === k) b.classList.add("wrongpick");
+    });
+    fb.className = "drill-fb " + (right ? "ok" : "no");
+    fb.innerHTML = (right ? "Right. " : "Not this one &mdash; it's <strong>" + label[it.a] + "</strong>. ") + it.why;
+    var lastOne = (i === cfg.items.length - 1);
+    nextB.textContent = lastOne ? "Start again" : "Next";
+    nextB.style.display = "";
+    if(lastOne){
+      var n = marks.filter(function(v){ return v; }).length;
+      fb.innerHTML += "<div class='drill-end'>" + n + " of " + cfg.items.length +
+        " right first time. " + (cfg.end || "") + "</div>";
+    }
+    drawPips();
+  }
+  draw();
+}
+
+/* ---------------- test-a-number ----------------
+   tester("#host", {
+     problems : [{label, set, ticks, test(x) -> {html, ok}}]
+     lo, hi, step, start
+     hidden   : true = the shading starts hidden, so the student predicts it
+   })
+   A slider (or a click on the line) moves a pin; the page substitutes that
+   number and says whether it lands in the set.                          */
+function tester(host, cfg){
+  if(typeof host === "string") host = $(host);
+  if(!host) return;
+  var pi = 0, xv = (cfg.start == null) ? 0 : cfg.start, show = !cfg.hidden;
+  var lo = (cfg.lo == null) ? -6 : cfg.lo, hi = (cfg.hi == null) ? 6 : cfg.hi;
+  var step = cfg.step || 0.5;
+  host.classList.add("tester");
+  host.innerHTML =
+    (cfg.problems.length > 1 ? "<div class='ctrls tp-probs'></div>" : "") +
+    "<div class='tp-line'></div>" +
+    "<div class='tp-slide'><span class='ctrl-label'>Move the point</span>" +
+      "<input type='range' min='" + lo + "' max='" + hi + "' step='" + step + "' value='" + xv +
+      "' aria-label='the number to test'></div>" +
+    "<div class='tp-out'></div>" +
+    "<div class='ctrls'><button type='button' class='btn tp-show'></button></div>";
+  var probs = $(".tp-probs", host), lineEl = $(".tp-line", host);
+  var range = $("input", host), out = $(".tp-out", host), showB = $(".tp-show", host);
+
+  if(probs){
+    probs.appendChild(el("span", "ctrl-label", "Inequality"));
+    cfg.problems.forEach(function(p, i){
+      var b = el("button", "btn" + (i === 0 ? " on" : ""), "<span class='m'>" + p.label + "</span>");
+      b.type = "button";
+      b.addEventListener("click", function(){
+        $$(".btn", probs).forEach(function(o){ o.classList.remove("on"); });
+        b.classList.add("on"); pi = i; show = !cfg.hidden; draw();
+      });
+      probs.appendChild(b);
+    });
+  }
+  function lineCfg(){
+    var p = cfg.problems[pi];
+    return {lo:lo, hi:hi, ticks:p.ticks || [], pieces:show ? p.set : [], cls:"ok",
+            pin:{v:xv, ok:p.test(xv).ok, label:"x = " + num(xv, true)}};
+  }
+  function draw(){
+    var p = cfg.problems[pi], r = p.test(xv), n = num(xv, true);
+    lineEl.innerHTML = nline(lineCfg());
+    out.className = "tp-out " + (r.ok ? "yes" : "no");
+    out.innerHTML = "<span class='m'>" + r.html + "</span>" +
+      "<span class='tp-verdict'>" + (r.ok ? "true, so " + n + " is in the set"
+                                          : "false, so " + n + " is not in the set") + "</span>";
+    showB.textContent = show ? "Hide the shading" : "Show every number that works";
+  }
+  range.addEventListener("input", function(){ xv = parseFloat(range.value); draw(); });
+  lineEl.addEventListener("click", function(e){
+    var svg = $("svg", lineEl); if(!svg) return;
+    var r = svg.getBoundingClientRect();
+    var v = Math.round(nlValueAt(lineCfg(), (e.clientX - r.left) / r.width) / step) * step;
+    xv = Math.max(lo, Math.min(hi, v)); range.value = xv; draw();
+  });
+  showB.addEventListener("click", function(){ show = !show; draw(); });
+  draw();
+}
+
+return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
+        root: root, num: num, SET: SET, nline: nline, nlValueAt: nlValueAt,
+        nstack: nstack, walks: walks, drill: drill, tester: tester, init: init};
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var $ = EXP.$, $$ = EXP.$$, num = EXP.num, fr = EXP.frac, SET = EXP.SET;
+
+var X = "<i>x</i>", FX = "<i>f</i>(" + X + ")";
+function sq(n){ return "<sup>" + n + "</sup>"; }
+var INF = "∞", U = " ∪ ";
+
+/* ---- drawing ---------------------------------------------------------------
+   zeros-01's graph(), plus what inequalities need:
+     ys       y scale relative to x (bumps can be far taller than wide)
+     gy       y grid spacing
+     vas/has  dashed asymptotes
+     curves   [{f, a, b}]: one piece per call, a and b clear of any asymptote
+     hl       a test(x): the curve is drawn dim, and the part where hl is true
+              is drawn over it in green
+     band     a SET, shaded along the x-axis with its endpoint dots       */
+var GID = 0;
+function graph(c){
+  var x0 = c.x[0], x1 = c.x[1], y0 = c.y[0], y1 = c.y[1], ys = c.ys || 1, gy = c.gy || 1;
+  var W = c.w || 320, P = 14, u = (W - 2 * P) / (x1 - x0), v = u * ys, H = Math.round(2 * P + v * (y1 - y0));
+  function px(x){ return +(P + (x - x0) * u).toFixed(2); }
+  function py(y){ return +(P + (y1 - y) * v).toFixed(2); }
+  var id = "gclip" + (++GID), s = "", i;
+  s += "<defs><clipPath id='" + id + "'><rect x='" + P + "' y='" + P + "' width='" + (W - 2 * P) +
+       "' height='" + (H - 2 * P) + "'/></clipPath></defs>";
+  for(i = Math.ceil(x0); i <= x1; i++)
+    s += "<line class='gp-g' x1='" + px(i) + "' y1='" + py(y0) + "' x2='" + px(i) + "' y2='" + py(y1) + "'/>";
+  for(i = Math.ceil(y0 / gy) * gy; i <= y1; i += gy)
+    s += "<line class='gp-g' x1='" + px(x0) + "' y1='" + py(i) + "' x2='" + px(x1) + "' y2='" + py(i) + "'/>";
+  if(y0 <= 0 && y1 >= 0) s += "<line class='gp-a' x1='" + px(x0) + "' y1='" + py(0) + "' x2='" + px(x1) + "' y2='" + py(0) + "'/>";
+  if(x0 <= 0 && x1 >= 0) s += "<line class='gp-a' x1='" + px(0) + "' y1='" + py(y0) + "' x2='" + px(0) + "' y2='" + py(y1) + "'/>";
+  for(i = Math.ceil(x0); i <= x1; i++){
+    if(!i || i === x0 || i === x1) continue;
+    s += "<text class='gp-t' x='" + px(i) + "' y='" + (py(0) + 13) + "'>" + num(i) + "</text>";
+  }
+  (c.vas || []).forEach(function(a){
+    s += "<line class='gp-as' x1='" + px(a) + "' y1='" + py(y1) + "' x2='" + px(a) + "' y2='" + py(y0) + "'/>";
+  });
+  (c.has || []).forEach(function(b){
+    s += "<line class='gp-as' x1='" + px(x0) + "' y1='" + py(b) + "' x2='" + px(x1) + "' y2='" + py(b) + "'/>";
+  });
+  function path(cv, test, cls){
+    var a = (cv.a == null) ? x0 : cv.a, b = (cv.b == null) ? x1 : cv.b, n = 320, d = "", pen = false, k, x, y;
+    for(k = 0; k <= n; k++){
+      x = a + (b - a) * k / n; y = cv.f(x);
+      if(!isFinite(y) || (test && !test(x))){ pen = false; continue; }
+      d += (pen ? "L" : "M") + px(x) + "," + Math.max(-60, Math.min(H + 60, py(y)));
+      pen = true;
+    }
+    return d ? "<path class='" + cls + "' clip-path='url(#" + id + ")' d='" + d + "'/>" : "";
+  }
+  (c.curves || []).forEach(function(cv){ s += path(cv, null, c.hl ? "gp-dim" : "gp-new"); });
+  if(c.hl) (c.curves || []).forEach(function(cv){ s += path(cv, c.hl, "gp-hl"); });
+  (c.band || []).forEach(function(p){
+    var a = (p[0] == null) ? P : px(p[0]), b = (p[1] == null) ? W - P : px(p[1]);
+    if(b > a) s += "<line class='gp-band' x1='" + a + "' y1='" + py(0) + "' x2='" + b + "' y2='" + py(0) + "'/>";
+  });
+  (c.pts || []).forEach(function(q){
+    s += "<circle class='gp-pn' cx='" + px(q.x) + "' cy='" + py(q.y) + "' r='4.2'/>";
+    if(q.lb) s += "<text class='gp-lb' x='" + (px(q.x) + (q.dx == null ? 7 : q.dx)) + "' y='" + (py(q.y) + (q.dy == null ? -9 : q.dy)) +
+                  "' text-anchor='" + (q.anchor || "start") + "'>" + q.lb + "</text>";
+  });
+  (c.band || []).forEach(function(p){
+    [[p[0], p[2]], [p[1], p[3]]].forEach(function(e, j){
+      if(e[0] == null || (j === 1 && p[1] === p[0])) return;
+      s += "<circle class='gp-bd" + (e[1] ? " open" : "") + "' cx='" + px(e[0]) + "' cy='" + py(0) + "' r='5'/>";
+    });
+  });
+  return "<svg class='gp' viewBox='0 0 " + W + " " + H + "' role='img' aria-label='" + (c.alt || "graph") + "'>" + s + "</svg>";
+}
+
+/* the functions, and where each is undefined */
+function A(x){ return (x + 1) * (x - 3); }
+function B(x){ return (x + 2) * (x - 1) * (x - 1); }
+function C(x){ return (x - 1) / (x + 2); }
+
+var FIGS = {
+  /* −(x + 2)(x − 3): zeros −2, 3, opens down, vertex (1/2, 25/4). f >= 0 on [−2, 3]. */
+  c1fig: graph({x:[-4, 5], y:[-4, 7], w:260, curves:[{f:function(x){ return -(x + 2) * (x - 3); }}],
+      pts:[{x:-2, y:0}, {x:3, y:0}],
+      alt:"a downward parabola crossing the x-axis at −2 and 3"}),
+  /* (x + 1)/(x − 2): zero −1, VA x = 2, HA y = 1. f <= 0 on [−1, 2). */
+  c2fig: graph({x:[-5, 6], y:[-5, 5], w:260, vas:[2], has:[1],
+      curves:[{f:function(x){ return (x + 1) / (x - 2); }, b:1.98}, {f:function(x){ return (x + 1) / (x - 2); }, a:2.02}],
+      pts:[{x:-1, y:0}],
+      alt:"a rational graph with a vertical asymptote at 2 and a horizontal asymptote at 1, crossing the x-axis at −1"}),
+  /* x(x + 2)(x − 2) = x³ − 4x. Turning points near (±1.15, ∓3.08). */
+  w3: graph({x:[-3, 3], y:[-4, 4], curves:[{f:function(x){ return x * (x + 2) * (x - 2); }}],
+      hl:function(x){ return x * (x + 2) * (x - 2) <= 0; },
+      band:[[null, -2, false, false], [0, 2, false, false]],
+      pts:[{x:-2, y:0}, {x:0, y:0}, {x:2, y:0}, {x:1, y:-3, lb:"(1, −3)", dy:16}],
+      alt:"graph of x(x + 2)(x − 2), with the parts on or below the axis marked: left of −2, and from 0 to 2"}),
+  /* x(x − 3)²: max (1, 4), touches at 3. Below only left of 0. */
+  w4: graph({x:[-1, 5], y:[-4, 6], curves:[{f:function(x){ return x * (x - 3) * (x - 3); }}],
+      hl:function(x){ return x * (x - 3) * (x - 3) < 0; },
+      band:[[null, 0, false, true]],
+      pts:[{x:0, y:0}, {x:3, y:0, lb:"touches", dy:18}, {x:1, y:4, lb:"(1, 4)"}],
+      alt:"graph of x(x − 3) squared: below the axis left of 0, crossing at 0, touching the axis at 3"}),
+  /* (x + 2)/(x − 3): VA 3, HA 1, zero −2, f(0) = −2/3. <= 0 on [−2, 3). */
+  w5a: graph({x:[-6, 8], y:[-5, 5], vas:[3], has:[1],
+      curves:[{f:function(x){ return (x + 2) / (x - 3); }, b:2.98}, {f:function(x){ return (x + 2) / (x - 3); }, a:3.02}],
+      hl:function(x){ return x !== 3 && (x + 2) / (x - 3) <= 0; },
+      band:[[-2, 3, false, true]],
+      pts:[{x:-2, y:0}],
+      alt:"graph of (x + 2)/(x − 3), with asymptotes x = 3 and y = 1, below the axis from −2 to 3"}),
+  /* (x + 3)(x − 1)/(x + 1)²: VA −1 (even), HA 1, zeros −3, 1. > 0 on (−∞, −3) ∪ (1, ∞). */
+  w5b: graph({x:[-7, 5], y:[-6, 3], vas:[-1], has:[1],
+      curves:[{f:function(x){ return (x + 3) * (x - 1) / ((x + 1) * (x + 1)); }, b:-1.02},
+              {f:function(x){ return (x + 3) * (x - 1) / ((x + 1) * (x + 1)); }, a:-0.98}],
+      hl:function(x){ return x !== -1 && (x + 3) * (x - 1) / ((x + 1) * (x + 1)) > 0; },
+      band:[[null, -3, false, true], [1, null, true, false]],
+      pts:[{x:-3, y:0}, {x:1, y:0}],
+      alt:"graph of (x + 3)(x − 1) over (x + 1) squared: above the axis left of −3 and right of 1, below on both sides of the asymptote at −1"}),
+  /* (x + 2)(x − 1)(x − 3)/2: f(0) = 3, f(2) = −2. < 0 on (−∞, −2) ∪ (1, 3). */
+  q1fig: graph({x:[-3, 5], y:[-4, 5], w:240, curves:[{f:function(x){ return (x + 2) * (x - 1) * (x - 3) / 2; }}],
+      pts:[{x:-2, y:0}, {x:1, y:0}, {x:3, y:0}],
+      alt:"a cubic graph crossing the x-axis at −2, 1 and 3, rising on the right"})
+};
+$$("[data-g]").forEach(function(h){ h.innerHTML = FIGS[h.getAttribute("data-g")]; });
+
+/* ---- the reader: pick an inequality, see it marked on the graph ------------ */
+var RELS = [
+  {k:"gt", t:FX + " &gt; 0", say:"above the axis"},
+  {k:"lt", t:FX + " &lt; 0", say:"below the axis"},
+  {k:"ge", t:FX + " ≥ 0", say:"on or above the axis"},
+  {k:"le", t:FX + " ≤ 0", say:"on or below the axis"}
+];
+function reader(sel, gs){
+  var host = $(sel); if(!host) return;
+  host.className = "reader";
+  host.innerHTML = (gs.length > 1 ? "<div class='ctrls rd-gs'><span class='ctrl-label'>Graph</span></div>" : "") +
+    "<div class='ctrls rd-rels'><span class='ctrl-label'>Where is</span></div>" +
+    "<div class='rd-fig'></div><div class='gcap rd-cap'></div><div class='rd-out'></div>";
+  var gsEl = $(".rd-gs", host), relsEl = $(".rd-rels", host), figEl = $(".rd-fig", host),
+      capEl = $(".rd-cap", host), out = $(".rd-out", host), gi = 0, rk = null;
+  function val(g, x){
+    if((g.vas || []).some(function(a){ return Math.abs(x - a) < 1e-9; })) return null;
+    return g.f(x);
+  }
+  function setOf(g, k){
+    var r = SET.rel(k, 0);
+    return SET.fromTest(function(x){ var y = val(g, x); return y != null && r(y); }, g.crit);
+  }
+  function draw(){
+    var g = gs[gi], set = rk ? setOf(g, rk) : null, r = SET.rel(rk || "gt", 0);
+    var cfg = {x:g.x, y:g.y, vas:g.vas, has:g.has, curves:g.curves, pts:g.pts, w:340, alt:g.alt};
+    if(set){
+      cfg.band = set;
+      cfg.hl = function(x){ var y = val(g, x); return y != null && r(y); };
+    }
+    figEl.innerHTML = graph(cfg);
+    capEl.innerHTML = "<span class='m'>" + FX + " = " + g.m + "</span>";
+    if(!rk){ out.innerHTML = "Pick an inequality above. Say the answer first, then check it."; return; }
+    var R = RELS.filter(function(q){ return q.k === rk; })[0];
+    out.innerHTML = "<span class='m'>" + R.t + "</span>: where the graph is " + R.say + ". &nbsp;<span class='m ans'>" +
+      SET.fmt(set) + "</span>" + (g.notes && g.notes[rk] ? "<br>" + g.notes[rk] : "");
+  }
+  if(gsEl) gs.forEach(function(g, i){
+    var b = EXP.el("button", "btn" + (i === 0 ? " on" : ""), String(i + 1)); b.type = "button";
+    b.addEventListener("click", function(){
+      $$(".btn", gsEl).forEach(function(o){ o.classList.remove("on"); });
+      b.classList.add("on"); gi = i; rk = null;
+      $$(".btn", relsEl).forEach(function(o){ o.classList.remove("on"); });
+      draw();
+    });
+    gsEl.appendChild(b);
+  });
+  RELS.forEach(function(R){
+    var b = EXP.el("button", "btn", "<span class='m'>" + R.t + "</span>"); b.type = "button";
+    b.addEventListener("click", function(){
+      $$(".btn", relsEl).forEach(function(o){ o.classList.remove("on"); });
+      b.classList.add("on"); rk = R.k; draw();
+    });
+    relsEl.appendChild(b);
+  });
+  draw();
+}
+
+reader("#rdA", [
+  /* (x + 1)(x − 3): > 0 (−∞, −1) ∪ (3, ∞); < 0 (−1, 3); >= adds −1, 3. */
+  {m:"(" + X + " + 1)(" + X + " − 3)", f:A, crit:[-1, 3], x:[-3, 5], y:[-5, 5],
+   curves:[{f:A}], pts:[{x:-1, y:0}, {x:3, y:0}],
+   alt:"an upward parabola crossing the x-axis at −1 and 3",
+   notes:{ge:"The zeros −1 and 3 are on the axis, so ≥ includes them.", le:"The zeros −1 and 3 are on the axis, so ≤ includes them."}}
+]);
+
+reader("#rdB", [
+  /* (x + 2)(x − 1)²: touches at 1. > 0 (−2, 1) ∪ (1, ∞); < 0 (−∞, −2);
+     >= [−2, ∞); <= (−∞, −2] ∪ {1}. */
+  {m:"(" + X + " + 2)(" + X + " − 1)" + sq(2), f:B, crit:[-2, 1], x:[-4, 3], y:[-4, 5],
+   curves:[{f:B}], pts:[{x:-2, y:0}, {x:1, y:0}],
+   alt:"a cubic graph crossing the x-axis at −2 and touching it at 1",
+   notes:{gt:"At 1 the graph touches the axis: <i>f</i>(1) = 0, which isn't &gt; 0. So 1 splits the piece in two.",
+          le:"The touch point 1 is on the axis, so it counts, on its own: {1}.",
+          ge:"The touch point 1 is on the axis, so it's in. It sits inside the piece already."}},
+  /* (x − 1)/(x + 2): VA −2, HA 1. > 0 (−∞, −2) ∪ (1, ∞); >= (−∞, −2) ∪ [1, ∞);
+     < 0 (−2, 1); <= (−2, 1]. */
+  {m:fr(X + " − 1", X + " + 2"), f:C, crit:[-2, 1], vas:[-2], has:[1], x:[-7, 4], y:[-5, 5],
+   curves:[{f:C, b:-2.02}, {f:C, a:-1.98}], pts:[{x:1, y:0}],
+   alt:"a rational graph with asymptotes x = −2 and y = 1, crossing the x-axis at 1",
+   notes:{ge:"−2 is an asymptote. There's no point on the graph there, so it's out, even with ≥.",
+          le:"−2 is an asymptote, so it's out. 1 is a zero, so it's in."}}
+]);
+
+EXP.init({
+  storeKey: "m1200-graphineq-01",
+  inline: ["c1","c2","c3","c4","c5"],
+  quiz:   ["q1","q2","q3","q4","q5","q6"],
+
+  checks: {
+    /* −(x + 2)(x − 3) >= 0: on or above between the zeros */
+    c1: { opts:[
+      {t:"[−2, 3]", ok:true, fb:"Right. The graph is above the axis between −2 and 3, and on it at −2 and 3. ≥ includes them."},
+      {t:"(−2, 3)", fb:"≥ means on or above. At −2 and 3 the graph is on the axis, so they're in: square brackets."},
+      {t:"(−" + INF + ", −2]" + U + "[3, " + INF + ")", fb:"That's where the graph is below the axis, or on it. ≥ 0 asks for above."},
+      {t:"[−3, 2]", fb:"Read the zeros off the axis: the graph meets it at −2 and 3."}
+    ]},
+    /* (x + 1)/(x − 2) <= 0: below between −1 and the asymptote */
+    c2: { opts:[
+      {t:"[−1, 2)", ok:true, fb:"Right. Below the axis between −1 and 2. −1 is a zero, so it's in. 2 is an asymptote, so it's out."},
+      {t:"[−1, 2]", fb:"2 is an asymptote. The graph has no point there, so it's never in."},
+      {t:"(−1, 2)", fb:"At −1 the graph is on the axis, and ≤ allows that. So −1 is in."},
+      {t:"(−" + INF + ", −1]" + U + "(2, " + INF + ")", fb:"Those are the pieces above the axis. ≤ 0 asks for below."}
+    ]},
+    /* −(x + 1)(x − 2)(x − 4) >= 0: leading −x³, rises left, falls right.
+       Signs +, −, +, −  ->  (−∞, −1] ∪ [2, 4] */
+    c3: { opts:[
+      {t:"(−" + INF + ", −1]" + U + "[2, 4]", ok:true, fb:"Right. The leading term is −" + X + sq(3) + ", so the graph rises on the left and falls on the right. It comes down through −1, up through 2, down through 4. Check: <i>f</i>(3) = −(4)(1)(−1) = 4, above."},
+      {t:"[−1, 2]" + U + "[4, " + INF + ")", fb:"That's the answer without the minus in front. −" + X + sq(3) + " rises on the left, so the graph starts above the axis. Check: <i>f</i>(0) = −(1)(−2)(−4) = −8, below."},
+      {t:"(−" + INF + ", −1)" + U + "(2, 4)", fb:"The pieces are right, but ≥ includes the zeros: −1, 2 and 4 are in."},
+      {t:"[2, 4]", fb:"That's one of the pieces. The graph is above the axis on the far left too. Check: <i>f</i>(−2) = −(−1)(−4)(−6) = 24."}
+    ]},
+    /* x³ + 2x² − 3x < 0, x(x + 3)(x − 1) < 0. Signs −, +, −, +  ->  (−∞, −3) ∪ (0, 1) */
+    c4: { opts:[
+      {t:"(−" + INF + ", −3)" + U + "(0, 1)", ok:true, fb:"Right. " + X + sq(3) + " + 2" + X + sq(2) + " − 3" + X + " &lt; 0, so " + X + "(" + X + " + 3)(" + X + " − 1) &lt; 0. Like " + X + sq(3) + ": falls on the left. Below left of −3, and between 0 and 1."},
+      {t:"(−3, 0)" + U + "(1, " + INF + ")", fb:"That's where the graph is above the axis. &lt; 0 asks for below."},
+      {t:"(−" + INF + ", −3]" + U + "[0, 1]", fb:"&lt; is strict, so the zeros −3, 0 and 1 are out."},
+      {t:"(−" + INF + ", −1)" + U + "(0, 3)", fb:"Check the factoring: " + X + sq(2) + " + 2" + X + " − 3 = (" + X + " + 3)(" + X + " − 1), so the zeros are −3 and 1."}
+    ]},
+    /* (x + 3)/(x − 2)² >= 0: far right above, stays above at 2 (even), crosses at −3.
+       ->  [−3, 2) ∪ (2, ∞) */
+    c5: { opts:[
+      {t:"[−3, 2)" + U + "(2, " + INF + ")", ok:true, fb:"Right. Far right it's above. (" + X + " − 2)" + sq(2) + " is even, so the sign stays at 2. It crosses at −3. −3 is in, 2 is out."},
+      {t:"[−3, " + INF + ")", fb:"The pieces are right, but 2 is an asymptote. It's never in, so the answer has a gap there."},
+      {t:"[−3, 2)", fb:"That changes the sign at 2. (" + X + " − 2)" + sq(2) + " is even, so the sign stays. Check: <i>f</i>(3) = 6/1, positive."},
+      {t:"(−" + INF + ", −3]", fb:"That's the piece below the axis. Check: <i>f</i>(0) = 3/4, positive."}
+    ]},
+
+    /* graph q1fig: < 0 on (−∞, −2) ∪ (1, 3) */
+    q1: { ask:"From this graph of <i>f</i>, where is <span class='m'>" + FX + " &lt; 0</span>?", m:"<span data-g2='q1fig'></span>", opts:[
+      {t:"(−" + INF + ", −2)" + U + "(1, 3)", ok:true, fb:"Below the axis left of −2 and between 1 and 3. &lt; is strict, so the zeros are out."},
+      {t:"(−2, 1)" + U + "(3, " + INF + ")", fb:"That's where the graph is above the axis. See section 1."},
+      {t:"(−" + INF + ", −2]" + U + "[1, 3]", fb:"&lt; is strict: on the axis doesn't count. Round brackets. See section 1."},
+      {t:"(1, 3)", fb:"The graph is also below the axis on the far left, before −2. See section 1."}
+    ]},
+    q2: { ask:"The graph of <i>f</i> touches the <i>x</i>-axis at 2, and is above the axis everywhere else. Solve", m:FX + " &gt; 0", opts:[
+      {t:"(−" + INF + ", 2)" + U + "(2, " + INF + ")", ok:true, fb:"Above everywhere except at 2, where <i>f</i>(2) = 0."},
+      {t:"(−" + INF + ", " + INF + ")", fb:"At 2 the graph is on the axis: <i>f</i>(2) = 0, which isn't &gt; 0. See section 2."},
+      {t:"{2}", fb:"That's the answer for <i>f</i>(" + X + ") ≤ 0. See section 2."},
+      {t:"no solution", fb:"The graph is above the axis almost everywhere. See section 2."}
+    ]},
+    /* −x(x − 4) > 0: opens down, above between 0 and 4 */
+    q3: { ask:"Solve", m:"−" + X + "(" + X + " − 4) &gt; 0", opts:[
+      {t:"(0, 4)", ok:true, fb:"Leading term −" + X + sq(2) + ": the graph opens down, so it's above the axis between its zeros."},
+      {t:"(−" + INF + ", 0)" + U + "(4, " + INF + ")", fb:"That ignores the minus. −" + X + sq(2) + " opens down. Check: 1 gives −1 · (−3) = 3, positive. See section 3."},
+      {t:"[0, 4]", fb:"&gt; is strict, so 0 and 4 are out. See section 1."},
+      {t:"(−4, 0)", fb:X + " − 4 is 0 at 4, not −4. See section 3."}
+    ]},
+    /* x³ - 9x >= 0, x(x + 3)(x − 3) >= 0  ->  [−3, 0] ∪ [3, ∞) */
+    q4: { ask:"Solve", m:X + sq(3) + " ≥ 9" + X, opts:[
+      {t:"[−3, 0]" + U + "[3, " + INF + ")", ok:true, fb:X + sq(3) + " − 9" + X + " = " + X + "(" + X + " + 3)(" + X + " − 3) ≥ 0. Falls on the left, so: below, above, below, above."},
+      {t:"(−" + INF + ", −3]" + U + "[3, " + INF + ")", fb:"That comes from dividing by " + X + ". Test −1: −1 ≥ −9 is true, so −1 works. See section 4."},
+      {t:"(−" + INF + ", −3]" + U + "[0, 3]", fb:"That's on or below the axis. The graph rises on the right. See section 3."},
+      {t:"(−3, 0)" + U + "(3, " + INF + ")", fb:"≥ includes the zeros −3, 0 and 3. See section 1."}
+    ]},
+    /* (x − 1)²(x + 4) < 0: touches at 1, crosses at −4, like x³  ->  (−∞, −4) */
+    q5: { ask:"Solve", m:"(" + X + " − 1)" + sq(2) + "(" + X + " + 4) &lt; 0", opts:[
+      {t:"(−" + INF + ", −4)", ok:true, fb:"Like " + X + sq(3) + ": below on the left. It crosses at −4, then touches at 1 and stays above."},
+      {t:"(−" + INF + ", −4)" + U + "(1, " + INF + ")", fb:"That has the graph crossing at 1. (" + X + " − 1)" + sq(2) + " is even: it touches and turns back. See section 4."},
+      {t:"(−4, 1)", fb:"That's above the axis. Check: 0 gives (1)(4) = 4, positive. See section 3."},
+      {t:"(−" + INF + ", −4]", fb:"&lt; is strict, so −4 is out. See section 1."}
+    ]},
+    /* (x + 2)/(x − 1)² <= 0: far right above, stays above at 1, crosses at −2  ->  (−∞, −2] */
+    q6: { ask:"Solve", m:fr(X + " + 2", "(" + X + " − 1)" + sq(2)) + " ≤ 0", opts:[
+      {t:"(−" + INF + ", −2]", ok:true, fb:"Above far right. Even power at 1, so still above. Crosses at −2. Below left of −2, and −2 itself is a zero."},
+      {t:"(−" + INF + ", −2]" + U + "(1, " + INF + ")", fb:"That changes the sign at 1. (" + X + " − 1)" + sq(2) + " is even, so the sign stays. See section 5."},
+      {t:"[−2, 1)", fb:"That piece is above the axis. Check: 0 gives 2/1, positive. See section 5."},
+      {t:"(−" + INF + ", −2)", fb:"≤ includes the zero −2. See section 1."}
+    ]}
+  },
+
+  verdicts: {
+    all:"All six. Sketch it, then read it off the axis.",
+    most:"Close. Sketch the misses on paper, using the section each one names.",
+    few:"Go back to section 1 and work forward. Try every button on both graphs in sections 1 and 2."
+  },
+
+  traps: [
+    {bad:"<i>x</i><sup>2</sup> &gt; 9<i>x</i>, so <i>x</i> &gt; 9", badge:"Wrong",
+     why:"Dividing by <i>x</i> breaks when <i>x</i> is negative. Get 0 on one side: <i>x</i>(<i>x</i> − 9) &gt; 0, a U through 0 and 9. Above outside: (−∞, 0) ∪ (9, ∞).",
+     sub:"x = −1", verdict:"1 &gt; −9 is true, so −1 works",
+     left:{lbl:"x² at −1", val:"1"}, right:{lbl:"9x at −1", val:"−9"}},
+    {bad:fr("<i>x</i> + 2", "<i>x</i> − 3") + " ≥ 0 includes <i>x</i> = 3", badge:"Wrong",
+     why:"3 makes the bottom 0. It's an asymptote: the graph has no point there. Never in, even with ≥.",
+     sub:"x = 3", verdict:"undefined: open dot",
+     left:{lbl:"(3 + 2) / (3 − 3)", val:"5 / 0"}, right:{lbl:"so 3 is", val:"out"}},
+    {bad:"(<i>x</i> − 2)<sup>2</sup>(<i>x</i> + 1) &gt; 0 is (−1, ∞)", badge:"Wrong",
+     why:"At 2 the graph touches the axis, so <i>f</i>(2) = 0. The answer is (−1, 2) ∪ (2, ∞).",
+     sub:"x = 2", verdict:"0 &gt; 0 is false",
+     left:{lbl:"(2 − 2)²(2 + 1)", val:"0"}, right:{lbl:"needs", val:"&gt; 0"}},
+    {bad:fr("<i>x</i> − 4", "(<i>x</i> + 1)<sup>2</sup>") + " &lt; 0 is (−1, 4)", badge:"Wrong",
+     why:"(<i>x</i> + 1)<sup>2</sup> is even, so the sign stays at −1. It's below on both sides: (−∞, −1) ∪ (−1, 4).",
+     sub:"x = −2", verdict:"−6 &lt; 0 is true, so −2 works",
+     left:{lbl:"(−2 − 4) / (−2 + 1)²", val:"−6"}, right:{lbl:"needs", val:"&lt; 0"}}
+  ]
+});
+
+/* the quiz graph is drawn after the quiz exists */
+$$("[data-g2]").forEach(function(h){ h.innerHTML = FIGS[h.getAttribute("data-g2")]; });
+
+EXP.walks();
+
+})();
+</script>
+</body>
+</html>

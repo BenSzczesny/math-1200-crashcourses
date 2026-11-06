@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Diamond</title>
+<title>Walk Across the Graph</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -362,12 +367,19 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 .hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
 
 /* ---------- page map ---------- */
-.pagemap{list-style:none; counter-reset:pm; margin:22px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px}
-.pagemap li{counter-increment:pm}
-.pagemap a{display:block; position:relative; padding:10px 14px 10px 38px; border:1px solid var(--rule); border-radius:8px; background:var(--surface); color:var(--ink); text-decoration:none; font-size:15px; line-height:1.35}
-.pagemap a::before{content:counter(pm); position:absolute; left:14px; top:12px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
-.pagemap a:hover{border-color:var(--accent)}
-.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+/* A contents list, not tiles: numbered rows on hairlines, reading down two
+   columns on wide screens and one on phones. */
+.pagemap{list-style:none; counter-reset:pm; margin:26px 0 0; padding:0; columns:2 250px; column-gap:44px}
+.pagemap::before{content:"On this page"; display:block; column-span:all; margin:0 0 6px; padding-bottom:8px;
+  border-bottom:1px solid var(--rule-strong); font-family:var(--mono); font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3)}
+.pagemap li{counter-increment:pm; break-inside:avoid}
+.pagemap a{display:block; position:relative; padding:8px 2px 8px 36px; border-bottom:1px solid var(--rule);
+  color:var(--ink); text-decoration:none; font-size:15.5px; line-height:1.35}
+.pagemap a::before{content:counter(pm, decimal-leading-zero); position:absolute; left:2px; top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{color:var(--accent-2); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.pagemap a:hover::before{color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:3px}
 
 /* ---------- key idea / watch out ---------- */
 .keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
@@ -462,45 +474,86 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 }
 </style>
 <style>
-/* diamond lesson only */
-.diawrap{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
-.diarow{display:flex; flex-wrap:wrap; gap:24px; align-items:center}
-.diarow .side{flex:1 1 240px; min-width:220px}
-.diarow svg{display:block; max-width:100%; height:auto}
-.dia-face{fill:var(--surface-2); stroke:var(--rule-strong); stroke-width:1.6}
-.dia-line{stroke:var(--rule-strong); stroke-width:1.4}
-.dia-txt{font-family:var(--mono); font-size:19px; fill:var(--ink); text-anchor:middle}
-.dia-txt.q{fill:var(--ink-3)}
-.dia-txt.a{fill:var(--accent); font-size:20px}
-.dia-lbl{font-family:var(--mono); font-size:10px; letter-spacing:.12em; fill:var(--ink-3); text-anchor:middle; text-transform:uppercase}
-.signgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:10px; margin:0 0 20px}
-.signcard{border:1px solid var(--rule); border-left:3px solid var(--accent); border-radius:0 9px 9px 0; background:var(--surface); padding:14px 16px}
-.signcard .when{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:7px}
-.signcard .what{font-weight:700; color:var(--ink); font-size:15px; margin-bottom:5px}
-.signcard small{display:block; color:var(--ink-2); font-size:13.5px; line-height:1.5}
-.pairbtns{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px}
-.pairbtn{font-family:var(--serif); font-size:18px; padding:11px 14px; border-radius:8px;
-         border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink)}
-.pairbtn:hover:not(:disabled){border-color:var(--accent)}
-.pairbtn:disabled{cursor:default}
-.pairbtn.right{border-color:var(--ok); background:var(--ok-wash)}
-.pairbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
-</style>
-<style>
-.pftab{width:100%; border-collapse:collapse; margin:12px 0 4px; font-size:15px}
-.pftab th{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); font-weight:500; text-align:left; padding:6px 10px; border-bottom:1px solid var(--rule)}
-.pftab td{padding:6px 10px; border-bottom:1px dashed var(--rule); font-family:var(--serif); font-size:17px}
-.pftab tr.hit td{background:var(--ok-wash); color:var(--ok); font-weight:600}
-.pfres{font-family:var(--serif); font-size:20px}
+/* walk-across-the-graph lesson only */
+.gp{display:block; width:100%; height:auto}
+.gp-g{stroke:var(--rule); stroke-width:1}
+.gp-a{stroke:var(--ink-3); stroke-width:1.4}
+.gp-t{font-family:var(--mono); font-size:10.5px; fill:var(--ink-3); text-anchor:middle}
+.gp-new{fill:none; stroke:var(--accent-2); stroke-width:2.8; stroke-linejoin:round; stroke-linecap:round}
+.gp-dim{fill:none; stroke:var(--ink-3); stroke-width:2; stroke-dasharray:2 5; stroke-linecap:round}
+.gp-as{stroke:var(--wrong); stroke-width:1.8; stroke-dasharray:6 5}
+.gp-pn{fill:var(--accent-2)}
+.gp-hole{fill:var(--surface); stroke:var(--accent-2); stroke-width:2.4}
+.gp-lb{font-family:var(--mono); font-size:11.5px; fill:var(--ink-2); font-weight:500}
+.gp-sg{font-family:var(--mono); font-size:12.5px; font-weight:500; fill:var(--ok); text-anchor:middle}
+.gfig{margin:6px 0 20px; max-width:340px}
+.gcap{font-size:13.5px; color:var(--ink-2); margin-top:6px; line-height:1.45}
+.check-q svg.gp{max-width:280px; margin-top:6px}
+.walk-steps li .gfig{grid-column:1/-1; margin:10px 0 2px}
+/* a worked example whose graph grows beside its steps */
+.walkg{display:grid; grid-template-columns:minmax(0,1fr) 300px; column-gap:22px}
+.walkg .walk-q, .walkg .walk-ctrls{grid-column:1/-1}
+.walkg .walk-steps{grid-column:1; grid-row:2}
+.walkg .walk-steps li{grid-template-columns:1fr}
+.wg-fig{grid-column:2; grid-row:2; align-self:start; position:sticky; top:60px; padding-top:12px; background:var(--surface); z-index:1}
+.wg-fig .gp-dim{stroke:var(--ink-2); stroke-width:2.8; stroke-dasharray:1 6}
+@media (max-width:720px){
+  .walkg{grid-template-columns:minmax(0,1fr)}
+  .walkg .walk-steps, .wg-fig{grid-column:1; grid-row:auto}
+  .wg-fig{max-width:300px; width:100%; justify-self:center; padding-bottom:6px}
+}
+.walk-steps li > .m{white-space:normal}
+.pgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; margin:0 0 24px}
+.pcard{border:1px solid var(--rule); border-radius:10px; background:var(--surface); padding:12px 14px}
+.pcard .gp{max-width:200px; margin:0 auto 8px}
+.pc-eq{display:block; font-size:1.3em; margin-bottom:2px}
+.pc-d{font-size:14px; color:var(--ink-2); line-height:1.45}
+.hrule{flex-direction:column; align-items:stretch; gap:0}
+.hrule .tag{margin-bottom:6px}
+.hrule .hc{display:grid; grid-template-columns:7.6em 1fr; column-gap:14px; row-gap:2px; padding:10px 0; border-top:1px dashed var(--rule-strong)}
+.hrule .hk{grid-row:1/3; align-self:center; font-family:var(--serif); font-size:19px; font-weight:600; color:var(--ink); line-height:1.25}
+.hrule .hw{font-size:15px; color:var(--ink-2)}
+.hrule .ha{font-family:var(--serif); font-size:20px; color:var(--ink)}
+.hrule i{font-style:italic}
+.check .opts{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.opt .m{white-space:normal}
+.drill .drill-q{white-space:normal}
+.ld-goal{font-weight:700; font-size:15.5px; color:var(--ink); margin:8px 0 0}
+.ld-goal:empty{display:none}
+.ld-q{font-size:clamp(22px,3.4vw,28px); margin:4px 0 12px}
+.ld-final{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; margin:12px 0 0; padding:12px 14px; border-radius:8px; background:var(--ok-wash)}
+.ld-final:empty{display:none}
+.ld-final .lbl{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ok)}
+.ld-final .m{font-size:1.3em; color:var(--ok); font-weight:600}
+.ld-final i{font-style:italic}
+.ld-final sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ld-done{display:flex; flex-direction:column; gap:4px; margin:0 0 10px}
+.ld-done:empty{display:none}
+.ld-line{display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline; font-size:15px; color:var(--ink-2)}
+.ld-line .m{color:var(--ok); font-weight:600; font-size:1.12em}
+.ld-ask{font-weight:700; font-size:15.5px; margin:0 0 10px; color:var(--ink)}
+.ld-step{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-right:10px}
+.ld-opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:0 0 6px}
+.drill.wide .ld-opts{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.ldbtn{font-family:var(--serif); font-size:18px; padding:11px 14px; border-radius:8px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink); cursor:pointer; text-align:center}
+.ldbtn i, .ld-q i, .ld-line i, .ld-ask i{font-style:italic}
+.ldbtn sup, .ld-q sup, .ld-line sup, .ld-ask sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ldbtn:hover:not(:disabled){border-color:var(--accent)}
+.ldbtn:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+.ldbtn:disabled{cursor:default}
+.ldbtn.right{border-color:var(--ok); background:var(--ok-wash)}
+.ldbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+@media (max-width:480px){ .drill.wide .ld-opts{grid-template-columns:1fr} }
+.ld-q{white-space:normal}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="topbar-in">
-    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Factoring 2</b></div>
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Walk Across the Graph</b></div>
     <div class="meter">
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
-      <div class="meter-num" id="meterNum">0 / 12 correct</div>
+      <div class="meter-num" id="meterNum">0 / 9 correct</div>
     </div>
   </div>
 </div>
@@ -508,298 +561,147 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <main>
 
 <section id="top">
-  <div class="eyebrow">Factoring · Part 2</div>
-  <h1>Two numbers do all the work</h1>
-  <p class="lead">Factoring a quadratic comes down to one question: <strong>which two numbers multiply to one thing and add to another?</strong> The diamond is where you write that question down.</p>
-  <p>Do Part 1 first: the diamond ends with a grouping step. No calculator needed.</p>
-  <p style="font-size:14.5px">ALEKS topics: <em>Factoring a quadratic with leading coefficient 1</em> · <em>Factoring out a constant before factoring a quadratic</em> · <em>Factoring a quadratic with leading coefficient greater than 1</em> · <em>Factoring a perfect square trinomial with leading coefficient greater than 1</em> (§R.5).</p>
+  <div class="eyebrow">Graphing rational functions · Part 3 of 3</div>
+  <h1>Walk across the graph</h1>
+  <p class="lead">You know where the ends go. You know what the graph does at each key number. Put them together, and you can tell which side of the <i>x</i>-axis the graph is on, <strong>everywhere, without testing a number.</strong></p>
+  <p>Do <strong><a class="xref" href="graphing-rational-1-the-ends.html">The Ends of a Graph</a></strong> and <strong><a class="xref" href="graphing-rational-2-even-and-odd.html">Even Keeps, Odd Changes</a></strong> first. Next comes <strong><a class="xref" href="inequalities-from-graphs.html">Inequalities from Graphs</a></strong>, which uses these sketches. No calculator needed.</p>
+  <p style="font-size:14.5px">Module 17 (§3.6): <em>Graphing a rational function: Constant over linear</em>, <em>Graphing a rational function: Linear over linear</em>, <em>Graphing rational functions with holes</em>, and <em>Matching graphs with rational functions: Two vertical asymptotes</em>.</p>
   <ol class="pagemap">
-    <li><a href="#s1">Where the two numbers come from</a></li>
-    <li><a href="#s2">The diamond</a></li>
-    <li><a href="#s3">Signs first</a></li>
-    <li><a href="#s4">Front number is 1</a></li>
-    <li><a href="#s5">Front number isn't 1</a></li>
-    <li><a href="#s6">Common factor first</a></li>
-    <li><a href="#s7">Perfect squares</a></li>
-    <li><a href="#s8">Try any quadratic</a></li>
-    <li><a href="#s9">Common mistakes</a></li>
-    <li><a href="#s10">Practice one step at a time</a></li>
-    <li><a href="#s11">Check yourself</a></li>
-    <li><a href="#s12">Cheat sheet</a></li>
+    <li><a href="#s1">The walk</a></li>
+    <li><a href="#s2">Fractions</a></li>
+    <li><a href="#s3">Two asymptotes, and holes</a></li>
+    <li><a href="#s4">Practice</a></li>
+    <li><a href="#s5">Common mistakes</a></li>
+    <li><a href="#s6">Check yourself</a></li>
+    <li><a href="#s7">Cheat sheet</a></li>
   </ol>
 </section>
 
 <section id="s1">
-  <div class="eyebrow">1 · Where it comes from</div>
-  <h2>Multiply two brackets and look at the result</h2>
+  <div class="eyebrow">1 · The method</div>
+  <h2>Start at the right end and walk left</h2>
 
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Multiply out</span><span class="m">(<i>x</i> + <i>p</i>)(<i>x</i> + <i>q</i>)</span></div>
+  <div class="keybox">
+    <span class="tag">What you bring</span>
+    <ul>
+      <li><strong>The ends:</strong> leading term over leading term, then simplify. Plus is above on the right, minus is below. Even or just a number: the left end is on the same side. Odd: the other side.</li>
+      <li><strong>The key numbers:</strong> at each zero or vertical asymptote, an odd power changes the sign and an even power keeps it. The sign just means which side of the <i>x</i>-axis the graph is on: above is positive, below is negative.</li>
+    </ul>
+  </div>
+
+  <ol class="steps-list">
+    <li><strong>Factor and cancel.</strong> Mark the key numbers.</li>
+    <li><strong>Right end:</strong> above or below, from the leading terms.</li>
+    <li><strong>Walk left.</strong> At each key number, switch sides if the power is odd. Stay on the same side if the power is even.</li>
+    <li><strong>Check:</strong> you must arrive at the left end the leading terms gave you. If you don't, a power was misread.</li>
+  </ol>
+  <p>The check works because the ends and the powers come from the same factors. So they have to agree.</p>
+  <p>Click through the steps and watch the graph grow. The dotted piece is the left end you predicted. The walk has to land on it.</p>
+
+  <div class="walk walkg">
+    <div class="walk-q"><span class="ask">Sketch</span><span class="m"><i>f</i>(<i>x</i>) = (<i>x</i> + 2)(<i>x</i> − 1)<sup>2</sup></span></div>
+    <div class="wg-fig" data-stages="w1"></div>
     <ol class="walk-steps">
-      <li><span class="m"><i>x</i><sup>2</sup> + <i>qx</i> + <i>px</i> + <i>pq</i></span><span class="why">Each term in the first bracket times each term in the second.</span></li>
-      <li class="ans"><span class="m"><i>x</i><sup>2</sup> + (<i>p</i> + <i>q</i>)<i>x</i> + <i>pq</i></span><span class="why">The middle number is <span class="m"><i>p</i> + <i>q</i></span>. The last number is <span class="m"><i>pq</i></span>.</span></li>
+      <li><span class="m">zeros: 1 (even), −2 (odd)</span><span class="why">A polynomial has no asymptotes.</span></li>
+      <li><span class="m">ends like <i>x</i> · <i>x</i><sup>2</sup> = <i>x</i><sup>3</sup></span><span class="why">Plus and odd: above on the right, below on the left.</span></li>
+      <li><span class="m">start above; keep at 1</span><span class="why">Above right of 1. Even at 1, so it touches and stays above.</span></li>
+      <li><span class="m">change at −2</span><span class="why">Odd at −2, so it crosses to below.</span></li>
+      <li class="ans"><span class="m">arrives below on the left ✓</span><span class="why">That matches the left end.</span></li>
     </ol>
   </div>
-
-  <p>So factoring <span class="m"><i>x</i><sup>2</sup> + 7<i>x</i> + 12</span> means finding two numbers that <strong>multiply to 12 and add to 7</strong>.</p>
-
-  <div class="rulebox">
-    <span class="tag">The question, every time</span>
-    <span class="m">multiply to ___ &nbsp;&nbsp; add to ___</span>
-  </div>
+  <p>The words along the top of each figure are what the walk found: which side of the axis the graph is on in each piece. You never had to test a number. For more detail, add the <i>y</i>-intercept, <span class="m"><i>f</i>(0)</span>.</p>
 </section>
 
 <section id="s2">
-  <div class="eyebrow">2 · The tool</div>
-  <h2>The diamond</h2>
-  <p><strong>Top: the product. Bottom: the sum. Sides: the two numbers you're looking for.</strong> It puts both conditions in front of you, so a pair that only passes one of them looks wrong.</p>
+  <div class="eyebrow">2 · Fractions</div>
+  <h2>Asymptotes join the walk</h2>
+  <p>An asymptote is one more key number. Knowing the side tells you which way the graph goes beside it:</p>
+  <div class="rulebox">
+    <span class="tag">Beside a vertical asymptote</span>
+    <span>A graph that's <strong>above</strong> the axis shoots <strong>up</strong>.</span>
+    <span>A graph that's <strong>below</strong> the axis shoots <strong>down</strong>.</span>
+  </div>
 
-  <div class="diawrap">
-    <div class="diarow">
-      <div style="flex:0 0 auto" id="diaDemo"></div>
-      <div class="side">
-        <p style="margin:0 0 10px"><strong>For <span class="m"><i>x</i><sup>2</sup> + 7<i>x</i> + 12</span>:</strong></p>
-        <ol class="plain" style="margin:0; padding-left:20px">
-          <li>Top: 12. Bottom: 7.</li>
-          <li>Pairs that multiply to 12: 1 and 12, 2 and 6, 3 and 4.</li>
-          <li>Only 3 and 4 add to 7.</li>
-        </ol>
-        <p style="margin:12px 0 0"><button class="btn" id="diaBtn">Fill the sides</button></p>
-      </div>
-    </div>
+  <div class="walk walkg">
+    <div class="walk-q"><span class="ask">Sketch</span><span class="m"><i>f</i>(<i>x</i>) = <span class="fr"><span><i>x</i> + 2</span><span><i>x</i> − 3</span></span></span></div>
+    <div class="wg-fig" data-stages="w2"></div>
+    <ol class="walk-steps">
+      <li><span class="m">zero −2 (odd), asymptote <i>x</i> = 3 (odd)</span><span class="why">Top and bottom, each with power 1.</span></li>
+      <li><span class="m">ends: <span class="fr"><span><i>x</i></span><span><i>x</i></span></span> = 1</span><span class="why">Horizontal asymptote <span class="m"><i>y</i> = 1</span>. Above on both ends.</span></li>
+      <li><span class="m">start above; change at 3</span><span class="why">Right of 3 it's above, so it shoots up there. Odd, so left of 3 it's below and shoots down.</span></li>
+      <li><span class="m">change at −2</span><span class="why">Odd at −2, so it crosses back to above.</span></li>
+      <li class="ans"><span class="m">arrives above on the left ✓</span><span class="why">That matches. And <span class="m"><i>f</i>(0) = <span class="fr"><span>2</span><span>−3</span></span></span> is below, as drawn.</span></li>
+    </ol>
+  </div>
+
+  <div class="walk walkg">
+    <div class="walk-q"><span class="ask">Sketch</span><span class="m"><i>f</i>(<i>x</i>) = <span class="fr"><span><i>x</i> − 2</span><span>(<i>x</i> + 1)<sup>2</sup></span></span></span></div>
+    <div class="wg-fig" data-stages="w3"></div>
+    <ol class="walk-steps">
+      <li><span class="m">zero 2 (odd), asymptote <i>x</i> = −1 (even)</span><span class="why">The bottom's power is 2.</span></li>
+      <li><span class="m">ends: <span class="fr"><span><i>x</i></span><span><i>x</i><sup>2</sup></span></span> = <span class="fr"><span>1</span><span><i>x</i></span></span></span><span class="why">Horizontal asymptote <span class="m"><i>y</i> = 0</span>. Just above on the right, just below on the left.</span></li>
+      <li><span class="m">start above; change at 2</span><span class="why">It crosses to below at 2.</span></li>
+      <li><span class="m">keep at −1</span><span class="why">Even at −1, so it's below on both sides of the asymptote: it shoots down on both sides.</span></li>
+      <li class="ans"><span class="m">arrives below on the left ✓</span><span class="why">That matches. And <span class="m"><i>f</i>(0) = −2</span> is below, as drawn.</span></li>
+    </ol>
+  </div>
+
+  <div class="check" data-q="c1">
+    <div class="check-q"><span class="ask">Beside <span class="m"><i>x</i> = −2</span>, the graph of</span><span class="m"><i>f</i>(<i>x</i>) = <span class="fr"><span><i>x</i> − 1</span><span>(<i>x</i> + 2)<sup>2</sup></span></span></span></div>
+    <div class="opts"></div><div class="fb"></div>
   </div>
 </section>
 
 <section id="s3">
-  <div class="eyebrow">3 · Save time</div>
-  <h2>Work out the signs first</h2>
-  <p>The signs of the two numbers are decided by the top and bottom of the diamond. Work them out before you search.</p>
+  <div class="eyebrow">3 · More key numbers</div>
+  <h2>Two asymptotes, and holes</h2>
+  <p>More key numbers only means more steps. Take them one at a time.</p>
 
-  <div class="signgrid">
-    <div class="signcard">
-      <div class="when">Product +, sum +</div>
-      <div class="what">Both positive</div>
-      <small><span class="m"><i>x</i><sup>2</sup> + 7<i>x</i> + 12</span>: 3 and 4</small>
-    </div>
-    <div class="signcard">
-      <div class="when">Product +, sum −</div>
-      <div class="what">Both negative</div>
-      <small><span class="m"><i>x</i><sup>2</sup> − 7<i>x</i> + 12</span>: −3 and −4</small>
-    </div>
-    <div class="signcard">
-      <div class="when">Product −</div>
-      <div class="what">One of each</div>
-      <small>The bigger one gets the sign of the sum. <span class="m"><i>x</i><sup>2</sup> + <i>x</i> − 12</span>: 4 and −3</small>
-    </div>
+  <div class="walk walkg">
+    <div class="walk-q"><span class="ask">Sketch</span><span class="m"><i>f</i>(<i>x</i>) = <span class="fr"><span><i>x</i></span><span>(<i>x</i> − 2)(<i>x</i> + 2)</span></span></span></div>
+    <div class="wg-fig" data-stages="w4"></div>
+    <ol class="walk-steps">
+      <li><span class="m">zero 0, asymptotes <i>x</i> = 2 and <i>x</i> = −2</span><span class="why">All odd, so the sign changes at all three.</span></li>
+      <li><span class="m">ends: <span class="fr"><span><i>x</i></span><span><i>x</i><sup>2</sup></span></span> = <span class="fr"><span>1</span><span><i>x</i></span></span></span><span class="why"><span class="m"><i>y</i> = 0</span>. Just above on the right, just below on the left.</span></li>
+      <li><span class="m">start above; change at 2</span><span class="why">Right of 2 it's above, so it shoots up there. Odd, so between 0 and 2 it's below and shoots down.</span></li>
+      <li><span class="m">change at 0</span><span class="why">Odd at 0, so it crosses to above.</span></li>
+      <li><span class="m">change at −2</span><span class="why">Between −2 and 0 it's above, so it shoots up there. Odd, so left of −2 it's below and shoots down.</span></li>
+      <li class="ans"><span class="m">arrives below on the left ✓</span><span class="why">Three changes turned above into below, and the left end agrees.</span></li>
+    </ol>
   </div>
 
-  <h3>Drill: pick the pair</h3>
-  <div class="drill">
-    <div class="drill-top">
-      <span class="count" id="dlCount"></span>
-      <div class="pips" id="dlPips"></div>
-    </div>
-    <div class="diarow" style="margin-bottom:14px">
-      <div style="flex:0 0 auto" id="dlDia"></div>
-      <div class="side">
-        <div class="pairbtns" id="dlBtns"></div>
-      </div>
-    </div>
-    <div class="drill-btns">
-      <button class="btn" id="dlNext" style="display:none">Next</button>
-    </div>
-    <div class="drill-fb" id="dlFb"></div>
+  <div class="check" data-q="c2">
+    <div class="check-q"><span class="ask">From left to right, the graph of</span><span class="m"><i>f</i>(<i>x</i>) = <span class="fr"><span><i>x</i> + 4</span><span><i>x</i>(<i>x</i> − 2)</span></span></span><span class="ask">is</span></div>
+    <div class="opts"></div><div class="fb"></div>
   </div>
 
-  <div class="check" data-q="d1">
-    <div class="check-q"><span class="ask">Before searching: what are the two signs in</span><span class="m" id="q_d1"></span><span class="ask">?</span></div>
+  <h3>Holes</h3>
+  <p>A hole changes nothing in the walk. Cancel the factor, sketch what's left, then put an open circle on the curve at the hole. Its height comes from putting its <span class="m"><i>x</i></span> into what's left, and that also tells you which side of the axis it's on.</p>
+
+  <div class="check" data-q="c3">
+    <div class="check-q"><span class="ask">The hole in</span><span class="m"><i>f</i>(<i>x</i>) = <span class="fr"><span>(<i>x</i> − 1)(<i>x</i> + 2)</span><span>(<i>x</i> − 1)(<i>x</i> − 3)</span></span></span><span class="ask">is at</span></div>
     <div class="opts"></div><div class="fb"></div>
   </div>
 </section>
 
 <section id="s4">
-  <div class="eyebrow">4 · Easy case</div>
-  <h2>When the front number is 1, the pair goes straight in</h2>
-
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m"><i>x</i><sup>2</sup> + 3<i>x</i> − 18</span></div>
-    <ol class="walk-steps">
-      <li><span class="m">multiply to −18, add to 3</span><span class="why">Product negative: one of each sign. Sum positive: the bigger one is positive.</span></li>
-      <li><span class="m">6 and −3</span><span class="why">Pairs for 18: 1 &amp; 18, 2 &amp; 9, 3 &amp; 6. Only 6 and &minus;3 add to 3.</span></li>
-      <li class="ans"><span class="m">(<i>x</i> + 6)(<i>x</i> − 3)</span><span class="why">Put them in the brackets. Check the middle: <span class="m">&minus;3<i>x</i> + 6<i>x</i> = 3<i>x</i></span>.</span></li>
-    </ol>
-  </div>
-
-  <div class="warn">
-    <span class="tag">Only when the front number is 1</span>
-    <p>For <span class="m">2<i>x</i><sup>2</sup></span>, <span class="m">3<i>x</i><sup>2</sup></span> and so on, the pair does <em>not</em> go straight in. See section 5.</p>
-  </div>
-
-  <div class="check" data-q="d2">
-    <div class="check-q"><span class="ask">Factor</span><span class="m" id="q_d2"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
+  <div class="eyebrow">4 · Practice</div>
+  <h2>One key number at a time</h2>
+  <p>Start at the right end and walk left. Work on paper, then pick.</p>
+  <div id="ldWalk"></div>
 </section>
 
 <section id="s5">
-  <div class="eyebrow">5 · Harder case</div>
-  <h2>When the front number isn't 1</h2>
-  <p>For <span class="m"><i>a</i><i>x</i><sup>2</sup> + <i>b</i><i>x</i> + <i>c</i></span>, two things change:</p>
-
-  <div class="keybox">
-    <span class="tag">Two changes</span>
-    <ul>
-      <li>The top of the diamond is <span class="m"><i>a</i> <span class="op">·</span> <i>c</i></span>, not <span class="m"><i>c</i></span>.</li>
-      <li>The two numbers <strong>split the middle term</strong>. Then factor by grouping (Part 1).</li>
-    </ul>
-  </div>
-
-  <div class="diawrap">
-    <div class="diarow">
-      <div style="flex:0 0 auto" id="nonDia"></div>
-      <div class="side">
-        <p style="margin:0 0 8px"><strong><span class="m">10<i>y</i><sup>2</sup> + 27<i>y</i> + 5</span></strong></p>
-        <ol class="plain" style="margin:0; padding-left:20px">
-          <li>Top: <span class="m">10 <span class="op">·</span> 5 = 50</span>. Bottom: 27.</li>
-          <li>Pairs for 50: 1 &amp; 50, 2 &amp; 25, 5 &amp; 10.</li>
-          <li>Only 2 and 25 add to 27.</li>
-        </ol>
-      </div>
-    </div>
-  </div>
-
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m">10<i>y</i><sup>2</sup> + 27<i>y</i> + 5</span></div>
-    <ol class="walk-steps">
-      <li><span class="m">10<i>y</i><sup>2</sup> + 25<i>y</i> + 2<i>y</i> + 5</span><span class="why">Split <span class="m">27<i>y</i></span> into <span class="m">25<i>y</i> + 2<i>y</i></span>.</span></li>
-      <li><span class="m">5<i>y</i>(2<i>y</i> + 5) + 1(2<i>y</i> + 5)</span><span class="why">Group in pairs. The same bracket twice means the split was right.</span></li>
-      <li class="ans"><span class="m">(2<i>y</i> + 5)(5<i>y</i> + 1)</span><span class="why">Pull out the shared bracket. (Splitting as <span class="m">2<i>y</i> + 25<i>y</i></span> gives the same answer.)</span></li>
-    </ol>
-  </div>
-
-  <div class="compare">
-    <div>
-      <div class="hd">Wrong: pair dropped straight in</div>
-      <span class="m">2<i>x</i><sup>2</sup> + 7<i>x</i> + 3 &ne; (2<i>x</i> + 6)(<i>x</i> + 1)</span>
-      <small>6 and 1 are the right pair, but multiplying back gives <span class="m">2<i>x</i><sup>2</sup> + 8<i>x</i> + 6</span>.</small>
-    </div>
-    <div>
-      <div class="hd">Right: split and group</div>
-      <span class="m">2<i>x</i><sup>2</sup> + 7<i>x</i> + 3 = (2<i>x</i> + 1)(<i>x</i> + 3)</span>
-      <small><span class="m">2<i>x</i><sup>2</sup> + 6<i>x</i> + <i>x</i> + 3</span>, then <span class="m">2<i>x</i>(<i>x</i> + 3) + 1(<i>x</i> + 3)</span>.</small>
-    </div>
-  </div>
-
-  <div class="check" data-q="d3">
-    <div class="check-q"><span class="ask">What goes in the top of the diamond for</span><span class="m" id="q_d3"></span><span class="ask">?</span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-
-  <div class="check" data-q="d4">
-    <div class="check-q"><span class="ask">Factor</span><span class="m" id="q_d4"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-</section>
-
-<section id="s6">
-  <div class="eyebrow">6 · Always first</div>
-  <h2>Take out the common factor first</h2>
-  <p>A common factor makes the diamond's top number bigger. Take it out first and the search gets easier.</p>
-
-  <div class="compare">
-    <div>
-      <div class="hd">Left in</div>
-      <span class="m">6<i>x</i><sup>2</sup> + 15<i>x</i> + 6</span>
-      <small>Top is <span class="m">6 <span class="op">·</span> 6 = 36</span>. Lots of pairs to check.</small>
-    </div>
-    <div>
-      <div class="hd">Taken out first</div>
-      <span class="m">3(2<i>x</i><sup>2</sup> + 5<i>x</i> + 2)</span>
-      <small>Top is <span class="m">2 <span class="op">·</span> 2 = 4</span>. The pair 4 and 1 is quick. Answer: <span class="m">3(2<i>x</i> + 1)(<i>x</i> + 2)</span>.</small>
-    </div>
-  </div>
-
-  <p><strong>The 3 stays in the answer.</strong> It was moved to the front, not cancelled.</p>
-
-  <div class="check" data-q="d5">
-    <div class="check-q"><span class="ask">Factor completely</span><span class="m" id="q_d5"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-</section>
-
-<section id="s7">
-  <div class="eyebrow">7 · Pattern</div>
-  <h2>Perfect square trinomials</h2>
-  <p>Sometimes the two numbers are the same, and the answer is a bracket squared.</p>
-
-  <div class="rulebox">
-    <span class="tag">The shapes</span>
-    <span class="m"><i>a</i><sup>2</sup> + 2<i>ab</i> + <i>b</i><sup>2</sup> = (<i>a</i> + <i>b</i>)<sup>2</sup></span>
-    <span class="m"><i>a</i><sup>2</sup> − 2<i>ab</i> + <i>b</i><sup>2</sup> = (<i>a</i> − <i>b</i>)<sup>2</sup></span>
-  </div>
-
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m">4<i>x</i><sup>2</sup> + 12<i>x</i> + 9</span></div>
-    <ol class="walk-steps">
-      <li><span class="m">(2<i>x</i>)<sup>2</sup> and 3<sup>2</sup></span><span class="why">Are the first and last terms squares? <span class="m">4<i>x</i><sup>2</sup> = (2<i>x</i>)<sup>2</sup></span> and <span class="m">9 = 3<sup>2</sup></span>. Yes.</span></li>
-      <li><span class="m">2 <span class="op">·</span> 2<i>x</i> <span class="op">·</span> 3 = 12<i>x</i></span><span class="why">Is the middle term twice their product? Yes.</span></li>
-      <li class="ans"><span class="m">(2<i>x</i> + 3)<sup>2</sup></span><span class="why">The middle sign is +, so it's <span class="m">(<i>a</i> + <i>b</i>)<sup>2</sup></span>. (The diamond gives the same: top 36, bottom 12, pair 6 and 6.)</span></li>
-    </ol>
-  </div>
-
-  <div class="check" data-q="d6">
-    <div class="check-q"><span class="ask">Factor</span><span class="m">9<i>x</i><sup>2</sup> − 30<i>x</i> + 25</span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-</section>
-
-<section id="s8">
-  <div class="eyebrow">8 · Your turn</div>
-  <h2>Try any quadratic</h2>
-  <p>Set <span class="m"><i>a</i></span>, <span class="m"><i>b</i></span> and <span class="m"><i>c</i></span>. The page takes out any common factor, fills in the diamond, lists every pair with the right signs, and finds the one that works. Try your homework problems here after doing them on paper.</p>
-
-  <div class="xp" id="pf"></div>
-
-  <div class="keybox">
-    <span class="tag">When no pair works</span>
-    <p>If you've listed every pair and none adds to the bottom number, the quadratic <strong>doesn't factor with integers</strong>. That's a real answer. Try <span class="m"><i>x</i><sup>2</sup> + 4<i>x</i> + 6</span> above: 1 and 6 add to 7, 2 and 3 add to 5, and that's every pair.</p>
-  </div>
-</section>
-
-<section id="s9">
-  <div class="eyebrow">9 · Common mistakes</div>
-  <h2>Four wrong factorings</h2>
-  <p>Put <span class="m"><i>x</i> = 1</span> into both sides. If they disagree, the factoring is wrong.</p>
+  <div class="eyebrow">5 · Common mistakes</div>
+  <h2>Four wrong claims</h2>
+  <p>Each card shows a wrong claim. Click its button to test it with a number.</p>
   <div id="trapHost"></div>
 </section>
 
-<section id="s10">
-  <div class="eyebrow">10 · Putting it together</div>
-  <h2>Practice one step at a time</h2>
-  <p>You pick the move; the page does the algebra. <strong>Common factor first.</strong> Then: three terms means a diamond, four terms means grouping.</p>
-
-  <div class="solver">
-    <div class="solver-head">
-      <span class="which" id="solverWhich">Problem 1</span>
-      <div class="tabs" id="solverTabs"></div>
-    </div>
-    <div class="work" id="solverWork"></div>
-    <div class="picker">
-      <div class="prompt" id="solverPrompt">What's the next step?</div>
-      <div class="rulegrid" id="solverRules"></div>
-      <div class="solver-fb" id="solverFb"></div>
-      <div class="finish" id="solverFinish" style="display:none">
-        <button class="btn on" id="solverNext">Next problem</button>
-        <span class="count" id="solverDone"></span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="s11">
-  <div class="eyebrow">11 · Check yourself</div>
+<section id="s6">
+  <div class="eyebrow">6 · Check yourself</div>
   <h2>Six on your own</h2>
-  <p>If you miss one, the feedback names the section to go back to.</p>
+  <p>Sketch each one on paper first. If you miss one, the feedback names the section to go back to.</p>
   <div id="quizHost"></div>
   <div class="score">
     <div style="display:flex; align-items:baseline; gap:10px">
@@ -809,32 +711,33 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   </div>
 </section>
 
-<section id="s12">
-  <div class="eyebrow">12 · Keep this</div>
+<section id="s7">
+  <div class="eyebrow">7 · Keep this</div>
   <h2>Cheat sheet</h2>
   <div class="cheat">
-    <h3>Factoring <span class="m"><i>ax</i><sup>2</sup> + <i>bx</i> + <i>c</i></span></h3>
+    <h3>Walk across the graph</h3>
     <ol class="steps-list">
-      <li>Take out any common factor. It stays in the answer.</li>
-      <li>Diamond: top <span class="m"><i>a</i> <span class="op">·</span> <i>c</i></span>, bottom <span class="m"><i>b</i></span>.</li>
-      <li>Work out the signs, then list pairs.<small>Product +: same signs (the sum's sign). Product −: one of each.</small></li>
-      <li><span class="m"><i>a</i> = 1</span>: the pair goes straight into the brackets.<small><span class="m"><i>a</i> &ne; 1</span>: split the middle term and group.</small></li>
-      <li>Multiply back to check. No pair works: doesn't factor with integers.</li>
+      <li><strong>Factor and cancel.</strong> Mark the zeros and vertical asymptotes.</li>
+      <li><strong>Right end:</strong> leading term over leading term. Plus is above, minus is below.</li>
+      <li><strong>Walk left:</strong> odd power, the sign changes, so switch sides. Even power, stay on the same side.<small><span class="m"><span class="fr"><span><i>x</i> + 2</span><span><i>x</i> − 3</span></span></span>: above, change at 3, change at −2</small></li>
+      <li><strong>Check:</strong> you must arrive at the left end the leading terms gave you.</li>
+      <li><strong>Beside an asymptote:</strong> above the axis shoots up, below shoots down.</li>
+      <li><strong>Holes:</strong> sketch what's left after cancelling, then add an open circle.</li>
     </ol>
   </div>
 
   <div class="next">
-    <div class="nextcard soon">
-      <div class="n">Done</div><div class="t">Part 1</div>
-      <p>GCF, patterns, and grouping.</p>
-    </div>
     <div class="nextcard">
-      <div class="n">Done</div><div class="t">Part 2</div>
-      <p>Quadratics with the diamond.</p>
+      <div class="n">Done</div><div class="t">Walk across the graph</div>
+      <p>The ends and the powers give the whole sketch.</p>
+    </div>
+    <div class="nextcard soon">
+      <div class="n">Next · Module 18</div><div class="t"><a class="xref" href="inequalities-from-graphs.html">Inequalities from Graphs</a></div>
+      <p>Use the sketch to solve polynomial and rational inequalities.</p>
     </div>
   </div>
   <div class="colophon">
-    Math 1200 · College Algebra · supplement to ALEKS §R.5<br>
+    Math 1200 · College Algebra · supplement to ALEKS §3.6<br>
     Practice only. Nothing here is graded or submitted.<br>
     Your progress is saved on this device only.
   </div>
@@ -912,9 +815,12 @@ function init(L){
 
   var TOTAL = L.inline.length + L.quiz.length;
 
+  /* Count only this page's questions. A saved store can hold keys from an
+     older version of the lesson (a split moves questions out), and counting
+     those would push the meter past TOTAL. */
   function paintMeter(){
-    var n = 0, k;
-    for(k in correct){ if(correct[k]) n++; }
+    var n = 0;
+    L.inline.concat(L.quiz).forEach(function(k){ if(correct[k]) n++; });
     var fill = $("#meterFill"), num = $("#meterNum");
     if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
     if(num) num.textContent = n + " / " + TOTAL + " correct";
@@ -1495,475 +1401,381 @@ return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
 <script>
 (function(){
 "use strict";
-var $ = EXP.$, $$ = EXP.$$;
+var $ = EXP.$, $$ = EXP.$$, num = EXP.num, fr = EXP.frac;
 
-/* ---- the diamond, as SVG ----------------------------------------------
-   A rhombus split by the two lines joining opposite edge midpoints, which is
-   what puts the four cells at top, right, bottom and left rather than in the
-   quadrants a vertical-plus-horizontal split would give.
-   Top = product, bottom = sum, the sides = the two numbers.
-   Any cell may be null, which draws a faint question mark instead.        */
-function diamond(top, left, right, bottom, hot){
-  var W = 230, H = 212, cx = 115, cy = 110, rx = 96, ry = 84;
-  var T = [cx, cy - ry], R = [cx + rx, cy], B = [cx, cy + ry], L = [cx - rx, cy];
-  function mid(a, b){ return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; }
-  var mTL = mid(T, L), mTR = mid(T, R), mBR = mid(B, R), mBL = mid(B, L);
+var X = "<i>x</i>", Y = "<i>y</i>", F = "<i>f</i>(" + X + ") = ";
+function sq(n){ return "<sup>" + n + "</sup>"; }
 
-  function line(a, b){
-    return "<line class='dia-line' x1='" + a[0] + "' y1='" + a[1] +
-           "' x2='" + b[0] + "' y2='" + b[1] + "'/>";
+/* ---- drawing: graphineq-01's graph(), without the shading ---------------------
+     ys       y scale relative to x
+     gx, gy   grid spacing (labels follow gx)
+     vas/has  dashed asymptotes
+     curves   [{f, a, b, dim}]: one piece per call, a and b clear of any asymptote
+     holes    [{x, y}]: open circles
+     pts      [{x, y, lb, dx, dy, anchor}]: dots, with optional labels
+     signs    [[x, "above"], ...]: printed along the top of the figure                */
+var GID = 0;
+function graph(c){
+  var x0 = c.x[0], x1 = c.x[1], y0 = c.y[0], y1 = c.y[1], ys = c.ys || 1, gx = c.gx || 1, gy = c.gy || 1;
+  var W = c.w || 320, P = 14, u = (W - 2 * P) / (x1 - x0), v = u * ys, H = Math.round(2 * P + v * (y1 - y0));
+  function px(x){ return +(P + (x - x0) * u).toFixed(2); }
+  function py(y){ return +(P + (y1 - y) * v).toFixed(2); }
+  var id = "gclip" + (++GID), s = "", i;
+  s += "<defs><clipPath id='" + id + "'><rect x='" + P + "' y='" + P + "' width='" + (W - 2 * P) +
+       "' height='" + (H - 2 * P) + "'/></clipPath></defs>";
+  for(i = Math.ceil(x0 / gx) * gx; i <= x1; i += gx)
+    s += "<line class='gp-g' x1='" + px(i) + "' y1='" + py(y0) + "' x2='" + px(i) + "' y2='" + py(y1) + "'/>";
+  for(i = Math.ceil(y0 / gy) * gy; i <= y1; i += gy)
+    s += "<line class='gp-g' x1='" + px(x0) + "' y1='" + py(i) + "' x2='" + px(x1) + "' y2='" + py(i) + "'/>";
+  if(y0 <= 0 && y1 >= 0) s += "<line class='gp-a' x1='" + px(x0) + "' y1='" + py(0) + "' x2='" + px(x1) + "' y2='" + py(0) + "'/>";
+  if(x0 <= 0 && x1 >= 0) s += "<line class='gp-a' x1='" + px(0) + "' y1='" + py(y0) + "' x2='" + px(0) + "' y2='" + py(y1) + "'/>";
+  if(!c.bare) for(i = Math.ceil(x0 / gx) * gx; i <= x1; i += gx){
+    if(!i || i === x0 || i === x1) continue;
+    s += "<text class='gp-t' x='" + px(i) + "' y='" + (py(0) + 13) + "'>" + num(i) + "</text>";
   }
-  function cell(x, y, v, isHot){
-    var blank = (v === null || v === undefined);
-    var cls = "dia-txt" + (blank ? " q" : (isHot ? " a" : ""));
-    return "<text class='" + cls + "' x='" + x + "' y='" + y + "'>" +
-           (blank ? "?" : String(v)) + "</text>";
-  }
-
-  return "<svg viewBox='0 0 " + W + " " + H + "' width='" + W + "' role='img' " +
-    "aria-label='Diamond: product " + (top == null ? "unknown" : top) +
-    ", sum " + (bottom == null ? "unknown" : bottom) +
-    ", sides " + (left == null ? "unknown" : left + " and " + right) + "'>" +
-    "<text class='dia-lbl' x='" + cx + "' y='11'>product</text>" +
-    "<polygon class='dia-face' points='" + T + " " + R + " " + B + " " + L + "'/>" +
-    line(mTL, mBR) + line(mTR, mBL) +
-    cell(cx, cy - 37, top, false) +
-    cell(cx - 48, cy + 7, left, hot) +
-    cell(cx + 48, cy + 7, right, hot) +
-    cell(cx, cy + 47, bottom, false) +
-    "<text class='dia-lbl' x='" + cx + "' y='" + (H - 3) + "'>sum</text>" +
-    "</svg>";
+  (c.vas || []).forEach(function(a){
+    s += "<line class='gp-as' x1='" + px(a) + "' y1='" + py(y1) + "' x2='" + px(a) + "' y2='" + py(y0) + "'/>";
+  });
+  (c.has || []).forEach(function(b){
+    s += "<line class='gp-as' x1='" + px(x0) + "' y1='" + py(b) + "' x2='" + px(x1) + "' y2='" + py(b) + "'/>";
+  });
+  (c.curves || []).forEach(function(cv){
+    var a = (cv.a == null) ? x0 : cv.a, b = (cv.b == null) ? x1 : cv.b, n = 320, d = "", pen = false, k, x, y;
+    for(k = 0; k <= n; k++){
+      x = a + (b - a) * k / n; y = cv.f(x);
+      if(!isFinite(y)){ pen = false; continue; }
+      d += (pen ? "L" : "M") + px(x) + "," + Math.max(-60, Math.min(H + 60, py(y)));
+      pen = true;
+    }
+    if(d) s += "<path class='" + (cv.dim ? "gp-dim" : "gp-new") + "' clip-path='url(#" + id + ")' d='" + d + "'/>";
+  });
+  (c.holes || []).forEach(function(q){
+    s += "<circle class='gp-hole' cx='" + px(q.x) + "' cy='" + py(q.y) + "' r='4.6'/>";
+  });
+  (c.pts || []).forEach(function(q){
+    s += "<circle class='gp-pn' cx='" + px(q.x) + "' cy='" + py(q.y) + "' r='4.2'/>";
+    if(q.lb) s += "<text class='gp-lb' x='" + (px(q.x) + (q.dx == null ? 7 : q.dx)) + "' y='" + (py(q.y) + (q.dy == null ? -9 : q.dy)) +
+                  "' text-anchor='" + (q.anchor || "start") + "'>" + q.lb + "</text>";
+  });
+  (c.signs || []).forEach(function(q){
+    s += "<text class='gp-sg' x='" + px(q[0]) + "' y='" + (P + 15) + "'>" + q[1] + "</text>";
+  });
+  return "<svg class='gp' viewBox='0 0 " + W + " " + H + "' role='img' aria-label='" + (c.alt || "graph") + "'>" + s + "</svg>";
 }
 
+function g1(x){ return (x + 2) * (x - 1) * (x - 1); }
+function g2(x){ return (x + 2) / (x - 3); }
+function g3(x){ return (x - 2) / ((x + 1) * (x + 1)); }
+function g4(x){ return x / ((x - 2) * (x + 2)); }
+function g6(x){ return x / ((x - 1) * (x + 2)); }
 
-/* pair finder: the diamond method for any ax² + bx + c, worked by the page.
-   Pure logic lives in solveQuad so it can be tested outside the page. */
-function gcd(a, b){ a = Math.abs(a); b = Math.abs(b); while(b){ var t = a % b; a = b; b = t; } return a; }
-
-function solveQuad(a, b, c){
-  /* a > 0, c != 0 */
-  var k = gcd(gcd(a, b), c);
-  var A = a / k, B = b / k, C = c / k, P = A * C;
-  var pairs = [], hit = null, d, n = Math.abs(P);
-  for(d = 1; d * d <= n; d++){
-    if(n % d) continue;
-    var e = n / d, cands;
-    if(P > 0) cands = (B < 0) ? [[-d, -e]] : [[d, e]];
-    else cands = (d === e) ? [[d, -e]] : [[e, -d], [-e, d]];
-    cands.forEach(function(pq){
-      var s = pq[0] + pq[1];
-      pairs.push({p:pq[0], q:pq[1], sum:s});
-      if(s === B && !hit) hit = {p:pq[0], q:pq[1]};
-    });
-  }
-  var res = {k:k, A:A, B:B, C:C, P:P, pairs:pairs, hit:hit};
-  if(hit){
-    var g1 = gcd(A, hit.p), g2 = gcd(A, hit.q);
-    res.f1 = [A / g1, hit.p / g1];
-    res.f2 = [A / g2, hit.q / g2];
-    /* multiply back to be sure */
-    var m = res.f1[0] * res.f2[0], mid = res.f1[0] * res.f2[1] + res.f1[1] * res.f2[0], last = res.f1[1] * res.f2[1];
-    res.ok = (m === A && mid === B && last === C);
-  }
-  return res;
+/* A worked example, one picture per step. Stage 0 is the empty axes; each later stage is
+   what the graph looks like once that step is shown, so a walk with n steps has n + 1. */
+function S(f, a, b){ return {f:f, a:a, b:b}; }             /* drawn */
+function D(f, a, b){ return {f:f, a:a, b:b, dim:true}; }   /* the left end, predicted but not reached */
+function stages(base, list){
+  return list.map(function(st, i){
+    var c = {}, k;
+    for(k in base) c[k] = base[k];
+    for(k in st) c[k] = st[k];
+    c.alt = base.alt + ", as it stands after step " + i + " of " + (list.length - 1);
+    return graph(c);
+  });
 }
-
-
-
-
-var EX = {
-  d1: "<i>x</i><sup>2</sup> − 9<i>x</i> + 20",
-  d2: "<i>x</i><sup>2</sup> + 5<i>x</i> − 14",
-  d3: "3<i>x</i><sup>2</sup> + 11<i>x</i> + 6",
-  d4: "3<i>x</i><sup>2</sup> + 11<i>x</i> + 6",
-  d5: "5<i>x</i><sup>2</sup> − 5<i>x</i> − 30"
+var AB = "above", BE = "below";
+var T1 = {x:-2, y:0, lb:"crosses", anchor:"end", dx:-8, dy:-8}, T2 = {x:1, y:0, lb:"touches", dx:0, dy:32, anchor:"middle"};
+var STAGES = {
+  /* (x + 2)(x − 1)²: below left of −2, above on (−2, 1), above right of 1. The graph leaves the
+     window at x ≈ −2.36 and 2.21, so the ends are drawn up to there. */
+  w1: stages({x:[-4, 3], y:[-4, 6], ys:0.6, alt:"sketch of (x + 2)(x − 1) squared"}, [
+    {},
+    {pts:[{x:-2, y:0}, {x:1, y:0}]},
+    {pts:[{x:-2, y:0}, {x:1, y:0}], signs:[[1.6, AB]], curves:[S(g1, 1.85), D(g1, -2.36, -2.12)]},
+    {pts:[{x:-2, y:0}, T2], signs:[[-0.7, AB], [1.6, AB]], curves:[S(g1, -0.6), D(g1, -2.36, -2.12)]},
+    {pts:[T1, T2], signs:[[-3, BE], [-0.7, AB], [1.6, AB]], curves:[S(g1, -2.05), D(g1, -2.36, -2.12)]},
+    {pts:[T1, T2], signs:[[-3, BE], [-0.7, AB], [1.6, AB]], curves:[S(g1)]}
+  ]),
+  /* (x + 2)/(x − 3): above left of −2, below on (−2, 3), above right of 3 */
+  w2: stages({x:[-7, 9], y:[-6, 7], vas:[3], pts:[{x:-2, y:0}], alt:"sketch of (x + 2)/(x − 3), with asymptotes x = 3 and y = 1"}, [
+    {vas:[], pts:[]},
+    {},
+    {has:[1], signs:[[6, AB]], curves:[S(g2, 6), D(g2, null, -4.5)]},
+    {has:[1], signs:[[1.2, BE], [6, AB]], curves:[S(g2, 3.02), S(g2, 0.5, 2.98), D(g2, null, -4.5)]},
+    {has:[1], signs:[[-4.5, AB], [1.2, BE], [6, AB]], curves:[S(g2, 3.02), S(g2, -3.2, 2.98), D(g2, null, -4.5)]},
+    {has:[1], signs:[[-4.5, AB], [1.2, BE], [6, AB]], curves:[S(g2, 3.02), S(g2, null, 2.98)]}
+  ]),
+  /* (x − 2)/(x + 1)²: below left of −1, below on (−1, 2), above right of 2 */
+  w3: stages({x:[-6, 8], y:[-6, 3], ys:1.2, vas:[-1], pts:[{x:2, y:0}], alt:"sketch of (x − 2)/(x + 1) squared, with asymptote x = −1"}, [
+    {vas:[], pts:[]},
+    {},
+    {has:[0], signs:[[5, AB]], curves:[S(g3, 5), D(g3, null, -3.5)]},
+    {has:[0], signs:[[1, BE], [5, AB]], curves:[S(g3, 0.2), D(g3, null, -3.5)]},
+    {has:[0], signs:[[-3.5, BE], [1, BE], [5, AB]], curves:[S(g3, -0.98), S(g3, -2.2, -1.02), D(g3, null, -3.5)]},
+    {has:[0], signs:[[-3.5, BE], [1, BE], [5, AB]], curves:[S(g3, -0.98), S(g3, null, -1.02)]}
+  ]),
+  /* x/((x − 2)(x + 2)): below, above, below, above, from left to right */
+  w4: stages({x:[-6, 6], y:[-4, 4], vas:[-2, 2], pts:[{x:0, y:0}], alt:"sketch of x/((x − 2)(x + 2)), with asymptotes at −2 and 2"}, [
+    {vas:[], pts:[]},
+    {},
+    {has:[0], signs:[[4, AB]], curves:[S(g4, 3.5), D(g4, null, -3.5)]},
+    {has:[0], signs:[[1, BE], [4, AB]], curves:[S(g4, 2.02), S(g4, 0.5, 1.98), D(g4, null, -3.5)]},
+    {has:[0], signs:[[-1, AB], [1, BE], [4, AB]], curves:[S(g4, 2.02), S(g4, -1, 1.98), D(g4, null, -3.5)]},
+    {has:[0], signs:[[-4, BE], [-1, AB], [1, BE], [4, AB]], curves:[S(g4, 2.02), S(g4, -1.98, 1.98), S(g4, -3, -2.02), D(g4, null, -3.5)]},
+    {has:[0], signs:[[-4, BE], [-1, AB], [1, BE], [4, AB]], curves:[S(g4, 2.02), S(g4, -1.98, 1.98), S(g4, null, -2.02)]}
+  ])
 };
-["d1","d2","d3","d4","d5"].forEach(function(k){
-  var n = $("#q_" + k); if(n) n.innerHTML = EX[k];
-});
 
-$("#nonDia").innerHTML = diamond(50, 25, 2, 27, true);
+var FIGS = {
+  /* x/((x − 1)(x + 2)): VAs 1 and −2, zero 0. −, +, −, + */
+  q3fig: graph({x:[-6, 5], y:[-4, 4], w:280, vas:[-2, 1], has:[0],
+      curves:[{f:g6, b:-2.02}, {f:g6, a:-1.98, b:0.98}, {f:g6, a:1.02}], pts:[{x:0, y:0}],
+      alt:"a graph with vertical asymptotes at −2 and 1, passing through the origin, going to the x-axis at both ends"})
+};
+$$("[data-g]").forEach(function(h){ h.innerHTML = FIGS[h.getAttribute("data-g")]; });
+
+var UD = "up on the left, down on the right", DU = "down on the left, up on the right",
+    UU = "up on both sides", DD = "down on both sides";
 
 EXP.init({
-  storeKey: "m1200-factor-02",
-  inline: ["d1","d2","d3","d4","d5","d6"],
+  storeKey: "m1200-walk-01",
+  inline: ["c1","c2","c3"],
   quiz:   ["q1","q2","q3","q4","q5","q6"],
 
   checks: {
-    d1: { opts:[
-      {t:"both negative", ok:true, fb:"Right. Product +20: same signs. Sum &minus;9: both negative. (&minus;4 and &minus;5.)"},
-      {t:"both positive", fb:"Two positives add to a positive, but the middle term is &minus;9<i>x</i>."},
-      {t:"one of each", fb:"That would make the product negative. It's +20."},
-      {t:"cannot be decided yet", fb:"It can. The product's sign says same or different; the sum's sign says which."}
+    /* far right above; change at 1 -> below; keep at −2 -> below */
+    c1: { opts:[
+      {t:"goes down on both sides", ok:true, fb:"Right. Far out it's " + fr("1", X) + ", so it starts above. It changes at 1, so it's below. Even at −2, so it's below on both sides."},
+      {t:"goes up on both sides", fb:"The power is even, but which way? Start above on the right. It crosses at 1 first. Check: <i>f</i>(0) = " + fr("−1", "4") + ", below."},
+      {t:"goes up on the left, down on the right", fb:"That's an odd power. (" + X + " + 2)" + sq(2) + " is even, so it goes the same way on both sides."},
+      {t:"goes down on the left, up on the right", fb:"That's an odd power. (" + X + " + 2)" + sq(2) + " is even, so it goes the same way on both sides."}
     ]},
-    d2: { opts:[
-      {t:"(<i>x</i> + 7)(<i>x</i> − 2)", ok:true, fb:"Right. 7 &middot; (&minus;2) = &minus;14 and 7 + (&minus;2) = 5."},
-      {t:"(<i>x</i> − 7)(<i>x</i> + 2)", fb:"That adds to &minus;5. The signs are swapped."},
-      {t:"(<i>x</i> + 7)(<i>x</i> + 2)", fb:"Both positive gives +14. The constant is &minus;14."},
-      {t:"(<i>x</i> + 14)(<i>x</i> − 1)", fb:"That adds to 13, not 5."}
+    /* far right above; change at 2, 0, −4. From the left: below, above, below, above */
+    c2: { opts:[
+      {t:"below, above, below, above", ok:true, fb:"Right. Far out it's " + fr("1", X) + ": above on the right, below on the left. All three powers are odd, so it changes at 2, 0 and −4."},
+      {t:"above, below, above, below", fb:"That ends below on the right. " + fr(X, X + sq(2)) + " = " + fr("1", X) + " is above on the right."},
+      {t:"below, above, above, above", fb:"That keeps the sign at 0 and 2. All the powers are 1, so it changes at each one."},
+      {t:"above, above, below, above", fb:"−4 has power 1, so it changes there too, and the left end must be below."}
     ]},
-    d3: { opts:[
-      {t:"18", ok:true, fb:"Right. Top is <i>a</i> &middot; <i>c</i> = 3 &middot; 6 = 18."},
-      {t:"6", fb:"That's <i>c</i>. When <i>a</i> isn't 1, the top is <i>a</i> &middot; <i>c</i>."},
-      {t:"11", fb:"11 is <i>b</i>. It goes on the bottom."},
-      {t:"3", fb:"That's <i>a</i>. Multiply it by <i>c</i>."}
-    ]},
-    d4: { opts:[
-      {t:"(3<i>x</i> + 2)(<i>x</i> + 3)", ok:true, fb:"Right. Top 18, bottom 11: 9 and 2. Split: 3<i>x</i><sup>2</sup> + 9<i>x</i> + 2<i>x</i> + 6, then 3<i>x</i>(<i>x</i> + 3) + 2(<i>x</i> + 3)."},
-      {t:"(3<i>x</i> + 9)(<i>x</i> + 2)", fb:"That's the pair dropped straight in. It only works when <i>a</i> = 1."},
-      {t:"(3<i>x</i> + 6)(<i>x</i> + 1)", fb:"Multiplying back gives 3<i>x</i><sup>2</sup> + 9<i>x</i> + 6."},
-      {t:"(3<i>x</i> + 1)(<i>x</i> + 6)", fb:"That gives a middle term of 19<i>x</i>."}
-    ]},
-    d5: { opts:[
-      {t:"5(<i>x</i> − 3)(<i>x</i> + 2)", ok:true, fb:"Right. Take out 5: 5(<i>x</i><sup>2</sup> &minus; <i>x</i> &minus; 6). Then &minus;3 and 2."},
-      {t:"5(<i>x</i> + 3)(<i>x</i> − 2)", fb:"That pair adds to +1. You need &minus;1."},
-      {t:"(<i>x</i> − 3)(<i>x</i> + 2)", fb:"The 5 stays in the answer."},
-      {t:"5(<i>x</i> − 6)(<i>x</i> + 1)", fb:"&minus;6 and 1 add to &minus;5, not &minus;1."}
-    ]},
-    d6: { opts:[
-      {t:"(3<i>x</i> − 5)<sup>2</sup>", ok:true, fb:"Right. 9<i>x</i><sup>2</sup> = (3<i>x</i>)<sup>2</sup>, 25 = 5<sup>2</sup>, and 2 &middot; 3<i>x</i> &middot; 5 = 30<i>x</i>. Minus in the middle."},
-      {t:"(3<i>x</i> + 5)<sup>2</sup>", fb:"That gives +30<i>x</i>. The middle term here is &minus;30<i>x</i>."},
-      {t:"(3<i>x</i> − 5)(3<i>x</i> + 5)", fb:"That's 9<i>x</i><sup>2</sup> &minus; 25, with no middle term."},
-      {t:"(9<i>x</i> − 5)(<i>x</i> − 5)", fb:"That gives a middle term of &minus;50<i>x</i>. Use the square roots, 3<i>x</i> and 5."}
+    /* (x + 2)/(x − 3) at 1: 3/(−2) */
+    c3: { opts:[
+      {t:"(1, " + fr("−3", "2") + ")", ok:true, fb:"Right. " + X + " − 1 cancels, leaving " + fr(X + " + 2", X + " − 3") + ". At 1 that's " + fr("3", "−2") + ", so the hole is below the axis."},
+      {t:"(1, " + fr("3", "2") + ")", fb:"Watch the sign: 1 − 3 = −2, so the height is " + fr("3", "−2") + "."},
+      {t:"(1, 0)", fb:"0 is where a zero sits. The height comes from what's left: " + fr("1 + 2", "1 − 3") + "."},
+      {t:"(3, " + fr("−3", "2") + ")", fb:"3 is the asymptote. The factor that cancels, " + X + " − 1, gives the hole at 1."}
     ]},
 
-    q1: { ask:"Factor", m:"<i>x</i><sup>2</sup> + 8<i>x</i> + 15", opts:[
-      {t:"(<i>x</i> + 3)(<i>x</i> + 5)", ok:true, fb:"3 &middot; 5 = 15 and 3 + 5 = 8."},
-      {t:"(<i>x</i> + 1)(<i>x</i> + 15)", fb:"That adds to 16. See section 2."},
-      {t:"(<i>x</i> − 3)(<i>x</i> − 5)", fb:"Both negative gives &minus;8<i>x</i>. See section 3."},
-      {t:"(<i>x</i> + 4)(<i>x</i> + 4)", fb:"That adds to 8 but multiplies to 16. Both conditions must hold. See section 2."}
+    /* (x − 1)/(x + 4): above; change at 1 -> below; change at −4 -> above */
+    q1: { ask:"Beside " + X + " = −4, the graph of", m:F + fr(X + " − 1", X + " + 4") + " goes", opts:[
+      {t:UD, ok:true, fb:"It starts above and changes at 1, so it's below just right of −4. It changes at −4, so it's above on the left. Above shoots up, below shoots down."},
+      {t:DU, fb:"You've skipped the zero at 1. Check: <i>f</i>(0) = " + fr("−1", "4") + ", below, so it goes down on the right of −4. See section 2."},
+      {t:UU, fb:"The power is 1, odd, so the two sides go opposite ways. See section 2."},
+      {t:DD, fb:"The power is 1, odd, so the two sides go opposite ways. See section 2."}
     ]},
-    q2: { ask:"Factor", m:"<i>x</i><sup>2</sup> − 2<i>x</i> − 15", opts:[
-      {t:"(<i>x</i> − 5)(<i>x</i> + 3)", ok:true, fb:"&minus;5 &middot; 3 = &minus;15 and &minus;5 + 3 = &minus;2."},
-      {t:"(<i>x</i> + 5)(<i>x</i> − 3)", fb:"That adds to +2. The bigger number takes the sum's sign. See section 3."},
-      {t:"(<i>x</i> − 5)(<i>x</i> − 3)", fb:"Two negatives multiply to +15. See section 3."},
-      {t:"(<i>x</i> − 15)(<i>x</i> + 1)", fb:"That adds to &minus;14. See section 2."}
+    /* x(x − 4)/(x + 2)²: ends 1; change at 4, change at 0, keep at −2 */
+    q2: { ask:"From left to right, the graph of", m:F + fr(X + "(" + X + " − 4)", "(" + X + " + 2)" + sq(2)) + " is", opts:[
+      {t:"above, above, below, above", ok:true, fb:"Ends: 1, above. It changes at 4 and at 0, and keeps at −2."},
+      {t:"below, above, below, above", fb:"That changes at −2. The power there is 2, even, so it stays. See section 2."},
+      {t:"above, below, above, below", fb:"That ends below. " + fr(X + sq(2), X + sq(2)) + " = 1, so the right end is above. See section 1."},
+      {t:"above, above, above, above", fb:"0 and 4 are zeros with power 1. The graph crosses there. See section 1."}
     ]},
-    q3: { ask:"Factor", m:"2<i>x</i><sup>2</sup> + 5<i>x</i> + 2", opts:[
-      {t:"(2<i>x</i> + 1)(<i>x</i> + 2)", ok:true, fb:"Top 4, bottom 5: 4 and 1. Split: 2<i>x</i><sup>2</sup> + 4<i>x</i> + <i>x</i> + 2, then 2<i>x</i>(<i>x</i> + 2) + 1(<i>x</i> + 2)."},
-      {t:"(2<i>x</i> + 4)(<i>x</i> + 1)", fb:"The pair dropped straight in. See section 5."},
-      {t:"(2<i>x</i> + 2)(<i>x</i> + 1)", fb:"That gives 2<i>x</i><sup>2</sup> + 4<i>x</i> + 2. See section 5."},
-      {t:"(<i>x</i> + 1)(<i>x</i> + 2)", fb:"That has no 2<i>x</i><sup>2</sup>. See section 5."}
+    /* graph q3fig */
+    q3: { ask:"Which could be the equation of this graph?", m:"<span data-g2='q3fig'></span>", opts:[
+      {t:Y + " = " + fr(X, "(" + X + " − 1)(" + X + " + 2)"), ok:true, fb:"Asymptotes at 1 and −2, a zero at 0, and just above the axis on the right."},
+      {t:Y + " = " + fr("−" + X, "(" + X + " − 1)(" + X + " + 2)"), fb:"The minus would put the right end below. This graph is above on the right. See section 3."},
+      {t:Y + " = " + fr(X, "(" + X + " + 1)(" + X + " − 2)"), fb:"Those asymptotes are at −1 and 2. Read the dashed lines: −2 and 1. See section 3."},
+      {t:Y + " = " + fr(X + sq(2), "(" + X + " − 1)(" + X + " + 2)"), fb:"That would touch at 0 and level off at " + Y + " = 1. This graph crosses at 0 and goes to the axis. See section 3."}
     ]},
-    q4: { ask:"Factor", m:"3<i>x</i><sup>2</sup> − 10<i>x</i> + 8", opts:[
-      {t:"(3<i>x</i> − 4)(<i>x</i> − 2)", ok:true, fb:"Top 24, bottom &minus;10: &minus;6 and &minus;4. Split and group: 3<i>x</i>(<i>x</i> &minus; 2) &minus; 4(<i>x</i> &minus; 2)."},
-      {t:"(3<i>x</i> − 2)(<i>x</i> − 4)", fb:"Middle term comes out &minus;14<i>x</i>. See section 5."},
-      {t:"(3<i>x</i> − 6)(<i>x</i> − 4)", fb:"The pair dropped straight in. See section 5."},
-      {t:"(3<i>x</i> + 4)(<i>x</i> + 2)", fb:"Both positive gives a positive middle term. See section 3."}
+    /* (x − 2)²/(x + 3): ends like x; above; keep at 2; change at −3 */
+    q4: { ask:"From left to right, the graph of", m:F + fr("(" + X + " − 2)" + sq(2), X + " + 3") + " is", opts:[
+      {t:"below, above, above", ok:true, fb:"Ends like " + X + ": above on the right, below on the left. It keeps at 2 and changes at −3."},
+      {t:"above, below, above", fb:"That changes at 2. The power there is 2, even, so it touches and stays above. See section 1."},
+      {t:"above, above, above", fb:"−3 is on the bottom with power 1, so the sign changes there. See section 2."},
+      {t:"below, below, above", fb:"That changes at 2 and keeps at −3. It's the other way round. See section 2."}
     ]},
-    q5: { ask:"Factor completely", m:"4<i>x</i><sup>2</sup> + 4<i>x</i> − 24", opts:[
-      {t:"4(<i>x</i> + 3)(<i>x</i> − 2)", ok:true, fb:"Take out 4: 4(<i>x</i><sup>2</sup> + <i>x</i> &minus; 6). Then 3 and &minus;2."},
-      {t:"(4<i>x</i> + 12)(<i>x</i> − 2)", fb:"Equal in value, but 4<i>x</i> + 12 still has a 4 to take out. See section 6."},
-      {t:"4(<i>x</i> − 3)(<i>x</i> + 2)", fb:"That pair adds to &minus;1. See section 3."},
-      {t:"4(<i>x</i><sup>2</sup> + <i>x</i> − 6)", fb:"Not finished: the bracket still factors. See section 6."}
+    /* −x(x − 3)/(x + 1)²: ends −1; below; change at 3; change at 0; keep at −1 */
+    q5: { ask:"From left to right, the graph of", m:F + fr("−" + X + "(" + X + " − 3)", "(" + X + " + 1)" + sq(2)) + " is", opts:[
+      {t:"below, below, above, below", ok:true, fb:"Ends: −1, below. It changes at 3 and at 0, and keeps at −1."},
+      {t:"above, above, below, above", fb:"That leaves out the minus. " + fr("−" + X + sq(2), X + sq(2)) + " = −1, so the right end is below. See section 1."},
+      {t:"above, below, above, below", fb:"That changes at −1. The power there is 2, even, so it stays. See section 2."},
+      {t:"below, above, above, below", fb:"Take them one at a time: it changes at 3 and at 0. See section 3."}
     ]},
-    q6: { ask:"Factor", m:"<i>x</i><sup>2</sup> + 4<i>x</i> + 6", opts:[
-      {t:"it doesn't factor with integers", ok:true, fb:"Pairs for 6: 1 &amp; 6 (sum 7), 2 &amp; 3 (sum 5). Both must be positive, so that's every pair, and none adds to 4."},
-      {t:"(<i>x</i> + 2)(<i>x</i> + 3)", fb:"That's <i>x</i><sup>2</sup> + 5<i>x</i> + 6. See section 8."},
-      {t:"(<i>x</i> + 1)(<i>x</i> + 6)", fb:"That gives 7<i>x</i> in the middle. See section 8."},
-      {t:"(<i>x</i> + 2)(<i>x</i> + 2)", fb:"That's <i>x</i><sup>2</sup> + 4<i>x</i> + 4. The constant is wrong. See section 2."}
+    /* (x + 2)/(x − 1)²: ends 1/x; above; keep at 1 -> above on both sides */
+    q6: { ask:"Beside " + X + " = 1, the graph of", m:F + fr(X + " + 2", "(" + X + " − 1)" + sq(2)) + " goes", opts:[
+      {t:UU, ok:true, fb:"Far out it's " + fr("1", X) + ", so it starts above. Even at 1, so it's above on both sides. Above shoots up."},
+      {t:DD, fb:"It's even, but it starts above on the right, and nothing changes that before 1. See section 2."},
+      {t:DU, fb:"That's an odd power. (" + X + " − 1)" + sq(2) + " is even. See section 2."},
+      {t:UD, fb:"That's an odd power. (" + X + " − 1)" + sq(2) + " is even. See section 2."}
     ]}
   },
 
   verdicts: {
-    all:"All six, including the one that doesn't factor.",
-    most:"Close. Go to the section named in each miss and redo those on paper.",
-    few:"Go back to section 3 and redo the diamond drill. Most misses here are sign mistakes."
+    all:"All six. Next, Inequalities from Graphs uses these sketches.",
+    most:"Close. Redo the misses on paper, using the section each one names.",
+    few:"Go back to section 1 and work forward. Then redo the practice in section 4."
   },
-
-  solver: {
-    ask: "What's the next step?",
-    ok: "Yes, that works here.",
-    done: "Fully factored: nothing left inside any bracket can come out."
-  },
-
-  rules: [
-    {id:"CF",    nm:"Pull out the common factor", frm:"it stays in the answer"},
-    {id:"PAIR",  nm:"Pair goes into the brackets", frm:"front number 1 only"},
-    {id:"SPLIT", nm:"Split the middle term",       frm:"front number not 1"},
-    {id:"GROUP", nm:"Group in pairs",              frm:"four terms, GCF out of each pair"}
-  ],
-
-  generic: {
-    CF:"Nothing is shared by every term here.",
-    PAIR:"The pair only goes straight into the brackets when the front number is 1.",
-    SPLIT:"Splitting is for a three-term quadratic whose front number isn't 1.",
-    GROUP:"Grouping is for four terms. This line doesn't have four."
-  },
-
-  problems: [
-    {
-      start:"2<i>x</i><sup>2</sup> − 8<i>x</i> − 24",
-      steps:[
-        {rule:"CF", result:"2(<i>x</i><sup>2</sup> − 4<i>x</i> − 12)",
-         note:"Every term is even. Taking out the 2 makes the front number 1.",
-         wrong:{
-           SPLIT:"You could, but taking out the 2 first gives a much smaller diamond.",
-           PAIR:"The front number is 2. Take the 2 out first and it becomes 1."
-         }},
-        {rule:"PAIR", result:"2(<i>x</i> − 6)(<i>x</i> + 2)",
-         note:"Multiply to &minus;12, add to &minus;4: &minus;6 and 2. Front number is 1, so they go straight in.",
-         wrong:{
-           SPLIT:"Inside the bracket the front number is 1, so no split needed.",
-           CF:"<i>x</i><sup>2</sup>, 4<i>x</i> and 12 share nothing."
-         }}
-      ]
-    },
-    {
-      start:"3<i>x</i><sup>2</sup> + 10<i>x</i> + 8",
-      steps:[
-        {rule:"SPLIT", result:"3<i>x</i><sup>2</sup> + 6<i>x</i> + 4<i>x</i> + 8",
-         note:"Top 3 &middot; 8 = 24, bottom 10: 6 and 4.",
-         wrong:{
-           PAIR:"Front number is 3. Dropping 6 and 4 in gives (3<i>x</i> + 6)(<i>x</i> + 4) = 3<i>x</i><sup>2</sup> + 18<i>x</i> + 24.",
-           CF:"3, 10 and 8 share nothing.",
-           GROUP:"Three terms. Split the middle first."
-         }},
-        {rule:"GROUP", result:"3<i>x</i>(<i>x</i> + 2) + 4(<i>x</i> + 2)",
-         note:"Matching brackets confirm the split.",
-         wrong:{SPLIT:"Already split."}},
-        {rule:"CF", result:"(<i>x</i> + 2)(3<i>x</i> + 4)",
-         note:"(<i>x</i> + 2) comes out front.",
-         wrong:{GROUP:"Already grouped."}}
-      ]
-    },
-    {
-      start:"2<i>m</i><sup>2</sup> − 7<i>m</i> − 15",
-      steps:[
-        {rule:"SPLIT", result:"2<i>m</i><sup>2</sup> − 10<i>m</i> + 3<i>m</i> − 15",
-         note:"Top 2 &middot; (&minus;15) = &minus;30, bottom &minus;7: &minus;10 and 3.",
-         wrong:{
-           PAIR:"Front number is 2. The pair splits the middle term.",
-           CF:"2, 7 and 15 share nothing."
-         }},
-        {rule:"GROUP", result:"2<i>m</i>(<i>m</i> − 5) + 3(<i>m</i> − 5)",
-         note:"Second pair: +3<i>m</i> &minus; 15 = 3(<i>m</i> &minus; 5).",
-         wrong:{SPLIT:"Already split."}},
-        {rule:"CF", result:"(<i>m</i> − 5)(2<i>m</i> + 3)",
-         note:"Check: 3<i>m</i> &minus; 10<i>m</i> = &minus;7<i>m</i>.",
-         wrong:{GROUP:"Already grouped."}}
-      ]
-    },
-    {
-      start:"4<i>x</i><sup>3</sup> + 14<i>x</i><sup>2</sup> + 6<i>x</i>",
-      steps:[
-        {rule:"CF", result:"2<i>x</i>(2<i>x</i><sup>2</sup> + 7<i>x</i> + 3)",
-         note:"Every coefficient is even and every term has an <i>x</i>. Take out 2<i>x</i>.",
-         wrong:{
-           SPLIT:"There's a common factor of 2<i>x</i>. Take it out first.",
-           PAIR:"Front number is 4, and there's a common factor first."
-         }},
-        {rule:"SPLIT", result:"2<i>x</i>(2<i>x</i><sup>2</sup> + 6<i>x</i> + <i>x</i> + 3)",
-         note:"Inside: top 2 &middot; 3 = 6, bottom 7: 6 and 1.",
-         wrong:{
-           PAIR:"Inside the bracket the front number is 2, not 1.",
-           CF:"2<i>x</i><sup>2</sup>, 7<i>x</i> and 3 share nothing."
-         }},
-        {rule:"GROUP", result:"2<i>x</i>[2<i>x</i>(<i>x</i> + 3) + 1(<i>x</i> + 3)]",
-         note:"Write the 1, just like in Part 1.",
-         wrong:{SPLIT:"Already split."}},
-        {rule:"CF", result:"2<i>x</i>(<i>x</i> + 3)(2<i>x</i> + 1)",
-         note:"(<i>x</i> + 3) comes out. The 2<i>x</i> stays out front.",
-         wrong:{GROUP:"Already grouped."}}
-      ]
-    }
-  ],
 
   traps: [
-    {bad:"2<i>x</i><sup>2</sup> + 7<i>x</i> + 3 = (2<i>x</i> + 6)(<i>x</i> + 1)", badge:"Wrong",
-     why:"6 and 1 are the right pair, but when the front number isn't 1 they split the middle term. The answer is (2<i>x</i> + 1)(<i>x</i> + 3).",
-     sub:"x = 1", verdict:"not equal",
-     left:{lbl:"2x² + 7x + 3", val:"12"},
-     right:{lbl:"(2x + 6)(x + 1)", val:"16"}},
-    {bad:"<i>x</i><sup>2</sup> − 5<i>x</i> + 6 = (<i>x</i> + 2)(<i>x</i> + 3)", badge:"Wrong",
-     why:"Product +6 with a negative sum: both numbers are negative. It's (<i>x</i> &minus; 2)(<i>x</i> &minus; 3).",
-     sub:"x = 1", verdict:"not equal",
-     left:{lbl:"x² − 5x + 6", val:"2"},
-     right:{lbl:"(x + 2)(x + 3)", val:"12"}},
-    {bad:"<i>x</i><sup>2</sup> + 5<i>x</i> + 6 = (<i>x</i> + 5)(<i>x</i> + 6)", badge:"Wrong",
-     why:"The numbers must multiply to 6 and add to 5: 2 and 3.",
-     sub:"x = 1", verdict:"not equal",
-     left:{lbl:"x² + 5x + 6", val:"12"},
-     right:{lbl:"(x + 5)(x + 6)", val:"42"}},
-    {bad:"(<i>x</i> + 2)(<i>x</i> + 3) = <i>x</i><sup>2</sup> + 6", badge:"Wrong",
-     why:"The middle term is missing: 3<i>x</i> + 2<i>x</i> = 5<i>x</i>.",
-     sub:"x = 1", verdict:"not equal",
-     left:{lbl:"(x + 2)(x + 3)", val:"12"},
-     right:{lbl:"x² + 6", val:"7"}}
+    {bad:fr(X + " − 3", "(" + X + " + 1)" + sq(2)) + " alternates, so it's above left of −1", badge:"Wrong",
+     why:"The graph only switches sides at odd powers. It's below between −1 and 3, and it stays below at −1.",
+     sub:"x = −2", verdict:"below the axis",
+     left:{lbl:"f(−2) = −5 / 1", val:"−5"}, right:{lbl:"claimed", val:"positive"}},
+    {bad:fr("−(" + X + " − 1)", X + " + 2") + " starts above the axis on the right", badge:"Wrong",
+     why:"The minus counts. Far out it's " + fr("−" + X, X) + " = −1, so the right end is below. A wrong start makes every piece wrong.",
+     sub:"x = 1000", verdict:"below the axis",
+     left:{lbl:"f(1000) = −999/1002", val:"≈ −1"}, right:{lbl:"claimed", val:"positive"}},
+    {bad:fr(X + " + 1", X + " − 2") + " goes up on both sides of 2, because the right end is above", badge:"Wrong",
+     why:"The right end only tells you the right side. The power is 1, odd, so left of 2 the graph is below and shoots down.",
+     sub:"x = 1.9 and x = 2.1", verdict:"opposite ways",
+     left:{lbl:"f(1.9) = 2.9/(−0.1)", val:"−29"}, right:{lbl:"f(2.1) = 3.1/0.1", val:"31"}},
+    {bad:fr(X + " + 1", X + sq(2) + " − 4") + " is above the axis left of −2, because every term is plus", badge:"Wrong",
+     why:"Don't guess the left end. Far out it's " + fr("1", X) + ", so it's below on the left.",
+     sub:"x = −3", verdict:"below the axis",
+     left:{lbl:"f(−3) = −2/5", val:"−0.4"}, right:{lbl:"claimed", val:"positive"}}
   ]
 });
 
+/* the quiz graph is drawn after the quiz exists */
+$$("[data-g2]").forEach(function(h){ h.innerHTML = FIGS[h.getAttribute("data-g2")]; });
+
 EXP.walks();
 
-/* ---- widgets ---- */
-
-/* the worked diamond for x² + 7x + 12 */
-(function demo(){
-  var host = $("#diaDemo"), btn = $("#diaBtn");
-  var shown = false;
+$$(".walkg").forEach(function(w){
+  var host = $(".wg-fig", w), name = host.getAttribute("data-stages"), list = STAGES[name], steps = $$(".walk-steps > li", w);
+  if(list.length !== steps.length + 1) throw new Error(name + ": " + list.length + " stages for " + steps.length + " steps");
   function draw(){
-    host.innerHTML = shown ? diamond(12, 3, 4, 7, true) : diamond(12, null, null, 7, false);
-    btn.textContent = shown ? "Hide the sides" : "Fill the sides";
+    host.innerHTML = list[steps.filter(function(li){ return li.style.display !== "none"; }).length];
   }
-  btn.addEventListener("click", function(){ shown = !shown; draw(); });
+  $(".walk-ctrls", w).addEventListener("click", draw);
   draw();
-})();
+});
 
-/* read-the-diamond drill */
-(function drill(){
-  var ITEMS = [
-    {top:12, bot:7, pairs:["3 and 4", "2 and 6", "1 and 12", "−3 and −4"], ok:0,
-     why:"Product positive and sum positive, so both are positive. 3 · 4 = 12 and 3 + 4 = 7."},
-    {top:12, bot:-7, pairs:["−3 and −4", "3 and 4", "−2 and −6", "−1 and −12"], ok:0,
-     why:"Product positive means matching signs; sum negative makes them both negative."},
-    {top:-12, bot:1, pairs:["4 and −3", "−4 and 3", "6 and −2", "12 and −1"], ok:0,
-     why:"Negative product means one of each. The sum is +1, so the bigger number, 4, is the positive one."},
-    {top:-12, bot:-1, pairs:["−4 and 3", "4 and −3", "−6 and 2", "−12 and 1"], ok:0,
-     why:"One of each again, but now the sum is negative, so the bigger number carries the minus."},
-    {top:18, bot:11, pairs:["2 and 9", "3 and 6", "1 and 18", "−2 and −9"], ok:0,
-     why:"3 and 6 multiply to 18 but add to 9. Only 2 and 9 add to 11."},
-    {top:-30, bot:-7, pairs:["−10 and 3", "10 and −3", "−15 and 2", "−6 and 5"], ok:0,
-     why:"−15 and 2 multiply to −30 but add to −13. −10 and 3 give −30 and −7."}
-  ];
-  var i = 0, marks = [];
-  var dia = $("#dlDia"), btns = $("#dlBtns"), fb = $("#dlFb"),
-      cnt = $("#dlCount"), pips = $("#dlPips"), next = $("#dlNext");
+/* ---- stepped practice: asymptotes-01's ladder() ----------------------------
+   items: [{goal, m, done, parts:[{ask, opts:[right first, ...], why}]}]   */
+function ladder(sel, items, cfg){
+  var host = $(sel); if(!host) return;
+  cfg = cfg || {};
+  host.className = "drill" + (cfg.wide ? " wide" : "");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='ld-goal'></div><div class='ld-q m'></div><div class='ld-done'></div><div class='ld-ask'></div>" +
+    "<div class='ld-opts'></div><div class='drill-fb'></div><div class='ld-final'></div>" +
+    "<div class='drill-btns'><button type='button' class='btn on ld-next'></button></div>";
+  var goalEl = $(".ld-goal", host), finEl = $(".ld-final", host), qEl = $(".ld-q", host), doneEl = $(".ld-done", host), askEl = $(".ld-ask", host),
+      optsEl = $(".ld-opts", host), fb = $(".drill-fb", host), cnt = $(".count", host),
+      pips = $(".pips", host), next = $(".ld-next", host);
+  var i = 0, p = 0, clean = true, marks = [];
 
   function shuffled(n){
     var a = [], j, t, k;
     for(k = 0; k < n; k++) a.push(k);
-    for(k = a.length - 1; k > 0; k--){
-      j = Math.floor(Math.random() * (k + 1));
-      t = a[k]; a[k] = a[j]; a[j] = t;
-    }
+    for(k = n - 1; k > 0; k--){ j = Math.floor(Math.random() * (k + 1)); t = a[k]; a[k] = a[j]; a[j] = t; }
     return a;
   }
   function drawPips(){
     pips.innerHTML = "";
-    ITEMS.forEach(function(_, k){
-      var p = document.createElement("span");
-      p.className = "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
-                    (k === i ? " now" : "");
-      pips.appendChild(p);
+    items.forEach(function(_, k){
+      pips.appendChild(EXP.el("span", "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
+                                     (k === i ? " now" : "")));
     });
   }
-  function draw(){
-    var it = ITEMS[i];
-    dia.innerHTML = diamond(it.top, null, null, it.bot, false);
-    cnt.textContent = (i + 1) + " of " + ITEMS.length;
-    fb.className = "drill-fb"; fb.textContent = "";
+  function drawItem(){
+    p = 0; clean = true;
+    goalEl.innerHTML = items[i].goal || cfg.goal || "";
+    qEl.innerHTML = items[i].m;
+    doneEl.innerHTML = "";
+    finEl.innerHTML = "";
+    cnt.textContent = "Problem " + (i + 1) + " of " + items.length;
+    drawPips();
+    drawPart();
+  }
+  function drawPart(){
+    var it = items[i], part = it.parts[p], n = it.parts.length;
+    askEl.innerHTML = (n > 1 ? "<span class='ld-step'>Step " + (p + 1) + " of " + n + "</span>" : "") + part.ask;
+    fb.className = "drill-fb"; fb.innerHTML = "";
     next.style.display = "none";
-    btns.innerHTML = "";
-    shuffled(it.pairs.length).forEach(function(idx){
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "pairbtn";
-      b.textContent = it.pairs[idx];
-      b.addEventListener("click", function(){ answer(idx, b, it); });
-      btns.appendChild(b);
+    optsEl.innerHTML = "";
+    shuffled(part.opts.length).forEach(function(k){
+      var b = EXP.el("button", "ldbtn", part.opts[k]);
+      b.type = "button"; b._k = k;
+      b.addEventListener("click", function(){ answer(k, b); });
+      optsEl.appendChild(b);
     });
-    drawPips();
   }
-  function answer(idx, btn, it){
-    var right = (idx === it.ok);
-    if(marks[i] === undefined) marks[i] = right;
-    Array.prototype.slice.call(btns.children).forEach(function(c){ c.disabled = true; });
-    btn.classList.add(right ? "right" : "wrongpick");
-    if(right){
-      var parts = it.pairs[it.ok].split(" and ");
-      dia.innerHTML = diamond(it.top, parts[0], parts[1], it.bot, true);
-    }else{
-      Array.prototype.slice.call(btns.children).forEach(function(c){
-        if(c.textContent === it.pairs[it.ok]) c.classList.add("right");
-      });
-    }
+  function answer(k, b){
+    var it = items[i], part = it.parts[p], right = (k === 0), last = (p === it.parts.length - 1);
+    if(!right) clean = false;
+    $$(".ldbtn", optsEl).forEach(function(c){ c.disabled = true; if(c._k === 0) c.classList.add("right"); });
+    if(!right) b.classList.add("wrongpick");
     fb.className = "drill-fb " + (right ? "ok" : "no");
-    fb.innerHTML = (right ? "Right. " : "Not this one: it's " + it.pairs[it.ok] + ". ") + it.why;
-    next.style.display = (i < ITEMS.length - 1) ? "" : "none";
-    if(i === ITEMS.length - 1){
-      var n = marks.filter(function(v){ return v; }).length;
-      fb.innerHTML += "<div class='drill-end'>" + n + " of " + ITEMS.length +
-        " right first time. Signs first, then pairs.</div>";
+    fb.innerHTML = (right ? "Right. " : "Not quite. ") + part.why;
+    if(last){
+      if(it.done) finEl.innerHTML = "<span class='lbl'>" + (it.doneLbl || cfg.doneLbl || "Finished") +
+        "</span><span class='m'>" + it.done + "</span>";
+      if(marks[i] === undefined) marks[i] = clean;
+      drawPips();
+      if(i === items.length - 1){
+        var got = marks.filter(function(v){ return v; }).length;
+        fb.innerHTML += "<div class='drill-end'>" + got + " of " + items.length + " right first time. " + (cfg.end || "") + "</div>";
+      }
     }
-    drawPips();
+    next.textContent = !last ? "Next step" : (i < items.length - 1 ? "Next problem" : "Start again");
+    next.style.display = "";
   }
-  next.addEventListener("click", function(){ i++; draw(); });
-  draw();
-})();
-
-
-/* try any quadratic */
-(function pairFinderUI(){
-  var st = {a:1, b:7, c:12};
-  var host = $("#pf");
-  var PRE = [[1,7,12],[1,-2,-15],[2,7,3],[6,15,6],[4,12,9],[1,4,6]];
-  function stepper(k){
-    return "<span class='m' style='margin-left:6px'><i>" + k + "</i> =</span><span class='stepper'>" +
-      "<button type='button' data-k='" + k + "' data-d='-1' aria-label='smaller " + k + "'>&minus;</button><span id='pf" + k + "'></span>" +
-      "<button type='button' data-k='" + k + "' data-d='1' aria-label='bigger " + k + "'>+</button></span>";
-  }
-  host.innerHTML =
-    "<div class='xp-row'><span class='ctrl-label'>Examples</span>" +
-      PRE.map(function(p, i){ return "<button type='button' class='btn' data-pre='" + i + "'>" + quad(p[0], p[1], p[2]) + "</button>"; }).join("") + "</div>" +
-    "<div class='xp-row'>" + stepper("a") + stepper("b") + stepper("c") + "</div>" +
-    "<div class='xp-stmt m' id='pfQ'></div>" +
-    "<div id='pfCF' class='xp-say'></div>" +
-    "<div class='diarow'><div style='flex:0 0 auto' id='pfDia'></div><div class='side'><table class='pftab' id='pfTab'></table></div></div>" +
-    "<div class='xp-out' id='pfOut'></div>";
-
-  function coef(n, v){ return (n === 1 ? "" : n === -1 ? "−" : EXP.num(n)) + v; }
-  function quad(a, b, c){
-    var s = coef(a, "<i>x</i><sup>2</sup>");
-    if(b) s += (b < 0 ? " − " : " + ") + (Math.abs(b) === 1 ? "" : Math.abs(b)) + "<i>x</i>";
-    return s + (c < 0 ? " − " : " + ") + Math.abs(c);
-  }
-  function brk(f){ return "(" + coef(f[0], "<i>x</i>") + (f[1] < 0 ? " − " : " + ") + Math.abs(f[1]) + ")"; }
-  function draw(){
-    var r = solveQuad(st.a, st.b, st.c);
-    $("#pfa").textContent = st.a; $("#pfb").textContent = EXP.num(st.b); $("#pfc").textContent = EXP.num(st.c);
-    $("#pfQ").innerHTML = "Factor " + quad(st.a, st.b, st.c);
-    $("#pfCF").innerHTML = (r.k > 1)
-      ? "Common factor first: <span class='m'>" + r.k + "(" + quad(r.A, r.B, r.C) + ")</span>. The diamond is for the bracket."
-      : "";
-    $("#pfDia").innerHTML = r.hit ? diamond(r.P, EXP.num(r.hit.p), EXP.num(r.hit.q), r.B, true) : diamond(r.P, null, null, r.B, false);
-    $("#pfTab").innerHTML = "<tr><th>pair (multiply to " + EXP.num(r.P) + ")</th><th>sum</th></tr>" +
-      r.pairs.map(function(p){
-        var hit = r.hit && p.p === r.hit.p && p.q === r.hit.q;
-        return "<tr" + (hit ? " class='hit'" : "") + "><td>" + EXP.num(p.p) + " and " + EXP.num(p.q) + "</td><td>" + EXP.num(p.sum) + (hit ? " &#10003;" : "") + "</td></tr>";
-      }).join("");
-    var out = $("#pfOut");
-    if(!r.hit){
-      out.className = "xp-out empty";
-      out.innerHTML = "<span class='shape'>no pair</span><span>Nothing adds to " + EXP.num(r.B) + ", so it doesn't factor with integers.</span>";
+  next.addEventListener("click", function(){
+    var it = items[i];
+    if(p < it.parts.length - 1){
+      doneEl.insertAdjacentHTML("beforeend", "<div class='ld-line'><span>" + it.parts[p].ask +
+        "</span><span class='m'>" + it.parts[p].opts[0] + "</span></div>");
+      p++; drawPart();
     }else{
-      var front = r.k > 1 ? String(r.k) : "";
-      var same = r.f1[0] === r.f2[0] && r.f1[1] === r.f2[1];
-      var ans = front + (same ? brk(r.f1) + "<sup>2</sup>" : brk(r.f1) + brk(r.f2));
-      var how = (r.A === 1)
-        ? "Front number is 1, so the pair goes straight into the brackets."
-        : "Front number isn't 1, so split the middle into " + coef(r.hit.p, "<i>x</i>") + " and " + coef(r.hit.q, "<i>x</i>") + ", then group.";
-      out.className = "xp-out";
-      out.innerHTML = "<span class='shape'>factored</span><span class='m pfres'>" + (r.ok ? ans : "check failed") + "</span><span>" + how + "</span>";
+      if(i < items.length - 1) i++; else { i = 0; marks = []; }
+      drawItem();
     }
-    $$("[data-pre]", host).forEach(function(b){
-      var p = PRE[+b.getAttribute("data-pre")];
-      b.classList.toggle("on", p[0] === st.a && p[1] === st.b && p[2] === st.c);
-    });
-  }
-  host.addEventListener("click", function(e){
-    var b = e.target.closest("button"); if(!b) return;
-    var a;
-    if((a = b.getAttribute("data-pre")) != null){ var p = PRE[+a]; st = {a:p[0], b:p[1], c:p[2]}; }
-    else if((a = b.getAttribute("data-k"))){
-      var d = +b.getAttribute("data-d");
-      if(a === "a") st.a = Math.max(1, Math.min(6, st.a + d));
-      else if(a === "b") st.b = Math.max(-15, Math.min(15, st.b + d));
-      else { st.c = st.c + d; if(st.c === 0) st.c += d; st.c = Math.max(-15, Math.min(15, st.c)); }
-    }else return;
-    draw();
   });
-  draw();
-})();
+  drawItem();
+}
+
+var AB = ["above", "below"], BA = ["below", "above"];
+ladder("#ldWalk", [
+  /* (x − 3)/(x + 1): ends 1. above, change at 3, change at −1 */
+  {m:F + fr(X + " − 3", X + " + 1"), done:"above, below, above", parts:[
+    {ask:"Far right, the graph is", opts:AB, why:fr(X, X) + " = 1, so it's above."},
+    {ask:"Walk left past 3 (top, power 1). Now it's", opts:BA, why:"Odd, so the sign changes: it crosses to below."},
+    {ask:"Walk left past −1 (bottom, power 1). Now it's", opts:AB, why:"Odd, so the sign changes. It arrives above, which matches the left end."}
+  ]},
+  /* (x + 2)²/(x − 1): ends like x. above, change at 1, keep at −2 */
+  {m:F + fr("(" + X + " + 2)" + sq(2), X + " − 1"), done:"below, below, above", parts:[
+    {ask:"Far right, the graph is", opts:AB, why:fr(X + sq(2), X) + " = " + X + ". It rises on the right, so it's above."},
+    {ask:"Walk left past 1 (bottom, power 1). Now it's", opts:BA, why:"Odd, so the sign changes."},
+    {ask:"Walk left past −2 (top, power 2). Now it's", opts:BA, why:"Even, so the sign stays: it touches from below. " + Y + " = " + X + " falls on the left, so that matches."}
+  ]},
+  /* (x − 4)/(x + 2)²: ends 1/x. above, change at 4, keep at −2 */
+  {m:F + fr(X + " − 4", "(" + X + " + 2)" + sq(2)), done:"below, below, above", parts:[
+    {ask:"Far right, the graph is", opts:AB, why:fr(X, X + sq(2)) + " = " + fr("1", X) + ", so it's just above."},
+    {ask:"Walk left past 4 (top, power 1). Now it's", opts:BA, why:"Odd, so the sign changes."},
+    {ask:"Walk left past −2 (bottom, power 2). Now it's", opts:BA, why:"Even, so the sign stays. It goes down on both sides of −2. " + fr("1", X) + " is below on the left, so that matches."}
+  ]},
+  /* −(x + 1)/(x − 2): ends −1. below, change at 2, change at −1 */
+  {m:F + fr("−(" + X + " + 1)", X + " − 2"), done:"below, above, below", parts:[
+    {ask:"Far right, the graph is", opts:BA, why:fr("−" + X, X) + " = −1, so it's below."},
+    {ask:"Walk left past 2 (bottom, power 1). Now it's", opts:AB, why:"Odd, so the sign changes."},
+    {ask:"Walk left past −1 (top, power 1). Now it's", opts:BA, why:"Odd, so the sign changes. It arrives below, which matches −1."}
+  ]},
+  /* x/((x − 1)(x + 3)): ends 1/x. above, change at 1, 0, −3 */
+  {m:F + fr(X, "(" + X + " − 1)(" + X + " + 3)"), done:"below, above, below, above", parts:[
+    {ask:"Far right, the graph is", opts:AB, why:fr(X, X + sq(2)) + " = " + fr("1", X) + ", so it's just above."},
+    {ask:"Walk left past 1 (bottom, power 1). Now it's", opts:BA, why:"Odd, so the sign changes."},
+    {ask:"Walk left past 0 (top, power 1). Now it's", opts:AB, why:"Odd, so it crosses."},
+    {ask:"Walk left past −3 (bottom, power 1). Now it's", opts:BA, why:"Odd, so the sign changes. " + fr("1", X) + " is below on the left, so that matches."}
+  ]},
+  /* (x − 1)²/((x − 2)(x + 2)): ends 1. above, change at 2, keep at 1, change at −2 */
+  {m:F + fr("(" + X + " − 1)" + sq(2), X + sq(2) + " − 4"), done:"above, below, below, above", parts:[
+    {ask:"Far right, the graph is", opts:AB, why:fr(X + sq(2), X + sq(2)) + " = 1, so it's above."},
+    {ask:"The bottom is (" + X + " − 2)(" + X + " + 2). Walk left past 2 (bottom, power 1). Now it's", opts:BA, why:"Odd, so the sign changes."},
+    {ask:"Walk left past 1 (top, power 2). Now it's", opts:BA, why:"Even, so the sign stays: it touches from below."},
+    {ask:"Walk left past −2 (bottom, power 1). Now it's", opts:AB, why:"Odd, so the sign changes. It arrives above, which matches 1."}
+  ]}
+], {doneLbl:"Left to right", end:"Missed some? Start from the ends, and take the key numbers one at a time, right to left."});
 
 })();
 </script>

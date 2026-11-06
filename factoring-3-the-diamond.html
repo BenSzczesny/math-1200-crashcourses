@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -518,7 +523,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Factoring · Part 3 of 3</div>
   <h1>Two numbers do all the work</h1>
   <p class="lead">Factoring a quadratic comes down to one question: <strong>which two numbers multiply to one thing and add to another?</strong> The diamond is where you write it down.</p>
-  <p>Do Part 2 first: the diamond ends with a grouping step. No calculator needed.</p>
+  <p>Do <a class="xref" href="factoring-2-grouping.html">Part 2</a> first: the diamond ends with a grouping step. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS topics: <em>Factoring a quadratic with leading coefficient 1</em> · <em>Factoring out a constant before factoring a quadratic</em> · <em>Factoring a quadratic with leading coefficient greater than 1</em> · <em>Factoring a perfect square trinomial with leading coefficient greater than 1</em> (§R.5).</p>
   <ol class="pagemap">
     <li><a href="#s1">Where the two numbers come from</a></li>
@@ -657,7 +662,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
     <span class="tag">Two changes</span>
     <ul>
       <li>The top of the diamond is <span class="m"><i>a</i> <span class="op">·</span> <i>c</i></span>, not <span class="m"><i>c</i></span>.</li>
-      <li>The two numbers <strong>split the middle term</strong>. Then factor by grouping (Part 2).</li>
+      <li>The two numbers <strong>split the middle term</strong>. Then factor by grouping (<a class="xref" href="factoring-2-grouping.html">Part 2</a>).</li>
     </ul>
   </div>
 

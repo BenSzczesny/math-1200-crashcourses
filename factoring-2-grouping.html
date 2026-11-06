@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -519,7 +524,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Factoring · Part 2 of 3</div>
   <h1>Grouping: find a shared bracket</h1>
   <p class="lead">A common factor can be a whole bracket. With four terms, <strong>factor each pair, and a shared bracket appears.</strong> Pull it out like any other common factor.</p>
-  <p>Do Part 1 first: every step here is pulling out a GCF. Part 3, the diamond, ends with this grouping step. No calculator needed.</p>
+  <p>Do <a class="xref" href="factoring-1-common-factors.html">Part 1</a> first: every step here is pulling out a GCF. <a class="xref" href="factoring-3-the-diamond.html">Part 3</a>, the diamond, ends with this grouping step. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS topics: <em>Factoring a univariate polynomial by grouping: Problem type 2</em> · <em>Factoring a multivariate polynomial by grouping: Problem type 1</em> (§R.5).</p>
   <ol class="pagemap">
     <li><a href="#s1">A bracket as the common factor</a></li>
@@ -709,7 +714,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>A bracket as the common factor, and grouping.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Next</div><div class="t">Part 3: the diamond</div>
+      <div class="n">Next</div><div class="t"><a class="xref" href="factoring-3-the-diamond.html">Part 3: the diamond</a></div>
       <p>Factoring quadratics with three terms.</p>
     </div>
   </div>

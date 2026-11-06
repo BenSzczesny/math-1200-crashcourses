@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -552,7 +557,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Graphs · Part 1 of 3</div>
   <h1>Inside or outside: one rule for every move</h1>
   <p class="lead">Most graphs in Module 12 are one of six <strong>parent graphs</strong>, moved. One rule says how any change in the equation moves the points. This page is that rule, then shifts: up, down, left and right.</p>
-  <p>Part 2 does flips and stretches. Part 3 puts several moves together. No calculator needed.</p>
+  <p><a class="xref" href="graphs-2-flips-and-stretches.html">Part 2</a> does flips and stretches. <a class="xref" href="graphs-3-several-moves.html">Part 3</a> puts several moves together. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS (§2.6): <em>Translating the graph of a function: One step</em> and <em>Writing an equation for a function after a vertical translation</em>. The parent graphs come from Module 11: <em>Matching parent graphs with their equations</em>.</p>
   <ol class="pagemap">
     <li><a href="#s1">The six parent graphs</a></li>
@@ -646,7 +651,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
     <tr><td class="m"><i>f</i>(<i>x</i>) + 3</td><td>outside</td><td><i>y</i> increases by 3: up 3, the same</td></tr>
     <tr><td class="m"><i>f</i>(<i>x</i>) − 3</td><td>outside</td><td><i>y</i> decreases by 3: down 3</td></tr>
   </table>
-  <p>The same rule covers flips and stretches in Part 2.</p>
+  <p>The same rule covers flips and stretches in <a class="xref" href="graphs-2-flips-and-stretches.html">Part 2</a>.</p>
 
   <div class="check" data-q="c4">
     <div class="check-q"><span class="ask"><i>f</i> passes through (5, 2). Which point is on</span><span class="m"><i>y</i> = <i>f</i>(<i>x</i> + 1)</span><span class="ask">?</span></div>
@@ -786,11 +791,11 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>The rule of thumb, and shifts.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Next</div><div class="t">Part 2</div>
+      <div class="n">Next</div><div class="t"><a class="xref" href="graphs-2-flips-and-stretches.html">Part 2</a></div>
       <p>Flips, and stretches up, down and sideways.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Then</div><div class="t">Part 3</div>
+      <div class="n">Then</div><div class="t"><a class="xref" href="graphs-3-several-moves.html">Part 3</a></div>
       <p>Several moves, one at a time.</p>
     </div>
   </div>

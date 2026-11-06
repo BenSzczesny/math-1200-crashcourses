@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -486,7 +491,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
   <div class="eyebrow">Exponents · Lesson 1 of 3</div>
   <h1>Write the power out, and the rules explain themselves</h1>
   <p class="lead"><span class="m"><i>x</i><sup>4</sup></span> means <span class="m"><i>x</i> <span class="op">·</span> <i>x</i> <span class="op">·</span> <i>x</i> <span class="op">·</span> <i>x</i></span>. Every rule on this page comes from writing a power out like that and <strong>counting the factors</strong>.</p>
-  <p>This lesson covers positive exponents. Negative exponents are Lesson 2, fractional ones Lesson 3. No calculator needed.</p>
+  <p>This lesson covers positive exponents. Negative exponents are <a class="xref" href="02-negative-exponents.html">Lesson 2</a>, fractional ones <a class="xref" href="03-rational-exponents.html">Lesson 3</a>. No calculator needed.</p>
   <p style="font-size:14.5px">ALEKS topics: <em>Product rule with positive exponents</em> · <em>Power rules with positive exponents</em> · <em>Power and quotient rules with positive exponents</em> (§R.2).</p>
   <ol class="pagemap">
     <li><a href="#s1">The exponent is a count</a></li>
@@ -604,7 +609,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
     <span class="cond">(<i>a</i> &ne; 0)</span>
   </div>
 
-  <p>Top exponent minus bottom exponent, in that order. On this page the top is always bigger. When the bottom is bigger you get a negative exponent: that is Lesson 2.</p>
+  <p>Top exponent minus bottom exponent, in that order. On this page the top is always bigger. When the bottom is bigger you get a negative exponent: that is <a class="xref" href="02-negative-exponents.html">Lesson 2</a>.</p>
 
   <div class="check" data-q="c2">
     <div class="check-q"><span class="ask">Simplify</span><span class="m"><span class="fr"><span><i>a</i><sup>9</sup></span><span><i>a</i><sup>4</sup></span></span></span></div>
@@ -784,11 +789,11 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
       <p>Positive exponents: the four rules.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Next</div><div class="t">Lesson 2</div>
+      <div class="n">Next</div><div class="t"><a class="xref" href="02-negative-exponents.html">Lesson 2</a></div>
       <p>Negative exponents.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Then</div><div class="t">Lesson 3</div>
+      <div class="n">Then</div><div class="t"><a class="xref" href="03-rational-exponents.html">Lesson 3</a></div>
       <p>Fractional exponents and roots.</p>
     </div>
   </div>

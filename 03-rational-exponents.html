@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -599,7 +604,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <section id="s3">
   <div class="eyebrow">3 · Both numbers</div>
   <h2>The bottom is the root, the top is the power</h2>
-  <p>With any fraction in the exponent, use the power-of-a-power rule from Lesson 1: <span class="m"><i>a</i><sup>m/n</sup> = (<i>a</i><sup>1/n</sup>)<sup>m</sup></span>.</p>
+  <p>With any fraction in the exponent, use the power-of-a-power rule from <a class="xref" href="01-exponent-rules.html">Lesson 1</a>: <span class="m"><i>a</i><sup>m/n</sup> = (<i>a</i><sup>1/n</sup>)<sup>m</sup></span>.</p>
 
   <div class="rulebox">
     <span class="tag">Rational exponent</span>
@@ -782,7 +787,7 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <section id="s8">
   <div class="eyebrow">8 · Putting it together</div>
   <h2>Practice one step at a time</h2>
-  <p>Same six tools as Lesson 2, now with fractions in the exponents. The rules haven't changed. A good order: <strong>clear brackets, combine, move negatives, then work out the numbers.</strong></p>
+  <p>Same six tools as <a class="xref" href="02-negative-exponents.html">Lesson 2</a>, now with fractions in the exponents. The rules haven't changed. A good order: <strong>clear brackets, combine, move negatives, then work out the numbers.</strong></p>
 
   <div class="solver">
     <div class="solver-head">

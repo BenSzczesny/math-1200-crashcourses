@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Factoring Is Un-Distributing</title>
+<title>The Factor Theorem</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400;1,6..72,600&display=swap">
@@ -313,6 +313,11 @@ button{font-family:inherit; font-size:inherit; cursor:pointer}
 .nextcard .n{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px}
 .nextcard .t{font-family:var(--serif); font-size:19px; font-weight:600; margin-bottom:4px}
 .nextcard.soon{border-style:dashed; opacity:.75}
+.nextcard.soon:has(.xref){opacity:1}
+/* a link to another course: inherits its text, so bold stays bold */
+.xref{color:inherit; text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px}
+.xref:hover{color:var(--accent-2); text-decoration-thickness:2px}
+.xref:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
 .nextcard p{font-size:13.5px; margin:0; color:var(--ink-2)}
 .colophon{font-family:var(--mono); font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:34px}
 
@@ -362,12 +367,19 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 .hl{background:var(--accent-wash); border-radius:4px; padding:1px 4px; box-decoration-break:clone}
 
 /* ---------- page map ---------- */
-.pagemap{list-style:none; counter-reset:pm; margin:22px 0 0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:8px}
-.pagemap li{counter-increment:pm}
-.pagemap a{display:block; position:relative; padding:10px 14px 10px 38px; border:1px solid var(--rule); border-radius:8px; background:var(--surface); color:var(--ink); text-decoration:none; font-size:15px; line-height:1.35}
-.pagemap a::before{content:counter(pm); position:absolute; left:14px; top:12px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
-.pagemap a:hover{border-color:var(--accent)}
-.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+/* A contents list, not tiles: numbered rows on hairlines, reading down two
+   columns on wide screens and one on phones. */
+.pagemap{list-style:none; counter-reset:pm; margin:26px 0 0; padding:0; columns:2 250px; column-gap:44px}
+.pagemap::before{content:"On this page"; display:block; column-span:all; margin:0 0 6px; padding-bottom:8px;
+  border-bottom:1px solid var(--rule-strong); font-family:var(--mono); font-size:11px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3)}
+.pagemap li{counter-increment:pm; break-inside:avoid}
+.pagemap a{display:block; position:relative; padding:8px 2px 8px 36px; border-bottom:1px solid var(--rule);
+  color:var(--ink); text-decoration:none; font-size:15.5px; line-height:1.35}
+.pagemap a::before{content:counter(pm, decimal-leading-zero); position:absolute; left:2px; top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-3)}
+.pagemap a:hover{color:var(--accent-2); text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px}
+.pagemap a:hover::before{color:var(--accent)}
+.pagemap a:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px; border-radius:3px}
 
 /* ---------- key idea / watch out ---------- */
 .keybox{background:var(--accent-wash); border-left:3px solid var(--accent); border-radius:0 10px 10px 0; padding:16px 20px; margin:0 0 20px}
@@ -462,46 +474,61 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 }
 </style>
 <style>
-/* factoring lesson 1 only */
-.termrow{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px}
-.termrow .lbl{font-family:var(--serif); font-size:1.18em; color:var(--ink-2); min-width:62px}
-.termrow .lbl i{font-style:italic}
-.termrow .lbl sup{font-size:.6em; vertical-align:.62em; line-height:0}
-.evalgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:12px; margin-top:16px}
-.evalcell{border:1px solid var(--rule); border-radius:9px; padding:14px 16px; background:var(--paper)}
-.evalcell .hd{font-family:var(--serif); font-size:1.18em; margin-bottom:8px; white-space:nowrap}
-.evalcell .hd i{font-style:italic}
-.evalcell .val{font-family:var(--mono); font-size:24px; color:var(--ink); font-variant-numeric:tabular-nums}
-.evalcell .tagline{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; margin-top:8px; color:var(--ink-3)}
-.evalcell.good{border-color:var(--ok); background:var(--ok-wash)}
-.evalcell.good .tagline{color:var(--ok)}
-.evalcell.bad{border-color:var(--wrong); background:var(--wrong-wash)}
-.evalcell.bad .tagline{color:var(--wrong)}
-.bracketbox{background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:20px; box-shadow:var(--shadow); margin:0 0 20px}
-/* pick-the-GCF drill */
-.optbtns{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px}
-.optbtn{font-family:var(--serif); font-size:17px; text-align:left; padding:11px 14px; border-radius:8px;
-        border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink)}
-.optbtn i{font-style:italic}
-.optbtn sup{font-size:.6em; vertical-align:.62em; line-height:0}
-.optbtn:hover:not(:disabled){border-color:var(--accent)}
-.optbtn:disabled{cursor:default}
-.optbtn.right{border-color:var(--ok); background:var(--ok-wash)}
-.optbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
-.drill-res{margin-top:14px; padding-top:14px; border-top:1px dashed var(--rule-strong); display:none}
-.drill-res.show{display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px}
-/* a bracket standing in as one object */
-.blk{display:inline-block; background:var(--accent-wash); border:1.5px solid var(--accent);
-     border-radius:5px; padding:0 .32em; color:var(--accent-2); font-style:normal}
+/* factor-theorem lesson only */
+.walk-steps li > .m{white-space:normal}
+.dwrap{overflow-x:auto; margin:10px 0 2px}
+.walk-steps li .dwrap{grid-column:1/-1}
+.syn{display:inline-grid; font-family:var(--serif); font-size:clamp(16px,4.4vw,20px); line-height:1.3; color:var(--ink)}
+.syn > span{padding:3px 8px; min-width:2.4em; text-align:center; white-space:nowrap}
+.syn .bx{border:2px solid var(--ink); border-radius:4px; margin-right:6px}
+.syn .ul{border-bottom:2px solid var(--ink)}
+.syn .rem{outline:2px solid var(--ok); outline-offset:-2px; color:var(--ok); font-weight:600}
+.syn .nw{background:var(--accent-wash); color:var(--accent-2); font-weight:600}
+.brgwrap{overflow-x:auto}
+.brg td{vertical-align:middle}
+.brg td:first-child{white-space:nowrap; color:var(--ink-2)}
+.brg td .m{white-space:normal}
+.brg.two td .m{font-size:1.3em}
+@media (max-width:560px){ .brg.two tr, .brg.two td{display:block} .brg.two td:first-child{padding-bottom:0; border-bottom:0} }
+.brgline{margin:0 0 14px; padding:12px 16px; border-radius:8px; background:var(--surface-2)}
+.brgline .m{white-space:normal; font-size:1.3em}
+.check .opts{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.opt .m{white-space:nowrap}
+.ld-goal{font-weight:700; font-size:15.5px; color:var(--ink); margin:8px 0 0}
+.ld-goal:empty{display:none}
+.ld-q{font-size:clamp(22px,3.4vw,28px); margin:4px 0 12px}
+.ld-final{display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 14px; margin:12px 0 0; padding:12px 14px; border-radius:8px; background:var(--ok-wash)}
+.ld-final:empty{display:none}
+.ld-final .lbl{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ok)}
+.ld-final .m{font-size:1.3em; color:var(--ok); font-weight:600}
+.ld-final i{font-style:italic}
+.ld-final sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ld-done{display:flex; flex-direction:column; gap:4px; margin:0 0 10px}
+.ld-done:empty{display:none}
+.ld-line{display:flex; flex-wrap:wrap; gap:2px 10px; align-items:baseline; font-size:15px; color:var(--ink-2)}
+.ld-line .m{color:var(--ok); font-weight:600; font-size:1.12em}
+.ld-ask{font-weight:700; font-size:15.5px; margin:0 0 10px; color:var(--ink)}
+.ld-step{display:inline-block; font-family:var(--mono); font-size:11px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-right:10px}
+.ld-opts{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; margin:0 0 6px}
+.drill.wide .ld-opts{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.ldbtn{font-family:var(--serif); font-size:18px; padding:11px 14px; border-radius:8px; border:1px solid var(--rule-strong); background:var(--paper); color:var(--ink); cursor:pointer; text-align:center}
+.ldbtn i, .ld-q i, .ld-line i, .ld-ask i{font-style:italic}
+.ldbtn sup, .ld-q sup, .ld-line sup, .ld-ask sup{font-size:.62em; vertical-align:.55em; line-height:0}
+.ldbtn:hover:not(:disabled){border-color:var(--accent)}
+.ldbtn:focus-visible{outline:2.5px solid var(--accent); outline-offset:2px}
+.ldbtn:disabled{cursor:default}
+.ldbtn.right{border-color:var(--ok); background:var(--ok-wash)}
+.ldbtn.wrongpick{border-color:var(--wrong); background:var(--wrong-wash)}
+@media (max-width:480px){ .drill.wide .ld-opts{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="topbar-in">
-    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>Factoring 1</b></div>
+    <div class="brandmark"><a href="index.html" title="All crash courses">&larr; Math 1200</a> · <b>The Factor Theorem</b></div>
     <div class="meter">
       <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
-      <div class="meter-num" id="meterNum">0 / 16 correct</div>
+      <div class="meter-num" id="meterNum">0 / 10 correct</div>
     </div>
   </div>
 </div>
@@ -509,392 +536,235 @@ svg.nl .pin.no line{stroke:var(--wrong)} svg.nl .pin.no polygon, svg.nl .pin.no 
 <main>
 
 <section id="top">
-  <div class="eyebrow">Factoring · Part 1</div>
-  <h1>Factoring is distributing, backwards</h1>
-  <p class="lead">You know <span class="m">3(2<i>x</i> + 3) = 6<i>x</i> + 9</span>. Factoring goes the other way: <strong>find what the terms share, pull it out front, and put what's left in a bracket.</strong></p>
-  <p>This page covers the common factor, difference of squares, sum and difference of cubes, and grouping. Part 2 covers quadratics (the diamond). No calculator needed.</p>
-  <p style="font-size:14.5px">ALEKS topics: <em>Factoring a linear binomial</em> · <em>Factoring out a monomial from a polynomial: Multivariate</em> · the two <em>Factoring … by grouping</em> topics · the two <em>Factoring a difference of squares</em> topics · <em>Factoring a sum or difference of two cubes</em> (§R.5).</p>
+  <div class="eyebrow">Polynomials · Module 16 · Part 2 of 2</div>
+  <h1>Remainders, factors and zeros</h1>
+  <p class="lead">Divide a polynomial <span class="m"><i>P</i>(<i>x</i>)</span> by <span class="m"><i>x</i> − <i>c</i></span>, and the remainder is <span class="m"><i>P</i>(<i>c</i>)</span>. A remainder of 0 means <span class="m"><i>x</i> − <i>c</i></span> is a factor and <span class="m"><i>c</i></span> is a zero. That lets you factor a cubic once you know one zero.</p>
+  <p>Do <strong><a class="xref" href="polynomial-division-1-long-and-synthetic.html">Part 1, Polynomial Division</a></strong>, first. This page uses synthetic division throughout. No calculator needed.</p>
+  <p style="font-size:14.5px">Module 16 (§3.3): <em>Using the remainder theorem to evaluate a polynomial</em>, <em>The Factor Theorem</em>, <em>Using a given zero to write a polynomial as a product of linear factors: Real zeros</em>, <em>Writing a quadratic function given its zeros</em>, and <em>Finding a polynomial of a given degree with given zeros: Real zeros</em>.</p>
   <ol class="pagemap">
-    <li><a href="#s1">What factoring is</a></li>
-    <li><a href="#s2">The greatest common factor</a></li>
-    <li><a href="#s3">The bracket matters</a></li>
-    <li><a href="#s4">Difference of squares</a></li>
-    <li><a href="#s5">Sum and difference of cubes</a></li>
-    <li><a href="#s6">A bracket as the common factor</a></li>
-    <li><a href="#s7">Grouping</a></li>
-    <li><a href="#s8">Common mistakes</a></li>
-    <li><a href="#s9">Practice one step at a time</a></li>
-    <li><a href="#s10">Check yourself</a></li>
-    <li><a href="#s11">Cheat sheet</a></li>
+    <li><a href="#s1">The remainder is P(c)</a></li>
+    <li><a href="#s2">Remainder 0 means a factor</a></li>
+    <li><a href="#s3">Factor from one zero</a></li>
+    <li><a href="#s4">Build from the zeros</a></li>
+    <li><a href="#s5">Practice</a></li>
+    <li><a href="#s6">Common mistakes</a></li>
+    <li><a href="#s7">Check yourself</a></li>
+    <li><a href="#s8">Cheat sheet</a></li>
   </ol>
 </section>
 
 <section id="s1">
-  <div class="eyebrow">1 · What it is</div>
-  <h2>A sum goes in, a product comes out</h2>
+  <div class="eyebrow">1 · The Remainder Theorem</div>
+  <h2>The remainder is <i>P</i>(<i>c</i>)</h2>
+  <p>In <a class="xref" href="polynomial-division-1-long-and-synthetic.html">Part 1</a> you wrote each answer as quotient + remainder over divisor. This page writes the same division a different way. Here is one example, start to finish.</p>
 
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Divide</span><span class="m"><i>P</i>(<i>x</i>) = <i>x</i><sup>3</sup> − 4<i>x</i><sup>2</sup> + 5 &nbsp;by&nbsp; <i>x</i> − 3</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">Put 3 in the box.</span><span class="why">The divisor is <i>x</i> − 3, so 3 goes in the box. Along the top, write the coefficients 1, −4, 0, 5. The 0 stands for the missing <i>x</i> term: <i>x</i><sup>3</sup> − 4<i>x</i><sup>2</sup> + 0<i>x</i> + 5.</span><div class="dwrap" data-syn="a:0"></div></li>
+      <li><span class="m">Bottom row: 1, −1, −3, −4</span><span class="why">Bring the 1 down. Then, column by column, multiply by 3 and add: 1 · 3 = 3 and −4 + 3 = −1. Then −1 · 3 = −3 and 0 + (−3) = −3. Then −3 · 3 = −9 and 5 + (−9) = −4.</span><div class="dwrap" data-syn="a:4"></div></li>
+      <li class="ans"><span class="m">quotient <i>x</i><sup>2</sup> − <i>x</i> − 3, &nbsp;remainder −4</span><span class="why">The quotient is one degree lower than <i>P</i>. <i>P</i> starts at <i>x</i><sup>3</sup>, so 1, −1, −3 means <i>x</i><sup>2</sup> − <i>x</i> − 3. The last number, −4, is the remainder.</span></li>
+    </ol>
+  </div>
+
+  <p>Now write that answer two ways. The second line is the first one multiplied through by <span class="m"><i>x</i> − 3</span>. It's <a class="xref" href="polynomial-division-1-long-and-synthetic.html">Part 1</a>'s check: divisor × quotient + remainder gives back the dividend.</p>
+  <div class="brgwrap"><table class="symtab brg two">
+    <tr><td><a class="xref" href="polynomial-division-1-long-and-synthetic.html">Part 1</a>'s form</td><td><span class="m"><span class="fr"><span><i>x</i><sup>3</sup> − 4<i>x</i><sup>2</sup> + 5</span><span><i>x</i> − 3</span></span> = <i>x</i><sup>2</sup> − <i>x</i> − 3 + <span class="fr"><span>−4</span><span><i>x</i> − 3</span></span></span></td></tr>
+    <tr><td>Times <span class="m"><i>x</i> − 3</span></td><td><span class="m"><i>x</i><sup>3</sup> − 4<i>x</i><sup>2</sup> + 5 = (<i>x</i> − 3)(<i>x</i><sup>2</sup> − <i>x</i> − 3) + (−4)</span></td></tr>
+  </table></div>
+  <p>Give each piece of the second line a name:</p>
+  <table class="symtab brg">
+    <tr><th>Piece</th><th>Here</th><th>Name</th></tr>
+    <tr><td>dividend</td><td><span class="m"><i>x</i><sup>3</sup> − 4<i>x</i><sup>2</sup> + 5</span></td><td><span class="m"><i>P</i>(<i>x</i>)</span></td></tr>
+    <tr><td>divisor</td><td><span class="m"><i>x</i> − 3</span></td><td><span class="m"><i>x</i> − <i>c</i></span>, with <span class="m"><i>c</i> = 3</span></td></tr>
+    <tr><td>quotient</td><td><span class="m"><i>x</i><sup>2</sup> − <i>x</i> − 3</span></td><td><span class="m"><i>Q</i>(<i>x</i>)</span></td></tr>
+    <tr><td>remainder</td><td><span class="m">−4</span></td><td><span class="m"><i>R</i></span></td></tr>
+  </table>
   <div class="rulebox">
-    <span class="tag">The whole idea</span>
-    <span class="m">6<i>x</i> + 9 = 3(2<i>x</i> + 3)</span>
+    <span class="tag">Any division by x − c</span>
+    <span class="m"><i>P</i>(<i>x</i>) = (<i>x</i> − <i>c</i>) · <i>Q</i>(<i>x</i>) + <i>R</i></span>
+  </div>
+  <div class="keybox">
+    <span class="tag">Which number is c?</span>
+    <p><span class="m"><i>c</i></span> is the number that makes the divisor 0. Write the divisor as <span class="m"><i>x</i> − (a number)</span>, and that number is <span class="m"><i>c</i></span>. The sign flips from the one you see.</p>
+    <ul>
+      <li><span class="m"><i>x</i> − 5</span>: &nbsp;<span class="m"><i>c</i> = 5</span></li>
+      <li><span class="m"><i>x</i> + 2 = <i>x</i> − (−2)</span>: &nbsp;<span class="m"><i>c</i> = −2</span></li>
+      <li><span class="m"><i>x</i> = <i>x</i> − 0</span>: &nbsp;<span class="m"><i>c</i> = 0</span></li>
+    </ul>
+    <p>This <span class="m"><i>c</i></span> is the number that goes in the box. Synthetic division only works for a divisor like these.</p>
   </div>
 
-  <p>Both sides are equal for every <span class="m"><i>x</i></span>. Only the shape changed: the left is a sum, the right is a product. Products are what you need for cancelling fractions and for solving equations like <span class="m">(<i>x</i> − 2)(<i>x</i> + 5) = 0</span>.</p>
-
-  <p>How to find what's shared: break each term into its factors, then look for what both piles have.</p>
-
-  <div class="expand">
-    <div class="stack">
-      <div class="termrow"><span class="lbl">12<i>x</i><sup>3</sup></span><div class="chiprow" id="ufTop"></div></div>
-      <div class="termrow"><span class="lbl">18<i>x</i><sup>2</sup></span><div class="chiprow" id="ufBot"></div></div>
-      <div class="expand-row overline">
-        <span class="count" id="ufSay"></span>
-        <button class="btn" id="ufBtn">Show what they share</button>
-      </div>
-      <div class="expand-row" id="ufOutRow" style="display:none">
-        <span class="m big" id="ufOut"></span>
-      </div>
-    </div>
+  <p>Now put <span class="m"><i>x</i> = 3</span> into the example's second line:</p>
+  <p class="brgline"><span class="m"><i>P</i>(3) = (3 − 3)(3<sup>2</sup> − 3 − 3) + (−4) = 0 · 3 − 4 = −4</span></p>
+  <p>The bracket <span class="m">3 − 3</span> is 0, and 0 times anything is 0. So the first part vanishes, and <span class="m"><i>P</i>(3)</span> is just the remainder. Check by putting 3 into <span class="m"><i>P</i></span> directly: <span class="m">27 − 36 + 5 = −4</span>.</p>
+  <p>The same happens for any division by <span class="m"><i>x</i> − <i>c</i></span>: putting in <span class="m"><i>x</i> = <i>c</i></span> makes the bracket 0.</p>
+  <div class="rulebox">
+    <span class="tag">The Remainder Theorem</span>
+    <span class="m">remainder = <i>P</i>(<i>c</i>)</span>
+    <span class="cond">when <i>P</i>(<i>x</i>) is divided by <i>x</i> − <i>c</i></span>
   </div>
+  <p>So you can find <span class="m"><i>P</i>(<i>c</i>)</span> by dividing or by plugging in. Dividing also gives you the quotient, and section 3 needs that.</p>
 
-  <p>What they share is the <strong>common factor</strong>. What's left of each term goes inside the bracket.</p>
+  <div class="check" data-q="c1">
+    <div class="check-q"><span class="ask">Use synthetic division to find <i>P</i>(−2) for</span><span class="m"><i>P</i>(<i>x</i>) = <i>x</i><sup>3</sup> + 2<i>x</i><sup>2</sup> − <i>x</i> + 3</span></div>
+    <div class="opts"></div><div class="fb"></div>
+  </div>
 </section>
 
 <section id="s2">
-  <div class="eyebrow">2 · Always first</div>
-  <h2>Pull out the greatest common factor (GCF)</h2>
-
+  <div class="eyebrow">2 · The Factor Theorem</div>
+  <h2>A remainder of 0 means a factor</h2>
+  <p>If the remainder is 0, the line from section 1 becomes <span class="m"><i>P</i>(<i>x</i>) = (<i>x</i> − <i>c</i>) · <i>Q</i>(<i>x</i>)</span>. So <span class="m"><i>x</i> − <i>c</i></span> divides in evenly: it's a factor. And by section 1, that remainder is <span class="m"><i>P</i>(<i>c</i>)</span>.</p>
+  <div class="rulebox">
+    <span class="tag">The Factor Theorem</span>
+    <span class="m">if <i>P</i>(<i>c</i>) = 0, &nbsp;then <i>x</i> − <i>c</i> is a factor</span>
+    <span class="cond">It works backwards too: if <i>x</i> − <i>c</i> is a factor, then <i>P</i>(<i>c</i>) = 0.</span>
+  </div>
+  <p>A <strong>zero</strong> of <span class="m"><i>P</i></span> is an input that makes the output 0. So <span class="m"><i>c</i></span> is a zero when <span class="m"><i>P</i>(<i>c</i>) = 0</span>. On the graph, a zero is where the graph meets the <span class="m"><i>x</i></span>-axis.</p>
   <div class="keybox">
-    <span class="tag">Two parts</span>
+    <span class="tag">Four ways to say one thing</span>
     <ul>
-      <li><strong>The number:</strong> the biggest number that divides every coefficient.</li>
-      <li><strong>The letters:</strong> each letter that's in <em>every</em> term, to the <em>lowest</em> power you see.</li>
+      <li><span class="m"><i>P</i>(<i>c</i>) = 0</span></li>
+      <li><span class="m"><i>c</i></span> is a zero of <span class="m"><i>P</i></span></li>
+      <li>dividing by <span class="m"><i>x</i> − <i>c</i></span> leaves remainder 0</li>
+      <li><span class="m"><i>x</i> − <i>c</i></span> is a factor of <span class="m"><i>P</i>(<i>x</i>)</span></li>
     </ul>
   </div>
 
   <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m">12<i>x</i><sup>3</sup> + 18<i>x</i><sup>2</sup></span></div>
+    <div class="walk-q"><span class="ask">Is <span class="m"><i>x</i> − 2</span> a factor of</span><span class="m"><i>P</i>(<i>x</i>) = <i>x</i><sup>3</sup> − 3<i>x</i><sup>2</sup> + 4</span><span class="ask">?</span></div>
     <ol class="walk-steps">
-      <li><span class="m">6</span><span class="why">The biggest number dividing 12 and 18 is 6.</span></li>
-      <li><span class="m"><i>x</i><sup>2</sup></span><span class="why">Both terms have <span class="m"><i>x</i></span>. The lowest power is <span class="m"><i>x</i><sup>2</sup></span>. (<span class="m"><i>x</i><sup>2</sup></span> goes into <span class="m"><i>x</i><sup>3</sup></span>, but not the other way.)</span></li>
-      <li><span class="m">6<i>x</i><sup>2</sup> <span class="op">·</span> 2<i>x</i> + 6<i>x</i><sup>2</sup> <span class="op">·</span> 3</span><span class="why">Write each term as the GCF times what's left.</span></li>
-      <li class="ans"><span class="m">6<i>x</i><sup>2</sup>(2<i>x</i> + 3)</span><span class="why">Pull it out front. Check by multiplying back: <span class="m">12<i>x</i><sup>3</sup> + 18<i>x</i><sup>2</sup></span>.</span></li>
+      <li><span class="m"><i>P</i>(2) = 8 − 12 + 4 = 0, &nbsp;so yes</span><span class="why">Test 2, the number that makes <i>x</i> − 2 zero. <i>P</i>(2) = 0, so by the Factor Theorem <i>x</i> − 2 is a factor. That already answers the question.</span></li>
+      <li><span class="m">To find the other factor, divide</span><span class="why">Put 2 in the box and 1, −3, 0, 4 along the top (0 for the missing <i>x</i> term). The remainder is 0, which just confirms step 1. What's new is the rest of the bottom row.</span><div class="dwrap" data-syn="b:4"></div></li>
+      <li class="ans"><span class="m"><i>P</i>(<i>x</i>) = (<i>x</i> − 2)(<i>x</i><sup>2</sup> − <i>x</i> − 2)</span><span class="why">1, −1, −2 is the quotient <i>x</i><sup>2</sup> − <i>x</i> − 2: the other factor. Section 3 uses this to factor completely.</span></li>
     </ol>
   </div>
 
-  <h3>Drill: what comes out front?</h3>
-  <p style="font-size:15px">Just name the GCF.</p>
-  <div class="drill">
-    <div class="drill-top">
-      <span class="count" id="g1Count"></span>
-      <div class="pips" id="g1Pips"></div>
-    </div>
-    <div class="drill-q m" id="g1Q"></div>
-    <div class="optbtns" id="g1Btns"></div>
-    <div class="drill-fb" id="g1Fb"></div>
-    <div class="drill-res" id="g1Res">
-      <span class="count">factored</span><span class="m big" id="g1Out"></span>
-    </div>
-    <div class="drill-btns" style="margin-top:12px">
-      <button class="btn" id="g1Next" style="display:none">Next</button>
-    </div>
-  </div>
-
-  <div class="check" data-q="f1">
-    <div class="check-q"><span class="ask">Factor completely</span><span class="m" id="q_f1"></span></div>
+  <div class="check" data-q="c2">
+    <div class="check-q"><span class="ask">Is <span class="m"><i>x</i> − 3</span> a factor of</span><span class="m"><i>P</i>(<i>x</i>) = <i>x</i><sup>3</sup> − <i>x</i><sup>2</sup> − 4<i>x</i> + 4</span><span class="ask">?</span></div>
     <div class="opts"></div><div class="fb"></div>
   </div>
 </section>
 
 <section id="s3">
-  <div class="eyebrow">3 · The bracket matters</div>
-  <h2>The bracket is doing real work</h2>
-  <p>The factor out front multiplies <em>everything</em> in the bracket. Leave the bracket off and it only multiplies the first piece. Pick a value of <span class="m"><i>x</i></span>:</p>
+  <div class="eyebrow">3 · Factor completely</div>
+  <h2>One zero gives you the rest</h2>
+  <p>ALEKS gives a cubic and one of its zeros. It asks for the cubic as a <strong>product of linear factors</strong>: brackets where <span class="m"><i>x</i></span> has power 1, like <span class="m">(2<i>x</i> + 1)</span>.</p>
+  <ol class="steps-list">
+    <li><strong>Divide</strong> by <span class="m"><i>x</i> − <i>c</i></span> with synthetic division, with the zero <span class="m"><i>c</i></span> in the box. The remainder must be 0.</li>
+    <li><strong>Factor</strong> the quadratic in the bottom row.</li>
+    <li><strong>Write all three factors,</strong> including <span class="m"><i>x</i> − <i>c</i></span>.</li>
+  </ol>
 
-  <div class="bracketbox">
-    <div class="ctrls">
-      <span class="ctrl-label">Try</span>
-      <button class="btn" data-x="1">x = 1</button>
-      <button class="btn" data-x="2">x = 2</button>
-      <button class="btn" data-x="5">x = 5</button>
-    </div>
-    <div class="evalgrid" id="evalGrid"></div>
+  <div class="walk">
+    <div class="walk-q"><span class="ask">−3 is a zero. Factor</span><span class="m"><i>f</i>(<i>x</i>) = 2<i>x</i><sup>3</sup> + 3<i>x</i><sup>2</sup> − 11<i>x</i> − 6</span></div>
+    <ol class="walk-steps">
+      <li><span class="m">Divide: bottom row 2, −3, −2, 0</span><span class="why">Put −3 in the box and 2, 3, −11, −6 along the top. The remainder is 0, as it must be when −3 is a zero.</span><div class="dwrap" data-syn="c:4"></div></li>
+      <li><span class="m">quotient 2<i>x</i><sup>2</sup> − 3<i>x</i> − 2</span><span class="why">The bottom row 2, −3, −2. It's one degree lower than the cubic, so it starts at <i>x</i><sup>2</sup>.</span></li>
+      <li><span class="m">2<i>x</i><sup>2</sup> − 4<i>x</i> + <i>x</i> − 2</span><span class="why">Factor with the diamond (<a class="xref" href="factoring-3-the-diamond.html">Factoring, Part 3</a>). Multiply the outside numbers: 2 · (−2) = −4. Two numbers that multiply to −4 and add to −3 are −4 and 1. Use them to split −3<i>x</i> into −4<i>x</i> + <i>x</i>.</span></li>
+      <li><span class="m">2<i>x</i>(<i>x</i> − 2) + 1(<i>x</i> − 2) = (2<i>x</i> + 1)(<i>x</i> − 2)</span><span class="why">Group in pairs and take out what each pair has in common. Both brackets are <i>x</i> − 2, so it comes out as a factor.</span></li>
+      <li class="ans"><span class="m"><i>f</i>(<i>x</i>) = (<i>x</i> + 3)(2<i>x</i> + 1)(<i>x</i> − 2)</span><span class="why">The zero −3 gives the factor <i>x</i> − (−3) = <i>x</i> + 3. Don't leave it out. All three factors are linear, so you're done.</span></li>
+    </ol>
   </div>
 
-  <div class="compare">
-    <div>
-      <div class="hd">Don't lose the 1</div>
-      <span class="m"><i>x</i><sup>2</sup> + <i>x</i> = <i>x</i>(<i>x</i> + 1)</span>
-      <small>Taking <span class="m"><i>x</i></span> out of <span class="m"><i>x</i></span> leaves 1, not nothing. Check: <span class="m"><i>x</i> &middot; <i>x</i> + <i>x</i> &middot; 1</span>.</small>
-    </div>
-    <div>
-      <div class="hd">A negative flips every sign</div>
-      <span class="m">−2<i>x</i> + 6 = −2(<i>x</i> − 3)</span>
-      <small>Check: <span class="m">−2 &middot; <i>x</i> = −2<i>x</i></span> and <span class="m">−2 &middot; (−3) = 6</span>.</small>
-    </div>
-  </div>
-
-  <h3>Drill: right or wrong?</h3>
-  <p style="font-size:15px">Multiply the right side back out in your head.</p>
-  <div id="brDrill"></div>
-
-  <div class="check" data-q="f2">
-    <div class="check-q"><span class="ask">Factor completely</span><span class="m" id="q_f2"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-
-  <div class="check" data-q="f3">
-    <div class="check-q"><span class="ask">Factor</span><span class="m" id="q_f3"></span></div>
+  <div class="check" data-q="c3">
+    <div class="check-q"><span class="ask">1 is a zero. As a product of linear factors,</span><span class="m"><i>f</i>(<i>x</i>) = <i>x</i><sup>3</sup> + 4<i>x</i><sup>2</sup> + <i>x</i> − 6 =</span></div>
     <div class="opts"></div><div class="fb"></div>
   </div>
 </section>
 
 <section id="s4">
-  <div class="eyebrow">4 · Pattern</div>
-  <h2>Difference of squares</h2>
-
-  <div class="rulebox">
-    <span class="tag">Know this shape</span>
-    <span class="m"><i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i> − <i>b</i>)(<i>a</i> + <i>b</i>)</span>
+  <div class="eyebrow">4 · Working backwards</div>
+  <h2>Build a polynomial from its zeros</h2>
+  <p>Now go the other way. By the Factor Theorem, each zero <span class="m"><i>c</i></span> gives a factor <span class="m"><i>x</i> − <i>c</i></span>. Write one factor per zero, then multiply them together.</p>
+  <p>A zero's <strong>multiplicity</strong> is how many times it counts. A zero with multiplicity 2 has its factor twice, as a square.</p>
+  <table class="symtab">
+    <tr><th>Zero</th><th>Factor</th><th>Because</th></tr>
+    <tr><td class="m">4</td><td class="m">(<i>x</i> − 4)</td><td class="m"><i>x</i> − 4</td></tr>
+    <tr><td class="m">−1</td><td class="m">(<i>x</i> + 1)</td><td class="m"><i>x</i> − (−1) = <i>x</i> + 1</td></tr>
+    <tr><td class="m">0</td><td class="m"><i>x</i></td><td class="m"><i>x</i> − 0 = <i>x</i></td></tr>
+    <tr><td class="m">−1, mult. 2</td><td class="m">(<i>x</i> + 1)<sup>2</sup></td><td>the factor twice</td></tr>
+  </table>
+  <div class="keybox">
+    <span class="tag">Why a leading coefficient?</span>
+    <p>The zeros fix the factors, but not the number in front. <span class="m">(<i>x</i> − 1)(<i>x</i> + 1)</span> and <span class="m">2(<i>x</i> − 1)(<i>x</i> + 1)</span> have the same zeros, 1 and −1. So the question names the leading coefficient, and it goes in front. If it's 1, nothing goes in front.</p>
   </div>
 
   <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m">9<i>x</i><sup>2</sup> − 16</span></div>
+    <div class="walk-q"><span class="ask">A quadratic with zeros −3 and 5, leading coefficient 1</span></div>
     <ol class="walk-steps">
-      <li><span class="m">(3<i>x</i>)<sup>2</sup> − 4<sup>2</sup></span><span class="why">Ask what's being squared. <span class="m">9<i>x</i><sup>2</sup> = (3<i>x</i>)<sup>2</sup></span> and <span class="m">16 = 4<sup>2</sup></span>.</span></li>
-      <li class="ans"><span class="m">(3<i>x</i> − 4)(3<i>x</i> + 4)</span><span class="why">Use the pattern with <span class="m"><i>a</i> = 3<i>x</i></span> and <span class="m"><i>b</i> = 4</span>.</span></li>
+      <li><span class="m">(<i>x</i> + 3)(<i>x</i> − 5)</span><span class="why">−3 gives <i>x</i> − (−3) = <i>x</i> + 3. 5 gives <i>x</i> − 5.</span></li>
+      <li class="ans"><span class="m"><i>x</i><sup>2</sup> − 2<i>x</i> − 15</span><span class="why">Multiply out, every term by every term: <span class="m"><i>x</i><sup>2</sup> − 5<i>x</i> + 3<i>x</i> − 15</span>. Then −5<i>x</i> + 3<i>x</i> = −2<i>x</i>.</span></li>
+    </ol>
+  </div>
+  <div class="walk">
+    <div class="walk-q"><span class="ask">Degree 3, leading coefficient 1, zeros 0 and 2 (multiplicity 2)</span></div>
+    <ol class="walk-steps">
+      <li><span class="m"><i>x</i>(<i>x</i> − 2)<sup>2</sup></span><span class="why">0 gives <i>x</i>. 2 with multiplicity 2 gives (<i>x</i> − 2) twice. Count the factors: 1 + 2 = 3, the degree asked for.</span></li>
+      <li><span class="m"><i>x</i>(<i>x</i><sup>2</sup> − 4<i>x</i> + 4)</span><span class="why">Square the bracket first: <span class="m">(<i>x</i> − 2)(<i>x</i> − 2)</span>.</span></li>
+      <li class="ans"><span class="m"><i>x</i><sup>3</sup> − 4<i>x</i><sup>2</sup> + 4<i>x</i></span><span class="why">Then multiply by <i>x</i>.</span></li>
     </ol>
   </div>
 
-  <div class="warn">
-    <span class="tag">It needs the minus</span>
-    <p><span class="m"><i>x</i><sup>2</sup> + 9</span> doesn't factor (using real numbers). <span class="m">(<i>x</i> + 3)(<i>x</i> + 3)</span> is <span class="m"><i>x</i><sup>2</sup> + 6<i>x</i> + 9</span>, a different expression.</p>
-  </div>
-
-  <div class="check" data-q="f4">
-    <div class="check-q"><span class="ask">Factor</span><span class="m" id="q_f4"></span></div>
+  <div class="check" data-q="c4">
+    <div class="check-q"><span class="ask">A quadratic with zeros 4 and −2, leading coefficient 1</span></div>
     <div class="opts"></div><div class="fb"></div>
   </div>
 </section>
 
 <section id="s5">
-  <div class="eyebrow">5 · Pattern</div>
-  <h2>Sum and difference of cubes</h2>
-
-  <div class="rulebox">
-    <span class="tag">Difference</span>
-    <span class="m"><i>a</i><sup>3</sup> − <i>b</i><sup>3</sup> = (<i>a</i> − <i>b</i>)(<i>a</i><sup>2</sup> + <i>ab</i> + <i>b</i><sup>2</sup>)</span>
-    <span class="tag">Sum</span>
-    <span class="m"><i>a</i><sup>3</sup> + <i>b</i><sup>3</sup> = (<i>a</i> + <i>b</i>)(<i>a</i><sup>2</sup> − <i>ab</i> + <i>b</i><sup>2</sup>)</span>
-  </div>
-
-  <div class="keybox">
-    <span class="tag">Remember the signs: SOAP</span>
-    <p><strong>S</strong>ame sign as the original, then <strong>O</strong>pposite sign, then <strong>A</strong>lways <strong>P</strong>ositive. For <span class="m"><i>a</i><sup>3</sup> − <i>b</i><sup>3</sup></span>: <span class="m">(<i>a</i> <b>−</b> <i>b</i>)(<i>a</i><sup>2</sup> <b>+</b> <i>ab</i> <b>+</b> <i>b</i><sup>2</sup>)</span>.</p>
-  </div>
-
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m"><i>x</i><sup>3</sup> − 8</span></div>
-    <ol class="walk-steps">
-      <li><span class="m"><i>x</i><sup>3</sup> − 2<sup>3</sup></span><span class="why">What's being cubed? <span class="m"><i>a</i> = <i>x</i></span> and <span class="m"><i>b</i> = 2</span>, since <span class="m">2<sup>3</sup> = 8</span>.</span></li>
-      <li><span class="m">(<i>x</i> − 2)(<i>x</i><sup>2</sup> + <i>x</i> <span class="op">·</span> 2 + 2<sup>2</sup>)</span><span class="why">Fill in the pattern. Signs: same (&minus;), opposite (+), always positive (+).</span></li>
-      <li class="ans"><span class="m">(<i>x</i> − 2)(<i>x</i><sup>2</sup> + 2<i>x</i> + 4)</span><span class="why">Check with <span class="m"><i>x</i> = 1</span>: <span class="m">1 − 8 = −7</span>, and <span class="m">(−1)(1 + 2 + 4) = −7</span>.</span></li>
-    </ol>
-  </div>
-
-  <div class="check" data-q="f9">
-    <div class="check-q"><span class="ask">Factor</span><span class="m"><i>x</i><sup>3</sup> − 27</span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
+  <div class="eyebrow">5 · Practice</div>
+  <h2>One step at a time</h2>
+  <p>Do each step on paper, then pick it.</p>
+  <div id="ldPractice"></div>
 </section>
 
 <section id="s6">
-  <div class="eyebrow">6 · Bigger factors</div>
-  <h2>A bracket can be the common factor</h2>
-  <p>The common factor doesn't have to be a number or a letter. <strong>It can be a whole bracket.</strong> If the same bracket multiplies both terms, pull it out front just like a 6.</p>
-
-  <div class="compare">
-    <div>
-      <div class="hd">The factor is a number</div>
-      <span class="m">6<i>x</i> + 18</span>
-      <small>Both terms are 6 times something, so <span class="m">6(<i>x</i> + 3)</span>.</small>
-    </div>
-    <div>
-      <div class="hd">The factor is a bracket</div>
-      <span class="m"><i>x</i>(<i>x</i> + 2) + 3(<i>x</i> + 2)</span>
-      <small>Both terms are <span class="m">(<i>x</i> + 2)</span> times something, so <span class="m">(<i>x</i> + 2)(<i>x</i> + 3)</span>.</small>
-    </div>
-  </div>
-
-  <p>If the bracket is hard to see as one thing, swap it for a box:</p>
-
-  <div class="expand">
-    <div class="stack">
-      <div class="expand-row"><span class="count">start</span><span class="m big" id="bx0"></span></div>
-      <div class="expand-row"><span class="count">both terms are it, times something</span><span class="m big" id="bx1"></span></div>
-      <div class="expand-row overline"><span class="count">pull it out front</span><span class="m big" id="bx2"></span></div>
-      <div class="expand-row"><button class="btn" id="bxBtn">Show the bracket as one object</button></div>
-    </div>
-  </div>
-
-  <div class="keybox">
-    <span class="tag">Three things to watch</span>
-    <ul>
-      <li>The shared bracket comes out <strong>once</strong>: <span class="m">(<i>x</i> + 2)(<i>x</i> + 3)</span>, not <span class="m">(<i>x</i> + 2)<sup>2</sup>(<i>x</i> + 3)</span>.</li>
-      <li>A term that's just the bracket leaves a 1: <span class="m"><i>w</i>(<i>w</i> − 3) + (<i>w</i> − 3) = (<i>w</i> − 3)(<i>w</i> + 1)</span>.</li>
-      <li>The brackets must match exactly. <span class="m">(<i>p</i> + 3)</span> and <span class="m">(<i>p</i> − 3)</span> are different.</li>
-    </ul>
-  </div>
-
-  <h3>Drill: what comes out front?</h3>
-  <div class="drill">
-    <div class="drill-top">
-      <span class="count" id="g2Count"></span>
-      <div class="pips" id="g2Pips"></div>
-    </div>
-    <div class="drill-q m" id="g2Q"></div>
-    <div class="optbtns" id="g2Btns"></div>
-    <div class="drill-fb" id="g2Fb"></div>
-    <div class="drill-res" id="g2Res">
-      <span class="count">factored</span><span class="m big" id="g2Out"></span>
-    </div>
-    <div class="drill-btns" style="margin-top:12px">
-      <button class="btn" id="g2Next" style="display:none">Next</button>
-    </div>
-  </div>
-
-  <div class="check" data-q="f5">
-    <div class="check-q"><span class="ask">Factor</span><span class="m" id="q_f5"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-
-  <div class="check" data-q="f6">
-    <div class="check-q"><span class="ask">Factor</span><span class="m" id="q_f6"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-</section>
-
-<section id="s7">
-  <div class="eyebrow">7 · Four terms</div>
-  <h2>Grouping: make a shared bracket</h2>
-  <p>With four terms, often nothing is shared by all four. So <strong>split them into two pairs and take the GCF out of each pair.</strong> If the same bracket shows up twice, pull it out, like in section 6.</p>
-
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m">2<i>x</i><sup>3</sup> + 4<i>x</i><sup>2</sup> + 3<i>x</i> + 6</span></div>
-    <ol class="walk-steps">
-      <li><span class="m">2<i>x</i><sup>2</sup>(<i>x</i> + 2) + 3(<i>x</i> + 2)</span><span class="why">GCF of the first pair is <span class="m">2<i>x</i><sup>2</sup></span>. GCF of the second pair is 3.</span></li>
-      <li class="ans"><span class="m">(<i>x</i> + 2)(2<i>x</i><sup>2</sup> + 3)</span><span class="why">The same bracket twice, so pull it out front.</span></li>
-    </ol>
-  </div>
-
-  <p><strong>If the third term is negative, pull out a negative.</strong> Otherwise the brackets won't match:</p>
-
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m"><i>x</i><sup>3</sup> + 2<i>x</i><sup>2</sup> − 3<i>x</i> − 6</span></div>
-    <ol class="walk-steps">
-      <li><span class="m"><i>x</i><sup>2</sup>(<i>x</i> + 2) + 3(−<i>x</i> − 2)</span><span class="why">Pulling out +3 gives brackets that don't match.</span></li>
-      <li><span class="m"><i>x</i><sup>2</sup>(<i>x</i> + 2) − 3(<i>x</i> + 2)</span><span class="why">Pull out <span class="m">−3</span> instead. Both signs in that pair flip.</span></li>
-      <li class="ans"><span class="m">(<i>x</i> + 2)(<i>x</i><sup>2</sup> − 3)</span><span class="why">Now the brackets match.</span></li>
-    </ol>
-  </div>
-
-  <p><strong>If adjacent terms share nothing, reorder them.</strong> Each sign moves with its term:</p>
-
-  <div class="walk">
-    <div class="walk-q"><span class="ask">Factor</span><span class="m"><i>m</i><sup>2</sup> − 3<i>n</i> + 3<i>m</i> − <i>mn</i></span></div>
-    <ol class="walk-steps">
-      <li><span class="m"><i>m</i><sup>2</sup> + 3<i>m</i> − <i>mn</i> − 3<i>n</i></span><span class="why">Put terms that share something next to each other.</span></li>
-      <li><span class="m"><i>m</i>(<i>m</i> + 3) − <i>n</i>(<i>m</i> + 3)</span><span class="why">GCF of each pair. The second pair gives up <span class="m">−<i>n</i></span>.</span></li>
-      <li class="ans"><span class="m">(<i>m</i> + 3)(<i>m</i> − <i>n</i>)</span><span class="why">Pull out the shared bracket.</span></li>
-    </ol>
-  </div>
-
-  <div class="check" data-q="f7">
-    <div class="check-q"><span class="ask">Factor by grouping</span><span class="m" id="q_f7"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-
-  <div class="check" data-q="f8">
-    <div class="check-q"><span class="ask">Factor by grouping</span><span class="m" id="q_f8"></span></div>
-    <div class="opts"></div><div class="fb"></div>
-  </div>
-</section>
-
-<section id="s8">
-  <div class="eyebrow">8 · Common mistakes</div>
-  <h2>Four wrong factorings</h2>
-  <p>Factoring never changes the value. So put the same number into both sides: if they disagree, the factoring is wrong.</p>
+  <div class="eyebrow">6 · Common mistakes</div>
+  <h2>Four wrong moves</h2>
+  <p>Each card shows a wrong claim. Click its button to test it with a number.</p>
   <div id="trapHost"></div>
 </section>
 
-<section id="s9">
-  <div class="eyebrow">9 · Putting it together</div>
-  <h2>Practice one step at a time</h2>
-  <p>You pick the move; the page does the algebra. <strong>Always try the common factor first.</strong> "Fully factored" means nothing left inside any bracket can come out.</p>
-
-  <div class="solver">
-    <div class="solver-head">
-      <span class="which" id="solverWhich">Problem 1</span>
-      <div class="tabs" id="solverTabs"></div>
-    </div>
-    <div class="work" id="solverWork"></div>
-    <div class="picker">
-      <div class="prompt" id="solverPrompt">What's the next step?</div>
-      <div class="rulegrid" id="solverRules"></div>
-      <div class="solver-fb" id="solverFb"></div>
-      <div class="finish" id="solverFinish" style="display:none">
-        <button class="btn on" id="solverNext">Next problem</button>
-        <span class="count" id="solverDone"></span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="s10">
-  <div class="eyebrow">10 · Check yourself</div>
-  <h2>Seven on your own</h2>
+<section id="s7">
+  <div class="eyebrow">7 · Check yourself</div>
+  <h2>Six on your own</h2>
   <p>If you miss one, the feedback names the section to go back to.</p>
   <div id="quizHost"></div>
   <div class="score">
     <div style="display:flex; align-items:baseline; gap:10px">
-      <span class="n" id="scoreN">0</span><span class="count">of 7</span>
+      <span class="n" id="scoreN">0</span><span class="count">of 6</span>
     </div>
-    <div class="say" id="scoreSay">Answer all seven to see where you stand.</div>
+    <div class="say" id="scoreSay">Answer all six to see where you stand.</div>
   </div>
 </section>
 
-<section id="s11">
-  <div class="eyebrow">11 · Keep this</div>
+<section id="s8">
+  <div class="eyebrow">8 · Keep this</div>
   <h2>Cheat sheet</h2>
   <div class="cheat">
-    <h3>Factoring, in order</h3>
+    <h3>Remainders, factors and zeros</h3>
     <ol class="steps-list">
-      <li>Pull out the GCF.<small>Biggest number, and each shared letter to its lowest power.</small></li>
-      <li>Two terms? Look for a pattern.<small>Difference of squares, or sum/difference of cubes.</small></li>
-      <li>Four terms? Group in pairs.<small>Third term negative: pull out a negative.</small></li>
-      <li>Check every bracket for more to factor.</li>
-      <li>Multiply back out to check.</li>
+      <li><strong>Remainder Theorem:</strong> dividing by <span class="m"><i>x</i> − <i>c</i></span> leaves remainder <span class="m"><i>P</i>(<i>c</i>)</span>.</li>
+      <li><strong>Factor Theorem:</strong> <span class="m"><i>x</i> − <i>c</i></span> is a factor exactly when <span class="m"><i>P</i>(<i>c</i>) = 0</span>.</li>
+      <li><strong>Factor from one zero:</strong> divide by <span class="m"><i>x</i> − <i>c</i></span>, factor the quadratic left over, write all three factors.<small><span class="m">2<i>x</i><sup>3</sup> + 3<i>x</i><sup>2</sup> − 11<i>x</i> − 6 = (<i>x</i> + 3)(2<i>x</i> + 1)(<i>x</i> − 2)</span></small></li>
+      <li><strong>Build from zeros:</strong> zero <span class="m"><i>c</i></span> gives <span class="m">(<i>x</i> − <i>c</i>)</span>, once per multiplicity. Multiply out. Leading coefficient in front.<small>zeros −3 and 5: <span class="m">(<i>x</i> + 3)(<i>x</i> − 5) = <i>x</i><sup>2</sup> − 2<i>x</i> − 15</span></small></li>
     </ol>
-    <table class="symtab">
-      <tbody>
-        <tr><td>Difference of squares</td><td class="m"><i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i> − <i>b</i>)(<i>a</i> + <i>b</i>)</td></tr>
-        <tr><td>Difference of cubes</td><td class="m"><i>a</i><sup>3</sup> − <i>b</i><sup>3</sup> = (<i>a</i> − <i>b</i>)(<i>a</i><sup>2</sup> + <i>ab</i> + <i>b</i><sup>2</sup>)</td></tr>
-        <tr><td>Sum of cubes</td><td class="m"><i>a</i><sup>3</sup> + <i>b</i><sup>3</sup> = (<i>a</i> + <i>b</i>)(<i>a</i><sup>2</sup> − <i>ab</i> + <i>b</i><sup>2</sup>)</td></tr>
-      </tbody>
-    </table>
   </div>
 
   <div class="next">
     <div class="nextcard">
-      <div class="n">Done</div><div class="t">Part 1</div>
-      <p>GCF, patterns, and grouping.</p>
+      <div class="n">Done</div><div class="t">The Factor Theorem</div>
+      <p>From one zero to a full factorization, and back.</p>
     </div>
     <div class="nextcard soon">
-      <div class="n">Next</div><div class="t">Part 2: the diamond</div>
-      <p>Factoring quadratics with three terms.</p>
+      <div class="n">Before this · Part 1</div><div class="t"><a class="xref" href="polynomial-division-1-long-and-synthetic.html">Polynomial division</a></div>
+      <p>If the synthetic division was the hard part, go back to it.</p>
     </div>
   </div>
   <div class="colophon">
-    Math 1200 · College Algebra · supplement to ALEKS §R.5<br>
+    Math 1200 · College Algebra · supplement to ALEKS §3.3<br>
     Practice only. Nothing here is graded or submitted.<br>
     Your progress is saved on this device only.
   </div>
@@ -972,9 +842,12 @@ function init(L){
 
   var TOTAL = L.inline.length + L.quiz.length;
 
+  /* Count only this page's questions. A saved store can hold keys from an
+     older version of the lesson (a split moves questions out), and counting
+     those would push the meter past TOTAL. */
   function paintMeter(){
-    var n = 0, k;
-    for(k in correct){ if(correct[k]) n++; }
+    var n = 0;
+    L.inline.concat(L.quiz).forEach(function(k){ if(correct[k]) n++; });
     var fill = $("#meterFill"), num = $("#meterNum");
     if(fill) fill.style.width = Math.round(100 * n / TOTAL) + "%";
     if(num) num.textContent = n + " / " + TOTAL + " correct";
@@ -1555,468 +1428,288 @@ return {$: $, $$: $$, el: el, rep: rep, chipRow: chipRow, frac: frac,
 <script>
 (function(){
 "use strict";
-var $ = EXP.$, $$ = EXP.$$, chipRow = EXP.chipRow;
+var $ = EXP.$, $$ = EXP.$$, num = EXP.num;
 
-var BOX = "<span class='blk'>■</span>";
+var X = "<i>x</i>", P = "<i>P</i>";
+function pw(d){ return d === 0 ? "" : d === 1 ? X : X + "<sup>" + d + "</sup>"; }
+function term(c, d, first){
+  var a = Math.abs(c), body = (a === 1 && d > 0 ? "" : num(a)) + pw(d);
+  return first ? (c < 0 ? "−" : "") + body : (c < 0 ? "− " : "+ ") + body;
+}
+/* coefficients, highest power first -> "2x³ − 5x + 3" */
+function poly(cs){
+  var n = cs.length - 1, out = [];
+  cs.forEach(function(c, i){ if(c) out.push(term(c, n - i, !out.length)); });
+  return out.join(" ") || "0";
+}
 
-var EX = {
-  f1: "20<i>a</i><sup>4</sup> + 35<i>a</i><sup>2</sup>",
-  f2: "<i>y</i><sup>3</sup> + <i>y</i><sup>2</sup>",
-  f3: "−3<i>x</i> + 12",
-  f4: "49<i>t</i><sup>2</sup> − 25",
-  f5: "4(<i>x</i> − 7) + <i>y</i>(<i>x</i> − 7)",
-  f6: "<i>m</i>(<i>m</i> + 6) + (<i>m</i> + 6)",
-  f7: "<i>x</i><sup>3</sup> + 5<i>x</i><sup>2</sup> + 2<i>x</i> + 10",
-  f8: "<i>x</i><sup>3</sup> + 2<i>x</i><sup>2</sup> − 3<i>x</i> − 6"
-};
-["f1","f2","f3","f4","f5","f6","f7","f8"].forEach(function(k){
-  var n = $("#q_" + k); if(n) n.innerHTML = EX[k];
+/* ---- synthetic division by x − c: divide-01's syn() ------------------------
+   stage 0 set-up, 1 bring down, k (2..n) column k−1 multiplied and added.  */
+function syn(c, cs, stage){
+  var n = cs.length, midR = [], bot = [], acc = 0, i, s = "";
+  for(i = 0; i < n; i++){
+    if(i){ midR[i] = acc * c; acc = cs[i] + acc * c; } else acc = cs[0];
+    bot[i] = acc;
+  }
+  s += "<span class='bx'>" + num(c) + "</span>";
+  cs.forEach(function(v){ s += "<span>" + num(v) + "</span>"; });
+  s += "<span></span>";
+  for(i = 0; i < n; i++) s += "<span class='ul" + (i && stage === i + 1 ? " nw" : "") + "'>" + (i && stage >= i + 1 ? num(midR[i]) : "") + "</span>";
+  s += "<span></span>";
+  for(i = 0; i < n; i++){
+    var cl = (i === n - 1 && stage >= n ? "rem" : "") + (stage === i + 1 ? " nw" : "");
+    s += "<span class='" + cl + "'>" + (stage >= i + 1 ? num(bot[i]) : "") + "</span>";
+  }
+  return "<div class='syn' style='grid-template-columns:repeat(" + (n + 1) + ",auto)' role='img' aria-label='synthetic division layout'>" + s + "</div>";
+}
+var SY = {a:[3, [1, -4, 0, 5]], b:[2, [1, -3, 0, 4]], c:[-3, [2, 3, -11, -6]]};
+$$("[data-syn]").forEach(function(h){
+  var k = h.getAttribute("data-syn").split(":"), p = SY[k[0]];
+  h.innerHTML = syn(p[0], p[1], +k[1]);
 });
 
+function br(s){ return "(" + s + ")"; }
+
 EXP.init({
-  storeKey: "m1200-factor-01",
-  inline: ["f1","f2","f3","f4","f9","f5","f6","f7","f8"],
-  quiz:   ["q1","q2","q3","q4","q5","q6","q7"],
+  storeKey: "m1200-factorthm-01",
+  inline: ["c1","c2","c3","c4"],
+  quiz:   ["q1","q2","q3","q4","q5","q6"],
 
   checks: {
-    f1: { opts:[
-      {t:"5<i>a</i><sup>2</sup>(4<i>a</i><sup>2</sup> + 7)", ok:true, fb:"Right. GCF of 20 and 35 is 5, and the lowest power of <i>a</i> is <i>a</i><sup>2</sup>."},
-      {t:"5<i>a</i><sup>2</sup>(4<i>a</i><sup>2</sup> + 7<i>a</i><sup>2</sup>)", fb:"35<i>a</i><sup>2</sup> &divide; 5<i>a</i><sup>2</sup> = 7, with no <i>a</i> left."},
-      {t:"5<i>a</i>(4<i>a</i><sup>3</sup> + 7<i>a</i>)", fb:"A common factor, but not the greatest. Both bracket terms still have an <i>a</i>."},
-      {t:"5<i>a</i><sup>4</sup>(4 + 7<i>a</i><sup>2</sup>)", fb:"Use the lowest power, not the highest. <i>a</i><sup>4</sup> doesn't go into 35<i>a</i><sup>2</sup>."}
+    /* box −2 on 1, 2, −1, 3: 1, 0, −1, 5. Check: −8 + 8 + 2 + 3 = 5 */
+    c1: { opts:[
+      {t:P + "(−2) = 5", ok:true, fb:"Right. Bottom row 1, 0, −1, 5. The remainder is 5. Check: −8 + 8 + 2 + 3 = 5."},
+      {t:P + "(−2) = 17", fb:"That's " + P + "(2): 2 went in the box. For " + P + "(−2), put −2 in the box."},
+      {t:P + "(−2) = " + X + "<sup>2</sup> − 1", fb:"That's the quotient, from 1, 0, −1. " + P + "(−2) is the last number, the remainder."},
+      {t:P + "(−2) = 1", fb:"1 is the first number, brought straight down. " + P + "(−2) is the last number."}
     ]},
-    f2: { opts:[
-      {t:"<i>y</i><sup>2</sup>(<i>y</i> + 1)", ok:true, fb:"Right. <i>y</i><sup>2</sup> &divide; <i>y</i><sup>2</sup> = 1, and the 1 must be written."},
-      {t:"<i>y</i><sup>2</sup>(<i>y</i>)", fb:"The second term vanished. It leaves a 1 behind."},
-      {t:"<i>y</i><sup>3</sup>(1 + <i>y</i>)", fb:"<i>y</i><sup>3</sup> doesn't go into <i>y</i><sup>2</sup>. Use the lower power."},
-      {t:"<i>y</i>(<i>y</i><sup>2</sup> + <i>y</i>)", fb:"Not the greatest. Both bracket terms still have a <i>y</i>."}
+    /* P(3) = 27 − 9 − 12 + 4 = 10; P(−3) = −27 − 9 + 12 + 4 = −20 */
+    c2: { opts:[
+      {t:"No, because " + P + "(3) = 10", ok:true, fb:"Right. 27 − 9 − 12 + 4 = 10. The remainder isn't 0, so " + X + " − 3 is not a factor."},
+      {t:"Yes, because " + P + "(3) = 10", fb:"A factor needs remainder 0. 10 isn't 0."},
+      {t:"No, because " + P + "(−3) = −20", fb:"\"No\" is right, but the reason isn't. " + X + " − 3 is zero at 3, so the test is " + P + "(3), not " + P + "(−3). " + P + "(3) = 10, which isn't 0."},
+      {t:"Yes, because " + P + "(−3) = −20", fb:"Test 3, the number that makes " + X + " − 3 zero. " + P + "(3) = 10, which isn't 0, so it's not a factor."}
     ]},
-    f3: { opts:[
-      {t:"−3(<i>x</i> − 4)", ok:true, fb:"Right. &minus;3 &middot; <i>x</i> = &minus;3<i>x</i> and &minus;3 &middot; (&minus;4) = 12."},
-      {t:"−3(<i>x</i> + 4)", fb:"Multiply back: &minus;3<i>x</i> &minus; 12. The sign inside has to flip."},
-      {t:"3(<i>x</i> − 4)", fb:"That gives 3<i>x</i> &minus; 12. Both signs are off."},
-      {t:"−3<i>x</i>(1 − 4)", fb:"12 has no <i>x</i>, so <i>x</i> can't come out of both terms."}
+    /* box 1 on 1, 4, 1, −6: 1, 5, 6, 0 -> x² + 5x + 6 = (x + 2)(x + 3) */
+    c3: { opts:[
+      {t:"(" + X + " − 1)(" + X + " + 2)(" + X + " + 3)", ok:true, fb:"Right. 1 in the box gives 1, 5, 6, 0. Then " + X + "<sup>2</sup> + 5" + X + " + 6 = (" + X + " + 2)(" + X + " + 3)."},
+      {t:"(" + X + " + 1)(" + X + " − 2)(" + X + " − 3)", fb:"Every sign is flipped. The zero 1 gives " + X + " − 1, and " + X + "<sup>2</sup> + 5" + X + " + 6 = (" + X + " + 2)(" + X + " + 3)."},
+      {t:"(" + X + " − 1)(" + X + "<sup>2</sup> + 5" + X + " + 6)", fb:"Not finished. " + X + "<sup>2</sup> + 5" + X + " + 6 isn't linear. Factor it too."},
+      {t:"(" + X + " − 1)(" + X + " + 1)(" + X + " + 6)", fb:"(" + X + " + 1)(" + X + " + 6) = " + X + "<sup>2</sup> + 7" + X + " + 6. You need numbers that multiply to 6 and add to 5: 2 and 3."}
     ]},
-    f4: { opts:[
-      {t:"(7<i>t</i> − 5)(7<i>t</i> + 5)", ok:true, fb:"Right. 49<i>t</i><sup>2</sup> = (7<i>t</i>)<sup>2</sup> and 25 = 5<sup>2</sup>."},
-      {t:"(7<i>t</i> − 5)<sup>2</sup>", fb:"That's 49<i>t</i><sup>2</sup> &minus; 70<i>t</i> + 25. The brackets need opposite signs."},
-      {t:"(49<i>t</i> − 25)(49<i>t</i> + 25)", fb:"Use the square roots: 7<i>t</i> and 5."},
-      {t:"it does not factor", fb:"It does. Both are perfect squares with a minus between them."}
-    ]},
-    f5: { opts:[
-      {t:"(<i>x</i> − 7)(4 + <i>y</i>)", ok:true, fb:"Right. Both terms are (<i>x</i> &minus; 7) times something. The leftovers, 4 and <i>y</i>, stay added."},
-      {t:"(<i>x</i> − 7)(4<i>y</i>)", fb:"The leftovers were separate terms, so they stay added: 4 + <i>y</i>."},
-      {t:"(<i>x</i> − 7)<sup>2</sup>(4 + <i>y</i>)", fb:"The shared bracket comes out once."},
-      {t:"4 + <i>y</i>", fb:"The bracket was pulled out, not cancelled. It's still part of the answer."}
-    ]},
-    f6: { opts:[
-      {t:"(<i>m</i> + 6)(<i>m</i> + 1)", ok:true, fb:"Right. The second term is just the bracket, so it leaves a 1."},
-      {t:"(<i>m</i> + 6)(<i>m</i>)", fb:"The second term vanished. It leaves a 1."},
-      {t:"(<i>m</i> + 6)(<i>m</i> + 6)", fb:"The first term is <i>m</i> times the bracket, so its leftover is <i>m</i>. The second leaves 1."},
-      {t:"2(<i>m</i> + 6)", fb:"That's (<i>m</i> + 6) + (<i>m</i> + 6). Here the first term is <i>m</i> times the bracket."}
-    ]},
-    f7: { opts:[
-      {t:"(<i>x</i> + 5)(<i>x</i><sup>2</sup> + 2)", ok:true, fb:"Right. <i>x</i><sup>2</sup>(<i>x</i> + 5) + 2(<i>x</i> + 5), then pull out (<i>x</i> + 5)."},
-      {t:"(<i>x</i> + 5)(<i>x</i><sup>2</sup> + 2<i>x</i>)", fb:"2<i>x</i> + 10 = 2(<i>x</i> + 5), so the leftover is 2."},
-      {t:"<i>x</i><sup>2</sup>(<i>x</i> + 5) + 2(<i>x</i> + 5)", fb:"That's the middle step. Pull the shared (<i>x</i> + 5) out front."},
-      {t:"(<i>x</i> + 2)(<i>x</i><sup>2</sup> + 5)", fb:"The shared bracket is (<i>x</i> + 5). The leftovers <i>x</i><sup>2</sup> and 2 go in the other one."}
-    ]},
-    f8: { opts:[
-      {t:"(<i>x</i> + 2)(<i>x</i><sup>2</sup> − 3)", ok:true, fb:"Right. Pull &minus;3 from the second pair: &minus;3(<i>x</i> + 2)."},
-      {t:"(<i>x</i> + 2)(<i>x</i><sup>2</sup> + 3)", fb:"Pull out &minus;3, not +3. Multiply back to check: this gives +3<i>x</i> + 6."},
-      {t:"(<i>x</i> − 2)(<i>x</i><sup>2</sup> − 3)", fb:"That's <i>x</i><sup>3</sup> &minus; 2<i>x</i><sup>2</sup> &minus; 3<i>x</i> + 6. The shared bracket is (<i>x</i> + 2)."},
-      {t:"it does not factor", fb:"It does, once you pull &minus;3 from the second pair."}
-    ]},
-    f9: { opts:[
-      {t:"(<i>x</i> − 3)(<i>x</i><sup>2</sup> + 3<i>x</i> + 9)", ok:true, fb:"Right. <i>a</i> = <i>x</i>, <i>b</i> = 3. Signs: same, opposite, always positive."},
-      {t:"(<i>x</i> − 3)(<i>x</i><sup>2</sup> − 3<i>x</i> + 9)", fb:"The middle sign is the opposite of the first bracket's: +3<i>x</i>."},
-      {t:"(<i>x</i> − 3)(<i>x</i><sup>2</sup> + 9)", fb:"You're missing the middle term, <i>ab</i> = 3<i>x</i>."},
-      {t:"(<i>x</i> − 3)<sup>3</sup>", fb:"(<i>x</i> &minus; 3)<sup>3</sup> has four terms when multiplied out. Use the cubes pattern."}
+    /* (x − 4)(x + 2) = x² − 2x − 8 */
+    c4: { opts:[
+      {t:poly([1, -2, -8]), ok:true, fb:"Right. (" + X + " − 4)(" + X + " + 2) = " + X + "<sup>2</sup> + 2" + X + " − 4" + X + " − 8."},
+      {t:poly([1, 2, -8]), fb:"That's (" + X + " + 4)(" + X + " − 2), with zeros −4 and 2. The zero 4 gives " + X + " − 4."},
+      {t:poly([1, -6, 8]), fb:"That's (" + X + " − 4)(" + X + " − 2). The zero −2 gives " + X + " + 2."},
+      {t:poly([1, -2, 8]), fb:"The constant is (−4)(2) = −8."}
     ]},
 
-    q1: { ask:"Factor completely", m:"8<i>y</i><sup>2</sup> − 12<i>y</i>", opts:[
-      {t:"4<i>y</i>(2<i>y</i> − 3)", ok:true, fb:"GCF of 8 and 12 is 4, and both terms have a <i>y</i>."},
-      {t:"4(2<i>y</i><sup>2</sup> − 3<i>y</i>)", fb:"Both bracket terms still have a <i>y</i>. See section 2."},
-      {t:"2<i>y</i>(4<i>y</i> − 6)", fb:"Not the greatest: 4 and 6 are still both even. See section 2."},
-      {t:"4<i>y</i>(2<i>y</i> − 12)", fb:"12<i>y</i> &divide; 4<i>y</i> = 3. Multiply back to check. See section 3."}
+    /* box 2 on 2, −1, 0, 3: 2, 3, 6, 15. Check 16 − 4 + 3 = 15 */
+    q1: { ask:"Use synthetic division to find " + P + "(2) for", m:P + "(" + X + ") = " + poly([2, -1, 0, 3]), opts:[
+      {t:"15", ok:true, fb:"Row 2, −1, 0, 3. Bottom row 2, 3, 6, 15. Check: 16 − 4 + 3 = 15."},
+      {t:"−17", fb:"That's " + P + "(−2). Put 2 in the box. See section 1."},
+      {t:"9", fb:"There's no " + X + " term, so the row needs a 0: 2, −1, 0, 3. See section 1."},
+      {t:"2" + X + "<sup>2</sup> + 3" + X + " + 6", fb:"That's the quotient. " + P + "(2) is the remainder, the last number. See section 1."}
     ]},
-    q2: { ask:"Factor", m:"<i>x</i><sup>2</sup> + <i>x</i>", opts:[
-      {t:"<i>x</i>(<i>x</i> + 1)", ok:true, fb:"<i>x</i> &divide; <i>x</i> = 1, and the 1 must be written."},
-      {t:"<i>x</i>(<i>x</i>)", fb:"That's only <i>x</i><sup>2</sup>. See section 3."},
-      {t:"<i>x</i><sup>2</sup>(1 + <i>x</i>)", fb:"<i>x</i><sup>2</sup> doesn't go into <i>x</i>. See section 2."},
-      {t:"2<i>x</i>", fb:"<i>x</i><sup>2</sup> and <i>x</i> aren't like terms, so they don't add. See section 1."}
+    /* x³ − 7x + 6: P(2) = 0; P(−2) = 12; P(−1) = 12; P(3) = 12 */
+    q2: { ask:"Which is a factor of", m:P + "(" + X + ") = " + poly([1, 0, -7, 6]), opts:[
+      {t:X + " − 2", ok:true, fb:P + "(2) = 8 − 14 + 6 = 0."},
+      {t:X + " + 2", fb:X + " + 2 is zero at −2, and " + P + "(−2) = −8 + 14 + 6 = 12. Not 0. See section 2."},
+      {t:X + " + 1", fb:P + "(−1) = −1 + 7 + 6 = 12. Not 0. See section 2."},
+      {t:X + " − 3", fb:P + "(3) = 27 − 21 + 6 = 12. Not 0. See section 2."}
     ]},
-    q3: { ask:"Factor", m:"4<i>x</i><sup>2</sup> − 25", opts:[
-      {t:"(2<i>x</i> − 5)(2<i>x</i> + 5)", ok:true, fb:"4<i>x</i><sup>2</sup> = (2<i>x</i>)<sup>2</sup> and 25 = 5<sup>2</sup>."},
-      {t:"(4<i>x</i> − 5)(4<i>x</i> + 5)", fb:"The square root of 4<i>x</i><sup>2</sup> is 2<i>x</i>. See section 4."},
-      {t:"(2<i>x</i> − 5)<sup>2</sup>", fb:"That has a middle term. See section 4."},
-      {t:"it does not factor", fb:"Two perfect squares with a minus between. See section 4."}
+    /* box 2 on 1, −3, −10, 24: 1, −1, −12, 0 -> (x − 4)(x + 3) */
+    q3: { ask:"2 is a zero. As a product of linear factors,", m:"<i>f</i>(" + X + ") = " + poly([1, -3, -10, 24]) + " =", opts:[
+      {t:"(" + X + " − 2)(" + X + " − 4)(" + X + " + 3)", ok:true, fb:"Bottom row 1, −1, −12, 0. " + X + "<sup>2</sup> − " + X + " − 12 = (" + X + " − 4)(" + X + " + 3)."},
+      {t:"(" + X + " + 2)(" + X + " + 4)(" + X + " − 3)", fb:"Every sign is flipped. The zero 2 gives " + X + " − 2. See section 3."},
+      {t:"(" + X + " − 2)(" + X + "<sup>2</sup> − " + X + " − 12)", fb:"Not finished: factor the quadratic too. See section 3."},
+      {t:"(" + X + " − 2)(" + X + " + 4)(" + X + " − 3)", fb:"(" + X + " + 4)(" + X + " − 3) = " + X + "<sup>2</sup> + " + X + " − 12. The middle sign is wrong. See section 3."}
     ]},
-    q4: { ask:"Factor completely", m:"3<i>x</i><sup>2</sup> − 12", opts:[
-      {t:"3(<i>x</i> − 2)(<i>x</i> + 2)", ok:true, fb:"GCF 3 first, then <i>x</i><sup>2</sup> &minus; 4 is a difference of squares."},
-      {t:"3(<i>x</i><sup>2</sup> − 4)", fb:"Not finished: <i>x</i><sup>2</sup> &minus; 4 still factors. See section 4."},
-      {t:"(3<i>x</i> − 6)(<i>x</i> + 2)", fb:"That multiplies back correctly, but 3<i>x</i> &minus; 6 still has a 3 to pull out. Not fully factored."},
-      {t:"3(<i>x</i> − 2)<sup>2</sup>", fb:"That gives 3<i>x</i><sup>2</sup> &minus; 12<i>x</i> + 12. The brackets need opposite signs."}
+    /* box 2 on 2, −3, −3, 2: 2, 1, −1, 0 -> 2x² + x − 1 = (2x − 1)(x + 1) */
+    q4: { ask:"2 is a zero. As a product of linear factors,", m:"<i>f</i>(" + X + ") = " + poly([2, -3, -3, 2]) + " =", opts:[
+      {t:"(" + X + " − 2)(2" + X + " − 1)(" + X + " + 1)", ok:true, fb:"Bottom row 2, 1, −1, 0. 2" + X + "<sup>2</sup> + " + X + " − 1 = (2" + X + " − 1)(" + X + " + 1)."},
+      {t:"(" + X + " − 2)(2" + X + " + 1)(" + X + " − 1)", fb:"(2" + X + " + 1)(" + X + " − 1) = 2" + X + "<sup>2</sup> − " + X + " − 1. The bottom row says +" + X + ". See section 3."},
+      {t:"(" + X + " + 2)(2" + X + " − 1)(" + X + " + 1)", fb:"The zero 2 gives " + X + " − 2, not " + X + " + 2. See section 3."},
+      {t:"(" + X + " − 2)(" + X + " − 1)(" + X + " + 1)", fb:"That multiplies out to " + X + "<sup>3</sup> − 2" + X + "<sup>2</sup> − " + X + " + 2. The 2 in front of 2" + X + "<sup>2</sup> + " + X + " − 1 went missing. See section 3."}
     ]},
-    q5: { ask:"Factor", m:"−5<i>x</i> + 20", opts:[
-      {t:"−5(<i>x</i> − 4)", ok:true, fb:"&minus;5 &middot; <i>x</i> = &minus;5<i>x</i> and &minus;5 &middot; (&minus;4) = 20."},
-      {t:"−5(<i>x</i> + 4)", fb:"Multiply back: &minus;5<i>x</i> &minus; 20. The sign inside has to flip. See section 3."},
-      {t:"5(<i>x</i> − 4)", fb:"That gives 5<i>x</i> &minus; 20. See section 3."},
-      {t:"−5<i>x</i>(1 − 4)", fb:"20 has no <i>x</i>. See section 2."}
+    /* (x + 1)(x − 6) = x² − 5x − 6 */
+    q5: { ask:"A quadratic with zeros −1 and 6, leading coefficient 1", m:"", opts:[
+      {t:poly([1, -5, -6]), ok:true, fb:"(" + X + " + 1)(" + X + " − 6) = " + X + "<sup>2</sup> − 6" + X + " + " + X + " − 6."},
+      {t:poly([1, 5, -6]), fb:"That's (" + X + " − 1)(" + X + " + 6). The zero −1 gives " + X + " + 1. See section 4."},
+      {t:poly([1, -7, 6]), fb:"That's (" + X + " − 1)(" + X + " − 6). The zero −1 gives " + X + " + 1. See section 4."},
+      {t:poly([1, -5, 6]), fb:"The constant is (1)(−6) = −6. See section 4."}
     ]},
-    q6: { ask:"Factor by grouping", m:"<i>a</i><i>b</i> + 3<i>a</i> + 2<i>b</i> + 6", opts:[
-      {t:"(<i>a</i> + 2)(<i>b</i> + 3)", ok:true, fb:"<i>a</i>(<i>b</i> + 3) + 2(<i>b</i> + 3), then pull out (<i>b</i> + 3)."},
-      {t:"(<i>a</i> + 3)(<i>b</i> + 2)", fb:"Multiply out: <i>ab</i> + 2<i>a</i> + 3<i>b</i> + 6. Not the same. See section 7."},
-      {t:"<i>a</i>(<i>b</i> + 3) + 2(<i>b</i> + 3)", fb:"That's the middle step. Pull out the shared bracket. See section 7."},
-      {t:"it does not factor", fb:"Both pairs give (<i>b</i> + 3). See section 7."}
-    ]},
-    q7: { ask:"Factor", m:"2<i>a</i>(<i>b</i> + 5) − 3(<i>b</i> + 5)", opts:[
-      {t:"(<i>b</i> + 5)(2<i>a</i> − 3)", ok:true, fb:"Pull out the shared bracket. The leftovers are 2<i>a</i> and &minus;3."},
-      {t:"(<i>b</i> + 5)(2<i>a</i> + 3)", fb:"The second term is subtracted, so its leftover is &minus;3. See section 6."},
-      {t:"(<i>b</i> + 5)<sup>2</sup>(2<i>a</i> − 3)", fb:"The shared bracket comes out once. See section 6."},
-      {t:"2<i>a</i> − 3", fb:"The bracket was pulled out, not cancelled. See section 6."}
+    /* (x + 2)²(x − 1) = (x² + 4x + 4)(x − 1) = x³ + 3x² − 4 */
+    q6: { ask:"Degree 3, leading coefficient 1, zeros −2 (multiplicity 2) and 1", m:"", opts:[
+      {t:poly([1, 3, 0, -4]), ok:true, fb:"(" + X + " + 2)<sup>2</sup>(" + X + " − 1) = (" + X + "<sup>2</sup> + 4" + X + " + 4)(" + X + " − 1) = " + X + "<sup>3</sup> + 3" + X + "<sup>2</sup> − 4."},
+      {t:poly([1, -3, 0, 4]), fb:"That's (" + X + " − 2)<sup>2</sup>(" + X + " + 1). Each zero's sign flips in its factor. See section 4."},
+      {t:poly([1, 1, -2]), fb:"Multiplicity 2 means (" + X + " + 2) appears twice. That also makes it degree 3. See section 4."},
+      {t:poly([1, -1, 4, -4]), fb:"(" + X + " + 2)<sup>2</sup> is " + X + "<sup>2</sup> + 4" + X + " + 4, not " + X + "<sup>2</sup> + 4. See section 4."}
     ]}
   },
 
   verdicts: {
-    all:"All seven. GCF first, bracket always, multiply back to check.",
-    most:"Close. Go to the section named in each miss and redo those on paper.",
-    few:"Go back to section 3 and redo the drill. Most misses are a lost 1, an unflipped sign, or a factor left inside."
+    all:"All six. You can go from a zero to the factors and back.",
+    most:"Close. Redo the misses on paper, using the section each one names.",
+    few:"Go back to section 1 and work forward. Then do the practice in section 5."
   },
-
-  solver: {
-    ask: "What's the next step?",
-    ok: "Yes, that works here.",
-    done: "Fully factored: nothing left inside any bracket can come out."
-  },
-
-  rules: [
-    {id:"GCF",   nm:"Pull out the common factor", frm:"12<i>x</i><sup>3</sup> + 18<i>x</i><sup>2</sup> = 6<i>x</i><sup>2</sup>(2<i>x</i> + 3)"},
-    {id:"NEG",   nm:"Pull out −1",                frm:"−<i>x</i> + 4 = −(<i>x</i> − 4)"},
-    {id:"DOS",   nm:"Difference of squares",      frm:"<i>a</i><sup>2</sup> − <i>b</i><sup>2</sup> = (<i>a</i> − <i>b</i>)(<i>a</i> + <i>b</i>)"},
-    {id:"GROUP", nm:"Group in pairs",             frm:"four terms, GCF out of each pair"}
-  ],
-
-  generic: {
-    GCF:"Nothing is shared by every term here.",
-    NEG:"The first term is already positive.",
-    DOS:"This isn't two perfect squares with a minus between them.",
-    GROUP:"Grouping is for four terms. This line doesn't have four."
-  },
-
-  problems: [
-    {
-      start:"3<i>x</i><sup>2</sup> − 27",
-      steps:[
-        {rule:"GCF", result:"3(<i>x</i><sup>2</sup> − 9)",
-         note:"Both terms divide by 3. Take it out first; it makes what's left easy to recognise.",
-         wrong:{
-           DOS:"Not yet. 3<i>x</i><sup>2</sup> isn't a perfect square. Take out the 3 first.",
-           GROUP:"Two terms, not four."
-         }},
-        {rule:"DOS", result:"3(<i>x</i> − 3)(<i>x</i> + 3)",
-         note:"<i>x</i><sup>2</sup> &minus; 9 = <i>x</i><sup>2</sup> &minus; 3<sup>2</sup>. The 3 out front stays.",
-         wrong:{GCF:"<i>x</i><sup>2</sup> and 9 share nothing."}}
-      ]
-    },
-    {
-      start:"2<i>x</i><sup>3</sup> + 4<i>x</i><sup>2</sup> + 3<i>x</i> + 6",
-      steps:[
-        {rule:"GROUP", result:"2<i>x</i><sup>2</sup>(<i>x</i> + 2) + 3(<i>x</i> + 2)",
-         note:"First pair: 2<i>x</i><sup>2</sup>(<i>x</i> + 2). Second pair: 3(<i>x</i> + 2). Same bracket twice.",
-         wrong:{
-           GCF:"3<i>x</i> is odd, so nothing is common to all four terms.",
-           DOS:"Four terms. A difference of squares has two."
-         }},
-        {rule:"GCF", result:"(<i>x</i> + 2)(2<i>x</i><sup>2</sup> + 3)",
-         note:"(<i>x</i> + 2) is in both, so it comes out front.",
-         wrong:{GROUP:"Already grouped. This line has two terms now."}}
-      ]
-    },
-    {
-      start:"−<i>x</i><sup>3</sup> + 4<i>x</i>",
-      steps:[
-        {rule:"NEG", result:"−(<i>x</i><sup>3</sup> − 4<i>x</i>)",
-         note:"Clear the leading minus first. Both signs inside flip.",
-         wrong:{
-           DOS:"<i>x</i><sup>3</sup> isn't a perfect square. There's an <i>x</i> to take out first.",
-           GCF:"Taking out <i>x</i> gives <i>x</i>(&minus;<i>x</i><sup>2</sup> + 4), which is also correct. But clearing the minus first keeps the bracket in the usual shape."
-         }},
-        {rule:"GCF", result:"−<i>x</i>(<i>x</i><sup>2</sup> − 4)",
-         note:"<i>x</i> goes into both terms.",
-         wrong:{NEG:"The minus is already out front."}},
-        {rule:"DOS", result:"−<i>x</i>(<i>x</i> − 2)(<i>x</i> + 2)",
-         note:"<i>x</i><sup>2</sup> &minus; 4 = <i>x</i><sup>2</sup> &minus; 2<sup>2</sup>.",
-         wrong:{GCF:"<i>x</i><sup>2</sup> and 4 share nothing."}}
-      ]
-    },
-    {
-      start:"3<i>m</i> − <i>m</i><i>n</i> + 12 − 4<i>n</i>",
-      steps:[
-        {rule:"GROUP", result:"<i>m</i>(3 − <i>n</i>) + 4(3 − <i>n</i>)",
-         note:"3<i>m</i> &minus; <i>mn</i> = <i>m</i>(3 &minus; <i>n</i>) and 12 &minus; 4<i>n</i> = 4(3 &minus; <i>n</i>).",
-         wrong:{
-           GCF:"12 has no <i>m</i> or <i>n</i>, so nothing is common to all four.",
-           DOS:"Four terms."
-         }},
-        {rule:"GCF", result:"(3 − <i>n</i>)(<i>m</i> + 4)",
-         note:"(3 &minus; <i>n</i>) is the common factor.",
-         wrong:{GROUP:"Already grouped."}}
-      ]
-    },
-    {
-      start:"3<i>x</i>(<i>x</i> + 4) − 12(<i>x</i> + 4)",
-      steps:[
-        {rule:"GCF", result:"(<i>x</i> + 4)(3<i>x</i> − 12)",
-         note:"Both terms are (<i>x</i> + 4) times something. The leftovers 3<i>x</i> and &minus;12 go in a bracket.",
-         wrong:{
-           GROUP:"Two terms, not four.",
-           DOS:"Neither term is a perfect square."
-         }},
-        {rule:"GCF", result:"3(<i>x</i> + 4)(<i>x</i> − 4)",
-         note:"Not finished yet: 3<i>x</i> &minus; 12 = 3(<i>x</i> &minus; 4). Always check inside each bracket.",
-         wrong:{
-           DOS:"This is already a product. What's left is a common 3 inside the second bracket.",
-           GROUP:"Two factors, not four terms."
-         }}
-      ]
-    }
-  ],
 
   traps: [
-    {bad:"6<i>x</i> + 9 = 3 <span class='op'>·</span> 2<i>x</i> + 3", badge:"Wrong",
-     why:"Without the bracket, the 3 only multiplies 2<i>x</i>. Write 3(2<i>x</i> + 3).",
-     sub:"x = 1", verdict:"not equal",
-     left:{lbl:"6x + 9", val:"15"},
-     right:{lbl:"3 · 2x + 3", val:"9"}},
-    {bad:"<i>x</i><sup>2</sup> + <i>x</i> = <i>x</i>(<i>x</i>)", badge:"Wrong",
-     why:"Taking <i>x</i> out of <i>x</i> leaves 1. The answer is <i>x</i>(<i>x</i> + 1).",
-     sub:"x = 2", verdict:"not equal",
-     left:{lbl:"x² + x", val:"6"},
-     right:{lbl:"x(x)", val:"4"}},
-    {bad:"−2<i>x</i> + 6 = −2(<i>x</i> + 3)", badge:"Wrong",
-     why:"A negative flips every sign inside. The answer is &minus;2(<i>x</i> &minus; 3).",
-     sub:"x = 1", verdict:"not equal",
-     left:{lbl:"−2x + 6", val:"4"},
-     right:{lbl:"−2(x + 3)", val:"−8"}},
-    {bad:"<i>x</i><sup>2</sup> + 9 = (<i>x</i> + 3)(<i>x</i> + 3)", badge:"Wrong",
-     why:"(<i>x</i> + 3)(<i>x</i> + 3) = <i>x</i><sup>2</sup> + 6<i>x</i> + 9. A sum of squares like <i>x</i><sup>2</sup> + 9 doesn't factor with real numbers.",
-     sub:"x = 1", verdict:"not equal",
-     left:{lbl:"x² + 9", val:"10"},
-     right:{lbl:"(x + 3)(x + 3)", val:"16"}}
+    {bad:"<i>x</i><sup>2</sup> + <i>x</i> divided by <i>x</i> + 2 leaves remainder <i>P</i>(2)", badge:"Wrong",
+     why:"<i>x</i> + 2 is <i>x</i> − (−2), so the remainder is <i>P</i>(−2). The box always holds the number that makes the divisor zero.",
+     sub:"the actual division", verdict:"the remainder is P(−2)",
+     left:{lbl:"remainder, −2 in the box", val:"2"}, right:{lbl:"P(2) = 4 + 2", val:"6"}},
+    {bad:"zeros 2 and −3 give (<i>x</i> + 2)(<i>x</i> − 3)", badge:"Wrong",
+     why:"A zero makes its factor 0. The zero 2 needs <i>x</i> − 2, and −3 needs <i>x</i> + 3: (<i>x</i> − 2)(<i>x</i> + 3).",
+     sub:"x = 2", verdict:"2 is not a zero of it",
+     left:{lbl:"(2 + 2)(2 − 3)", val:"−4"}, right:{lbl:"a zero needs", val:"0"}},
+    {bad:"<i>x</i><sup>3</sup> − 2<i>x</i><sup>2</sup> − 5<i>x</i> + 6 = (<i>x</i> − 3)(<i>x</i><sup>2</sup> + <i>x</i> − 2) is fully factored", badge:"Not done",
+     why:"It's correct but not finished. <i>x</i><sup>2</sup> + <i>x</i> − 2 isn't linear: it's (<i>x</i> + 2)(<i>x</i> − 1). So the answer is (<i>x</i> − 3)(<i>x</i> + 2)(<i>x</i> − 1).",
+     sub:"x = 1", verdict:"so x − 1 is another factor",
+     left:{lbl:"x² + x − 2 at x = 1", val:"0"}, right:{lbl:"so 1 is", val:"another zero"}},
+    {bad:"(<i>x</i> + 2)<sup>2</sup> = <i>x</i><sup>2</sup> + 4", badge:"Wrong",
+     why:"Squaring a bracket means multiplying it by itself: (<i>x</i> + 2)(<i>x</i> + 2) = <i>x</i><sup>2</sup> + 4<i>x</i> + 4.",
+     sub:"x = 1", left:{lbl:"(1 + 2)²", val:"9"}, right:{lbl:"1² + 4", val:"5"}}
   ]
 });
 
 EXP.walks();
 
-/* ---- widgets ---- */
-
-/* un-distributing 12x³ + 18x², chip by chip */
-(function unfactor(){
-  var top = $("#ufTop"), bot = $("#ufBot"), btn = $("#ufBtn"),
-      say = $("#ufSay"), outRow = $("#ufOutRow"), out = $("#ufOut");
-  var TOP = ["2","2","3","x","x","x"], TOPSHARE = [0,2,3,4];
-  var BOT = ["2","3","3","x","x"],     BOTSHARE = [0,1,3,4];
-  var done = false;
-
-  function paint(list, share){
-    return list.map(function(t, i){
-      return {t:t, cls: (done && share.indexOf(i) !== -1) ? "a" : ""};
-    });
-  }
-  function draw(){
-    chipRow(top, paint(TOP, TOPSHARE));
-    chipRow(bot, paint(BOT, BOTSHARE));
-    say.textContent = done
-      ? "shared: 2 · 3 · x · x = 6x² — left over: 2x above, 3 below"
-      : "12 = 2 · 2 · 3 and 18 = 2 · 3 · 3";
-    outRow.style.display = done ? "" : "none";
-    btn.textContent = done ? "Start over" : "Show what they share";
-  }
-  out.innerHTML = "12<i>x</i><sup>3</sup> + 18<i>x</i><sup>2</sup> = 6<i>x</i><sup>2</sup>(2<i>x</i> + 3)";
-  btn.addEventListener("click", function(){ done = !done; draw(); });
-  draw();
-})();
-
-/* the bracket matters: evaluate all three forms at a chosen x */
-(function bracket(){
-  var grid = $("#evalGrid");
-  var btns = $$(".bracketbox .btn");
-
-  function draw(x){
-    var orig = 6 * x + 9, good = 3 * (2 * x + 3), bad = 3 * 2 * x + 3;
-    grid.innerHTML =
-      "<div class='evalcell'><div class='hd'>6<i>x</i> + 9</div>" +
-        "<div class='val'>" + orig + "</div>" +
-        "<div class='tagline'>the original</div></div>" +
-      "<div class='evalcell good'><div class='hd'>3(2<i>x</i> + 3)</div>" +
-        "<div class='val'>" + good + "</div>" +
-        "<div class='tagline'>matches</div></div>" +
-      "<div class='evalcell bad'><div class='hd'>3 <span class='op'>·</span> 2<i>x</i> + 3</div>" +
-        "<div class='val'>" + bad + "</div>" +
-        "<div class='tagline'>does not match</div></div>";
-    btns.forEach(function(b){
-      b.classList.toggle("on", Number(b.getAttribute("data-x")) === x);
-    });
-  }
-  btns.forEach(function(b){
-    b.addEventListener("click", function(){ draw(Number(b.getAttribute("data-x"))); });
-  });
-  draw(1);
-})();
-
-/* swap the shared bracket for a single box, and back */
-(function oneObject(){
-  var btn = $("#bxBtn"), boxed = false;
-  var B = "(<i>x</i> + 2)";
-  function draw(){
-    var f = boxed ? BOX : B;
-    $("#bx0").innerHTML = "<i>x</i>" + f + " + 3" + f;
-    $("#bx1").innerHTML = f + " <span class='op'>·</span> <i>x</i> + " + f + " <span class='op'>·</span> 3";
-    $("#bx2").innerHTML = f + "(<i>x</i> + 3)";
-    btn.textContent = boxed ? "Put the bracket back" : "Show the bracket as one object";
-  }
-  btn.addEventListener("click", function(){ boxed = !boxed; draw(); });
-  draw();
-})();
-
-/* name-the-GCF drill, instantiated twice: numbers and letters, then brackets */
-function gcfDrill(prefix, ITEMS){
-  var i = 0, marks = [];
-  var q = $("#" + prefix + "Q"), fb = $("#" + prefix + "Fb"), cnt = $("#" + prefix + "Count"),
-      pips = $("#" + prefix + "Pips"), btns = $("#" + prefix + "Btns"),
-      res = $("#" + prefix + "Res"), out = $("#" + prefix + "Out"), next = $("#" + prefix + "Next");
+/* ---- stepped practice: vertex-01's ladder() --------------------------------
+   items: [{goal, m, done, parts:[{ask, opts:[right first, ...], why}]}]   */
+function ladder(sel, items, cfg){
+  var host = $(sel); if(!host) return;
+  cfg = cfg || {};
+  host.className = "drill" + (cfg.wide ? " wide" : "");
+  host.innerHTML =
+    "<div class='drill-top'><span class='count'></span><div class='pips'></div></div>" +
+    "<div class='ld-goal'></div><div class='ld-q m'></div><div class='ld-done'></div><div class='ld-ask'></div>" +
+    "<div class='ld-opts'></div><div class='drill-fb'></div><div class='ld-final'></div>" +
+    "<div class='drill-btns'><button type='button' class='btn on ld-next'></button></div>";
+  var goalEl = $(".ld-goal", host), finEl = $(".ld-final", host), qEl = $(".ld-q", host), doneEl = $(".ld-done", host), askEl = $(".ld-ask", host),
+      optsEl = $(".ld-opts", host), fb = $(".drill-fb", host), cnt = $(".count", host),
+      pips = $(".pips", host), next = $(".ld-next", host);
+  var i = 0, p = 0, clean = true, marks = [];
 
   function shuffled(n){
     var a = [], j, t, k;
     for(k = 0; k < n; k++) a.push(k);
-    for(k = a.length - 1; k > 0; k--){
-      j = Math.floor(Math.random() * (k + 1));
-      t = a[k]; a[k] = a[j]; a[j] = t;
-    }
+    for(k = n - 1; k > 0; k--){ j = Math.floor(Math.random() * (k + 1)); t = a[k]; a[k] = a[j]; a[j] = t; }
     return a;
   }
   function drawPips(){
     pips.innerHTML = "";
-    ITEMS.forEach(function(_, k){
-      var p = document.createElement("span");
-      p.className = "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
-                    (k === i ? " now" : "");
-      pips.appendChild(p);
+    items.forEach(function(_, k){
+      pips.appendChild(EXP.el("span", "pip" + (marks[k] === true ? " ok" : marks[k] === false ? " no" : "") +
+                                     (k === i ? " now" : "")));
     });
   }
-  function draw(){
-    var it = ITEMS[i];
-    q.innerHTML = it.m;
-    cnt.textContent = (i + 1) + " of " + ITEMS.length;
-    fb.className = "drill-fb"; fb.textContent = "";
-    res.className = "drill-res";
+  function drawItem(){
+    p = 0; clean = true;
+    goalEl.innerHTML = items[i].goal || cfg.goal || "";
+    qEl.innerHTML = items[i].m;
+    doneEl.innerHTML = "";
+    finEl.innerHTML = "";
+    cnt.textContent = "Problem " + (i + 1) + " of " + items.length;
+    drawPips();
+    drawPart();
+  }
+  function drawPart(){
+    var it = items[i], part = it.parts[p], n = it.parts.length;
+    askEl.innerHTML = (n > 1 ? "<span class='ld-step'>Step " + (p + 1) + " of " + n + "</span>" : "") + part.ask;
+    fb.className = "drill-fb"; fb.innerHTML = "";
     next.style.display = "none";
-    btns.innerHTML = "";
-    shuffled(it.picks.length).forEach(function(idx){
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "optbtn";
-      b._idx = idx;
-      b.innerHTML = it.picks[idx];
-      b.addEventListener("click", function(){ answer(idx, b, it); });
-      btns.appendChild(b);
+    optsEl.innerHTML = "";
+    shuffled(part.opts.length).forEach(function(k){
+      var b = EXP.el("button", "ldbtn", part.opts[k]);
+      b.type = "button"; b._k = k;
+      b.addEventListener("click", function(){ answer(k, b); });
+      optsEl.appendChild(b);
     });
-    drawPips();
   }
-  function answer(idx, btn, it){
-    var right = (idx === it.ok);
-    if(marks[i] === undefined) marks[i] = right;
-    Array.prototype.slice.call(btns.children).forEach(function(c){
-      c.disabled = true;
-      if(c._idx === it.ok) c.classList.add("right");
-    });
-    if(!right) btn.classList.add("wrongpick");
+  function answer(k, b){
+    var it = items[i], part = it.parts[p], right = (k === 0), last = (p === it.parts.length - 1);
+    if(!right) clean = false;
+    $$(".ldbtn", optsEl).forEach(function(c){ c.disabled = true; if(c._k === 0) c.classList.add("right"); });
+    if(!right) b.classList.add("wrongpick");
     fb.className = "drill-fb " + (right ? "ok" : "no");
-    fb.innerHTML = (right ? "Correct. " : "No — the GCF is " + it.picks[it.ok] + ". ") + it.why;
-    out.innerHTML = it.out;
-    res.className = "drill-res show";
-    next.style.display = (i < ITEMS.length - 1) ? "" : "none";
-    if(i === ITEMS.length - 1){
-      var n = marks.filter(function(v){ return v; }).length;
-      fb.innerHTML += "<div class='drill-end'>" + n + " of " + ITEMS.length + " right first time.</div>";
+    fb.innerHTML = (right ? "Right. " : "Not quite. ") + part.why;
+    if(last){
+      if(it.done) finEl.innerHTML = "<span class='lbl'>" + (it.doneLbl || cfg.doneLbl || "Finished") +
+        "</span><span class='m'>" + it.done + "</span>";
+      if(marks[i] === undefined) marks[i] = clean;
+      drawPips();
+      if(i === items.length - 1){
+        var got = marks.filter(function(v){ return v; }).length;
+        fb.innerHTML += "<div class='drill-end'>" + got + " of " + items.length + " right first time. " + (cfg.end || "") + "</div>";
+      }
     }
-    drawPips();
+    next.textContent = !last ? "Next step" : (i < items.length - 1 ? "Next problem" : "Start again");
+    next.style.display = "";
   }
-  next.addEventListener("click", function(){ i++; draw(); });
-  draw();
+  next.addEventListener("click", function(){
+    var it = items[i];
+    if(p < it.parts.length - 1){
+      doneEl.insertAdjacentHTML("beforeend", "<div class='ld-line'><span>" + it.parts[p].ask +
+        "</span><span class='m'>" + it.parts[p].opts[0] + "</span></div>");
+      p++; drawPart();
+    }else{
+      if(i < items.length - 1) i++; else { i = 0; marks = []; }
+      drawItem();
+    }
+  });
+  drawItem();
 }
 
-/* drill one: the common factor is a number, a letter, or neither */
-gcfDrill("g1", [
-  {m:"12<i>x</i> + 18", ok:0, picks:["6", "2", "3", "12"],
-   out:"6(2<i>x</i> + 3)",
-   why:"6 is the largest number dividing both 12 and 18. There is no x in 18, so no letter comes out."},
-  {m:"<i>x</i><sup>3</sup> + <i>x</i><sup>2</sup>", ok:0,
-   picks:["<i>x</i><sup>2</sup>", "<i>x</i><sup>3</sup>", "<i>x</i>", "<i>x</i><sup>5</sup>"],
-   out:"<i>x</i><sup>2</sup>(<i>x</i> + 1)",
-   why:"Take the lowest power present. x² divides x³; x³ does not divide x²."},
-  {m:"8<i>y</i><sup>2</sup> − 12<i>y</i>", ok:0,
-   picks:["4<i>y</i>", "4", "2<i>y</i>", "4<i>y</i><sup>2</sup>"],
-   out:"4<i>y</i>(2<i>y</i> − 3)",
-   why:"Number and letter separately: 4 divides 8 and 12, and the lowest power of y is y itself."},
-  {m:"10<i>a</i><sup>2</sup><i>b</i> + 15<i>a</i><i>b</i><sup>2</sup>", ok:0,
-   picks:["5<i>a</i><i>b</i>", "5<i>a</i><sup>2</sup><i>b</i><sup>2</sup>", "<i>a</i><i>b</i>", "5"],
-   out:"5<i>a</i><i>b</i>(2<i>a</i> + 3<i>b</i>)",
-   why:"5 divides 10 and 15; a and b each appear in both terms, to the first power at least."},
-  {m:"7<i>m</i> + 7", ok:0, picks:["7", "7<i>m</i>", "<i>m</i>", "14"],
-   out:"7(<i>m</i> + 1)",
-   why:"There is no m in the second term. Taking the whole 7 out of it leaves 1 behind."},
-  {m:"4<i>a</i> + 9<i>b</i>", ok:0,
-   picks:["nothing — the GCF is 1", "4", "<i>a</i><i>b</i>", "36"],
-   out:"4<i>a</i> + 9<i>b</i> — already done",
-   why:"4 and 9 share no factor, and neither letter is in both terms. Sometimes there is nothing to take out."}
-]);
-
-/* drill two: now the common factor can be a whole bracket */
-gcfDrill("g2", [
-  {m:"<i>x</i>(<i>x</i> + 2) + 3(<i>x</i> + 2)", ok:0,
-   picks:["(<i>x</i> + 2)", "<i>x</i>", "3", "(<i>x</i> + 3)"],
-   out:"(<i>x</i> + 2)(<i>x</i> + 3)",
-   why:"Both terms are (x + 2) times something. The leftovers x and 3 go inside the second bracket."},
-  {m:"5(<i>a</i> − 1) + <i>b</i>(<i>a</i> − 1)", ok:0,
-   picks:["(<i>a</i> − 1)", "5<i>b</i>", "(5 + <i>b</i>)", "5"],
-   out:"(<i>a</i> − 1)(5 + <i>b</i>)",
-   why:"(a − 1) multiplies both terms. 5 and b are the leftovers, and they stay added."},
-  {m:"<i>w</i>(<i>w</i> − 3) + (<i>w</i> − 3)", ok:0,
-   picks:["(<i>w</i> − 3)", "<i>w</i>", "(<i>w</i> − 3)<sup>2</sup>", "nothing — the GCF is 1"],
-   out:"(<i>w</i> − 3)(<i>w</i> + 1)",
-   why:"The second term is one copy of the bracket, so it leaves a 1 behind — the invisible 1 again."},
-  {m:"2<i>y</i>(<i>y</i> + 4) − 7(<i>y</i> + 4)", ok:0,
-   picks:["(<i>y</i> + 4)", "(<i>y</i> − 4)", "2<i>y</i>", "(2<i>y</i> − 7)"],
-   out:"(<i>y</i> + 4)(2<i>y</i> − 7)",
-   why:"The minus belongs to the 7, not to the bracket. Both terms carry the same (y + 4)."},
-  {m:"4(<i>p</i> + 3) + <i>q</i>(<i>p</i> − 3)", ok:0,
-   picks:["nothing — the GCF is 1", "(<i>p</i> + 3)", "(<i>p</i> − 3)", "(<i>p</i> + 3)(<i>p</i> − 3)"],
-   out:"4(<i>p</i> + 3) + <i>q</i>(<i>p</i> − 3) — already done",
-   why:"The brackets are not identical, and a shared factor has to be shared exactly. Nothing comes out."},
-  {m:"(<i>x</i> + 1)(<i>x</i> + 5) + (<i>x</i> + 1)(<i>x</i> − 2)", ok:0,
-   picks:["(<i>x</i> + 1)", "(<i>x</i> + 5)", "(<i>x</i> − 2)", "(<i>x</i> + 1)<sup>2</sup>"],
-   out:"(<i>x</i> + 1)(2<i>x</i> + 3)",
-   why:"(x + 1) is in both terms. The leftovers add: (x + 5) + (x − 2) = 2x + 3."}
-]);
-
-
-/* right or wrong? multiply back to check */
-EXP.drill("#brDrill", {
-  choices:[{k:"ok", t:"Right"}, {k:"no", t:"Wrong"}],
-  end:"Multiplying back out catches every one of these.",
-  items:[
-    {m:"5<i>x</i> + 5 = 5(<i>x</i> + 1)", a:"ok", why:"5 &middot; <i>x</i> = 5<i>x</i> and 5 &middot; 1 = 5."},
-    {m:"6<i>x</i> + 9 = 3 <span class='op'>·</span> 2<i>x</i> + 3", a:"no", why:"No bracket, so the 3 only reaches 2<i>x</i>. It should be 3(2<i>x</i> + 3)."},
-    {m:"<i>x</i><sup>2</sup> + <i>x</i> = <i>x</i>(<i>x</i>)", a:"no", why:"Multiplying back gives only <i>x</i><sup>2</sup>. It should be <i>x</i>(<i>x</i> + 1)."},
-    {m:"4<i>x</i> − 8 = 4(<i>x</i> − 2)", a:"ok", why:"4 &middot; <i>x</i> = 4<i>x</i> and 4 &middot; (&minus;2) = &minus;8."},
-    {m:"−3<i>x</i> + 12 = −3(<i>x</i> + 4)", a:"no", why:"&minus;3 &middot; 4 = &minus;12, not +12. It should be &minus;3(<i>x</i> &minus; 4)."},
-    {m:"2<i>x</i><sup>2</sup> + 6<i>x</i> = 2<i>x</i>(<i>x</i> + 3)", a:"ok", why:"2<i>x</i> &middot; <i>x</i> = 2<i>x</i><sup>2</sup> and 2<i>x</i> &middot; 3 = 6<i>x</i>."},
-    {m:"10 − 5<i>y</i> = 5(2 − <i>y</i>)", a:"ok", why:"5 &middot; 2 = 10 and 5 &middot; (&minus;<i>y</i>) = &minus;5<i>y</i>."},
-    {m:"<i>x</i><sup>3</sup> + <i>x</i><sup>2</sup> = <i>x</i><sup>3</sup>(1 + <i>x</i>)", a:"no", why:"<i>x</i><sup>3</sup> doesn't go into <i>x</i><sup>2</sup>. It should be <i>x</i><sup>2</sup>(<i>x</i> + 1)."}
-  ]
-});
+var F = "<i>f</i>(" + X + ") = ";
+ladder("#ldPractice", [
+  /* P(−3) for x³ − 5x + 2: row 1, 0, −5, 2; box −3: 1, −3, 4, −10. Check −27 + 15 + 2 = −10 */
+  {goal:"Find " + P + "(−3) with synthetic division.", m:P + "(" + X + ") = " + poly([1, 0, -5, 2]), done:P + "(−3) = −10", parts:[
+    {ask:"The row of coefficients:", opts:["1, &nbsp;0, &nbsp;−5, &nbsp;2", "1, &nbsp;−5, &nbsp;2", "0, &nbsp;1, &nbsp;−5, &nbsp;2", "1, &nbsp;5, &nbsp;2"],
+     why:"There's no " + X + "<sup>2</sup> term, so it gets a 0."},
+    {ask:"The number in the box:", opts:["−3", "3", "2", "−5"],
+     why:"We want " + P + "(−3), so −3."},
+    {ask:"The bottom row ends in", opts:["−10", "14", "4", "−3"],
+     why:"1, then −3, then −5 + 9 = 4, then 2 + (−12) = −10. Check: −27 + 15 + 2 = −10."}
+  ]},
+  /* x³ − 3x² − 6x + 8: P(4) = 64 − 48 − 24 + 8 = 0 */
+  {goal:"Is " + X + " − 4 a factor?", m:P + "(" + X + ") = " + poly([1, -3, -6, 8]), done:"Yes: " + P + "(4) = 0", parts:[
+    {ask:"Which number do you test?", opts:["4", "−4", "8", "−3"],
+     why:X + " − 4 is zero at " + X + " = 4."},
+    {ask:P + "(4) =", opts:["0", "−80", "8", "64"],
+     why:"64 − 48 − 24 + 8 = 0. (−80 is " + P + "(−4).)"},
+    {ask:"So", opts:[X + " − 4 is a factor", X + " − 4 is not a factor", X + " + 4 is a factor", "4 is not a zero"],
+     why:"A remainder of 0 means it divides in evenly."}
+  ]},
+  /* −2 is a zero of x³ − 7x − 6: row 1, 0, −7, −6; box −2: 1, −2, −3, 0 -> (x − 3)(x + 1) */
+  {goal:"−2 is a zero. Factor completely.", m:F + poly([1, 0, -7, -6]), done:"(" + X + " + 2)(" + X + " − 3)(" + X + " + 1)", parts:[
+    {ask:"The bottom row, with −2 in the box:", opts:["1, &nbsp;−2, &nbsp;−3, &nbsp;0", "1, &nbsp;2, &nbsp;−3, &nbsp;−12", "1, &nbsp;−9, &nbsp;12", "1, &nbsp;−2, &nbsp;−3, &nbsp;6"],
+     why:"Row 1, 0, −7, −6. Bring down 1. −2 → 0 + (−2) = −2. 4 → −7 + 4 = −3. 6 → −6 + 6 = 0."},
+    {ask:"The quadratic left over:", opts:[poly([1, -2, -3]), poly([1, -2, -3, 0]), poly([1, -9, 12]), poly([1, -3])],
+     why:"1, −2, −3 is one power lower than the cubic."},
+    {ask:"Factored:", opts:["(" + X + " − 3)(" + X + " + 1)", "(" + X + " + 3)(" + X + " − 1)", "(" + X + " − 1)(" + X + " − 3)", "(" + X + " + 3)(" + X + " + 1)"],
+     why:"−3 · 1 = −3 and −3 + 1 = −2."}
+  ]},
+  /* 1 is a zero of 3x³ + 4x² − 5x − 2: box 1: 3, 7, 2, 0 -> 3x² + 7x + 2 = (3x + 1)(x + 2) */
+  {goal:"1 is a zero. Factor completely.", m:F + poly([3, 4, -5, -2]), done:"(" + X + " − 1)(3" + X + " + 1)(" + X + " + 2)", parts:[
+    {ask:"The bottom row, with 1 in the box:", opts:["3, &nbsp;7, &nbsp;2, &nbsp;0", "3, &nbsp;1, &nbsp;−6, &nbsp;4", "3, &nbsp;4, &nbsp;−5, &nbsp;−2", "3, &nbsp;7, &nbsp;12, &nbsp;10"],
+     why:"Bring down 3. 3 → 4 + 3 = 7. 7 → −5 + 7 = 2. 2 → −2 + 2 = 0."},
+    {ask:"Factor 3" + X + "<sup>2</sup> + 7" + X + " + 2:", opts:["(3" + X + " + 1)(" + X + " + 2)", "(3" + X + " + 2)(" + X + " + 1)", "(3" + X + " − 1)(" + X + " − 2)", "(" + X + " + 3)(" + X + " + 2)"],
+     why:"Diamond: 3 · 2 = 6, and 6 + 1 = 7. So 3" + X + "<sup>2</sup> + 6" + X + " + " + X + " + 2 = 3" + X + "(" + X + " + 2) + 1(" + X + " + 2)."}
+  ]},
+  /* zeros 1, −1, 3, leading coefficient 2: 2(x² − 1)(x − 3) = 2x³ − 6x² − 2x + 6 */
+  {goal:"Degree 3, leading coefficient 2, zeros 1, −1 and 3.", m:F + "?", done:poly([2, -6, -2, 6]), parts:[
+    {ask:"The factors:", opts:["2(" + X + " − 1)(" + X + " + 1)(" + X + " − 3)", "2(" + X + " + 1)(" + X + " − 1)(" + X + " + 3)", "(" + X + " − 1)(" + X + " + 1)(" + X + " − 3)", "(" + X + " − 2)(" + X + " − 1)(" + X + " + 1)(" + X + " − 3)"],
+     why:"One factor per zero, and the leading coefficient 2 in front. It's a number, not a zero."},
+    {ask:"(" + X + " − 1)(" + X + " + 1) =", opts:[X + "<sup>2</sup> − 1", X + "<sup>2</sup> + 1", X + "<sup>2</sup> − 2" + X + " + 1", X + "<sup>2</sup> + 2" + X + " − 1"],
+     why:"The middle terms cancel: −" + X + " + " + X + " = 0."},
+    {ask:"(" + X + "<sup>2</sup> − 1)(" + X + " − 3) =", opts:[poly([1, -3, -1, 3]), poly([1, -3, 1, -3]), poly([1, -3, -1, -3]), poly([1, 3, -1, -3])],
+     why:X + "<sup>3</sup> − 3" + X + "<sup>2</sup> − " + X + " + 3."},
+    {ask:"Times 2:", opts:[poly([2, -6, -2, 6]), poly([2, -3, -1, 3]), poly([2, -6, -2, 3]), poly([2, -6, 2, -6])],
+     why:"Every term doubles."}
+  ]}
+], {wide:true, doneLbl:"Answer", end:"Missed some? Check each one by multiplying back or plugging in."});
 
 })();
 </script>
